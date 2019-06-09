@@ -91,9 +91,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Dot.png" />
+    <Content Include="Note8_.png" />
     <Content Include="NoteWord.ico" />
     <None Include="Resources\NewIcon.png" />
     <Content Include="Rain.png" />
+    <Content Include="Star.png" />
     <Content Include="Tray.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -21,11 +21,12 @@ namespace ChordingCoding
         public enum Theme { Forest, Rain, Star }
         static OutputDevice outDevice;
         static bool _isReady = false;
-        static int _opacity = 100;
+        static int _opacity = 80;
         static int _volume = 100;
         static int frameNumber = 0;         // 실행 후 지금까지 지난 프레임 수
         static Theme _theme = Theme.Forest;
         static List<ParticleSystem> particleSystems = new List<ParticleSystem>();
+        static ParticleSystem basicParticleSystem = null;
         Bitmap bitmap;
         public static Form1 form1;
         public const float frame = 32f;     // 1초에 전환되는 화면의 프레임 수
@@ -120,8 +121,8 @@ namespace ChordingCoding
             form.ShowInTaskbar = false;
 
             Opacity = opacity / 100D;
-            trackBarMenuItem1.Value = opacity;
-            trackBarMenuItem2.Value = volume;
+            trackBarMenuItem1.Value = opacity / 5;
+            trackBarMenuItem2.Value = volume / 5;
             불투명도ToolStripMenuItem.Text = "불투명도 (" + opacity + "%)";
             음량ToolStripMenuItem.Text = "음량 (" + volume + "%)";
 
@@ -129,6 +130,7 @@ namespace ChordingCoding
             비오는날ToolStripMenuItem.CheckState = CheckState.Unchecked;
             별헤는밤ToolStripMenuItem.CheckState = CheckState.Unchecked;
             _theme = Theme.Forest;
+            basicParticleSystem = null;
 
             bitmap = new Bitmap(Width, Height);
             
@@ -177,6 +179,7 @@ namespace ChordingCoding
             // 각 파티클 시스템 객체의 Update 함수 호출
             foreach (ParticleSystem ps in particleSystems)
             {
+                // 수명이 다한 파티클 시스템 처리
                 if (ps.CanDestroy())
                 {
                     deadParticleSystem.Add(ps);
@@ -191,6 +194,11 @@ namespace ChordingCoding
                 particleSystems.Remove(dead);
             }
 
+            if (basicParticleSystem != null)
+            {
+                basicParticleSystem.Update();
+            }
+
             if (opacity > 0)
                 Invalidate(true);   // 화면을 다시 그리게 함
         }
@@ -202,6 +210,8 @@ namespace ChordingCoding
             {
                 ps.Draw(e.Graphics);
             }
+            if (basicParticleSystem != null)
+                basicParticleSystem.Draw(e.Graphics);
         }
 
         /// <summary>
@@ -225,6 +235,18 @@ namespace ChordingCoding
                                                        createNumber, createRange, createFunction,
                                                        particleType, particleColor, particleSize, particleLifetime);
             particleSystems.Add(ps);
+        }
+
+        /// <summary>
+        /// 기본 파티클 시스템에 파티클을 추가합니다.
+        /// </summary>
+        public static void AddParticleToBasicParticleSystem(Chord.Root pitch = Chord.Root.C)
+        {
+            if (basicParticleSystem == null) return;
+            if (theme == Theme.Rain)
+                basicParticleSystem.AddParticleInBasic(Particle.Type.note, 64, Chord.PitchColor(pitch), 0.1f);
+            else if (theme == Theme.Star)
+                basicParticleSystem.AddParticleInBasic(Particle.Type.star, 32, Chord.PitchColor(pitch), 2.3f);
         }
 
         /// <summary>
@@ -269,7 +291,7 @@ namespace ChordingCoding
 
         private void trackBarMenuItem1_ValueChanged(object sender, EventArgs e)
         {
-            opacity = trackBarMenuItem1.Value;
+            opacity = trackBarMenuItem1.Value * 5;
             Opacity = opacity / 100D;
             불투명도ToolStripMenuItem.Text = "불투명도 (" + opacity + "%)";
         }
@@ -277,7 +299,7 @@ namespace ChordingCoding
 
         private void trackBarMenuItem2_ValueChanged(object sender, EventArgs e)
         {
-            volume = trackBarMenuItem2.Value;
+            volume = trackBarMenuItem2.Value * 5;
             음량ToolStripMenuItem.Text = "음량 (" + volume + "%)";
         }
 
@@ -294,6 +316,7 @@ namespace ChordingCoding
                 비오는날ToolStripMenuItem.CheckState = CheckState.Unchecked;
                 별헤는밤ToolStripMenuItem.CheckState = CheckState.Unchecked;
                 _theme = Theme.Forest;
+                basicParticleSystem = null;
 
                 StopPlaying(0);
                 StopPlaying(1);
@@ -310,6 +333,11 @@ namespace ChordingCoding
                 비오는날ToolStripMenuItem.CheckState = CheckState.Checked;
                 별헤는밤ToolStripMenuItem.CheckState = CheckState.Unchecked;
                 _theme = Theme.Rain;
+                basicParticleSystem = new ParticleSystem(
+                                    /*cNum*/ 1, /*cRange*/ 0,
+                                    ParticleSystem.CreateFunction.TopRandom,
+                                    Particle.Type.rain, Color.CornflowerBlue,
+                                    /*pSize*/ 0.3f, /*pLife*/ 32);
 
                 StopPlaying(0);
                 StopPlaying(1);
@@ -326,6 +354,11 @@ namespace ChordingCoding
                 비오는날ToolStripMenuItem.CheckState = CheckState.Unchecked;
                 별헤는밤ToolStripMenuItem.CheckState = CheckState.Checked;
                 _theme = Theme.Star;
+                basicParticleSystem = new ParticleSystem(
+                                    /*cNum*/ 1, /*cRange*/ 0,
+                                    ParticleSystem.CreateFunction.Random,
+                                    Particle.Type.star, Color.Black,
+                                    /*pSize*/ 1f, /*pLife*/ 64);
 
                 StopPlaying(0);
                 StopPlaying(1);

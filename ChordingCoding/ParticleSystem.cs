@@ -9,7 +9,7 @@ namespace ChordingCoding
 {
     public class ParticleSystem
     {
-        public enum CreateFunction { Gaussian }
+        public enum CreateFunction { Gaussian, DiracDelta, TopRandom, Random }
         public float positionX;
         public float positionY;
         public float velocityX;
@@ -22,11 +22,15 @@ namespace ChordingCoding
         public Color particleColor;
         public float particleSize;
         public int particleLifetime;                                    // 각 파티클의 초기 수명
+        public bool isBasicParticleSystem = false;
 
         public List<Particle> particles = new List<Particle>();         // 생성한 파티클 목록
 
         private Random random = new Random();
 
+        /// <summary>
+        /// 새 파티클 시스템을 생성합니다.
+        /// </summary>
         public ParticleSystem(float startPosX, float startPosY, float velocityX, float velocityY, int lifetime, 
             int createNumber, float createRange, CreateFunction createFunction,
             Particle.Type particleType, Color particleColor, float particleSize, int particleLifetime)
@@ -47,6 +51,34 @@ namespace ChordingCoding
             this.particleSize = particleSize;
             this.particleLifetime = particleLifetime;
 
+            this.isBasicParticleSystem = false;
+        }
+
+        /// <summary>
+        /// 테마에 맞는 기본 파티클 시스템을 생성합니다.
+        /// 기본 파티클 시스템은 테마가 바뀔 때까지 사라지지 않고, 키보드 입력에 따라 파티클을 생성합니다.
+        /// </summary>
+        public ParticleSystem(
+            int createNumber, float createRange, CreateFunction createFunction,
+            Particle.Type particleType, Color particleColor, float particleSize, int particleLifetime)
+        {
+            //Random r = new Random();
+            this.positionX = 0;
+            this.positionY = 0;
+            this.velocityX = 0;
+            this.velocityY = 0;
+            this.lifetime = -1;
+
+            this.createNumber = createNumber;
+            this.createRange = createRange;
+            this.createFunction = createFunction;
+
+            this.particleType = particleType;
+            this.particleColor = particleColor;
+            this.particleSize = particleSize;
+            this.particleLifetime = particleLifetime;
+
+            this.isBasicParticleSystem = true;
         }
 
         /// <summary>
@@ -77,7 +109,7 @@ namespace ChordingCoding
                 particles.Remove(dead);
             }
 
-            if (lifetime > 0)
+            if (lifetime > 0 && !isBasicParticleSystem)
             {
                 // 새 파티클 생성
                 for (int i = 0; i < createNumber; i++)
@@ -98,6 +130,19 @@ namespace ChordingCoding
                 // 파티클 시스템의 수명 감소
                 lifetime--;
             }
+            else if (isBasicParticleSystem && particleType != Particle.Type.star)
+            {
+                for (int i = 0; i < createNumber; i++)
+                {
+                    // 한 파티클 시스템 당 최대 파티클 개수 200개로 제한
+                    if (particles.Count >= 200)
+                    {
+                        particles.RemoveAt(0);
+                    }
+                    ParticlePosition(out float posX, out float posY);
+                    particles.Add(new Particle(particleType, posX, posY, particleLifetime, particleColor, particleSize));
+                }
+            }
         }
 
         /// <summary>
@@ -117,11 +162,32 @@ namespace ChordingCoding
         /// <returns></returns>
         public bool CanDestroy()
         {
-            return lifetime <= 0 && particles.Count == 0;
+            return lifetime <= 0 && particles.Count == 0 && !isBasicParticleSystem;
+        }
+
+        /// <summary>
+        /// 기본 파티클 시스템에 새 파티클을 createNumber만큼 추가합니다.
+        /// </summary>
+        public void AddParticleInBasic(Particle.Type particleType, int particleLifetime, Color particleColor, float particleSize)
+        {
+            if (!isBasicParticleSystem) return;
+
+            // 새 파티클 생성
+            for (int i = 0; i < createNumber; i++)
+            {
+                // 한 파티클 시스템 당 최대 파티클 개수 200개로 제한
+                if (particles.Count >= 200)
+                {
+                    particles.RemoveAt(0);
+                }
+                ParticlePosition(out float posX, out float posY);
+                particles.Add(new Particle(particleType, posX, posY, particleLifetime, particleColor, particleSize));
+            }
         }
 
         /// <summary>
         /// 새로 생성될 파티클의 위치를 결정해 주는 함수입니다.
+        /// createFunction으로 계산됩니다.
         /// posX, posY로 결과가 반환됩니다.
         /// </summary>
         /// <param name="posX">새 파티클의 X좌표</param>
@@ -130,14 +196,26 @@ namespace ChordingCoding
         {
             posX = positionX;
             posY = positionY;
-            float r1 = GaussianRandom(random);
-            float r2 = GaussianRandom(random);
 
             switch (createFunction)
             {
                 case CreateFunction.Gaussian:
+                    float r1 = GaussianRandom(random);
+                    float r2 = GaussianRandom(random);
                     posX = positionX + createRange * r1;
                     posY = positionY + createRange * r2;
+                    break;
+                case CreateFunction.DiracDelta:
+                    posX = positionX;
+                    posY = positionY;
+                    break;
+                case CreateFunction.TopRandom:
+                    posX = (float)(random.NextDouble() * Form1.form1.Size.Width);
+                    posY = 0;
+                    break;
+                case CreateFunction.Random:
+                    posX = (float)(random.NextDouble() * Form1.form1.Size.Width);
+                    posY = (float)(random.NextDouble() * Form1.form1.Size.Height);
                     break;
             }
         }

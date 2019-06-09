@@ -55,6 +55,20 @@ namespace ChordingCoding
                             pitch = Form1.chord.NextNote();
                             Form1.PlayANote(pitch - 12, 14, 0, 96);
                             Form1.PlayANote(pitch, 16, 1);
+                            //Form1.AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
+                            //Form1.PlayANote(vkCode % 24 + 50);
+                            break;
+                        case Form1.Theme.Rain:
+                            pitch = Form1.chord.NextNote();
+                            Form1.PlayANote(pitch - 12, 14, 0, 96);
+                            Form1.PlayANote(pitch, 16, 1);
+                            Form1.AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
+                            break;
+                        case Form1.Theme.Star:
+                            pitch = Form1.chord.NextNote();
+                            Form1.PlayANote(pitch - 12, 14, 0, 96);
+                            Form1.PlayANote(pitch, 16, 1);
+                            Form1.AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
                             //Form1.PlayANote(vkCode % 24 + 50);
                             break;
                     }
@@ -83,19 +97,33 @@ namespace ChordingCoding
                             }
                             if (Form1.form1 != null)
                             {
-                                /* Starfall */
-                                Form1.AddParticleSystem(
-                                    /*posX*/ (float)(r.NextDouble() * Form1.form1.Size.Width),
-                                    /*posY*/ (float)(r.NextDouble() * Form1.form1.Size.Height * 2 / 3 - Form1.form1.Size.Height / 6),
-                                    /*velX*/ 2, /*velY*/ 8, /*life*/ 64,
-                                    /*cNum*/ 10, /*cRange*/ 5,
-                                    ParticleSystem.CreateFunction.Gaussian,
-                                    Particle.Type.dot, Form1.chord.ChordColor(),
-                                    /*pSize*/ 1, /*pLife*/ 20);
+                                // TODO
                             }
                             break;
 
                         case Form1.Theme.Rain:
+                            Form1.StopPlaying(0);
+                            Form1.chord = new Chord(Form1.theme, Form1.chord);
+                            pitch = Form1.chord.NextNote();
+                            Form1.PlayANote(pitch, 16, 1);
+                            foreach (int p in Form1.chord.NextChord())
+                            {
+                                Form1.PlayANote((p + 6) % 12 + 54, 14, 0, 96);
+                            }
+                            if (Form1.form1 != null)
+                            {
+                                /* Rain */
+                                Form1.AddParticleSystem(
+                                    /*posX*/ 0,
+                                    /*posY*/ 0,
+                                    /*velX*/ 0, /*velY*/ 0, /*life*/ 32,
+                                    /*cNum*/ 1, /*cRange*/ 0,
+                                    ParticleSystem.CreateFunction.TopRandom,
+                                    Particle.Type.rain, Color.CornflowerBlue,
+                                    /*pSize*/ 0.3f, /*pLife*/ 32);
+                            }
+                            break;
+                        case Form1.Theme.Star:
                             Form1.StopPlaying(0);
                             Form1.chord = new Chord(Form1.theme, Form1.chord);
                             pitch = Form1.chord.NextNote();
@@ -107,15 +135,15 @@ namespace ChordingCoding
                             }
                             if (Form1.form1 != null)
                             {
-                                /* Rain */
+                                /* Starfall */
                                 Form1.AddParticleSystem(
                                     /*posX*/ (float)(r.NextDouble() * Form1.form1.Size.Width),
-                                    /*posY*/ 0,
-                                    /*velX*/ 0.2f, /*velY*/ 16, /*life*/ 160,
-                                    /*cNum*/ 1, /*cRange*/ 0,
+                                    /*posY*/ (float)(r.NextDouble() * Form1.form1.Size.Height * 2 / 3 - Form1.form1.Size.Height / 6),
+                                    /*velX*/ 2, /*velY*/ 8, /*life*/ 64,
+                                    /*cNum*/ 10, /*cRange*/ 5,
                                     ParticleSystem.CreateFunction.Gaussian,
-                                    Particle.Type.rain, Color.CornflowerBlue,
-                                    /*pSize*/ 0.5f, /*pLife*/ 1);
+                                    Particle.Type.dot, Form1.chord.ChordColor(),
+                                    /*pSize*/ 1, /*pLife*/ 20);
                             }
                             break;
                     }

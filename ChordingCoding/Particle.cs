@@ -10,11 +10,13 @@ namespace ChordingCoding
 {
     public class Particle
     {
-        public enum Type { dot, rain }
+        public enum Type { dot, rain, note, star }
         public Type type;
         public Image image;
         public float positionX;
         public float positionY;
+        public float velocityX;
+        public float velocityY;
         public int initialLifetime;
         public int lifetime;
         public Color initialColor;
@@ -29,9 +31,23 @@ namespace ChordingCoding
             {
                 case Type.dot:
                     image = Properties.Resources.Dot;
+                    velocityX = 0;
+                    velocityY = 0;
                     break;
                 case Type.rain:
                     image = Properties.Resources.Rain;
+                    velocityX = 0;
+                    velocityY = 30;
+                    break;
+                case Type.note:
+                    image = Properties.Resources.Note8_;
+                    velocityX = 0;
+                    velocityY = 15;
+                    break;
+                case Type.star:
+                    image = Properties.Resources.Star;
+                    velocityX = 0;
+                    velocityY = 0;
                     break;
             }
 
@@ -58,9 +74,13 @@ namespace ChordingCoding
         /// </summary>
         public void Update()
         {
-            // TODO
             if (lifetime > 0)
             {
+                // 위치 이동
+                positionX += velocityX;
+                positionY += velocityY;
+
+                // 파티클의 수명 감소
                 lifetime--;
             }
         }
@@ -71,13 +91,14 @@ namespace ChordingCoding
         public void Draw(Graphics g)
         {
             // TODO
-            // Additive Alpha Blending
+            // Additive Blending
             // https://stackoverflow.com/questions/12170894/drawing-image-with-additive-blending
+            // https://stackoverflow.com/questions/726549/algorithm-for-additive-color-mixing-for-rgb-values
 
             if (lifetime > 0)
             {
                 RectangleF rf = new RectangleF(positionX, positionY, image.Width * size, image.Height * size);
-                if (type == Type.dot)
+                if (type == Type.dot || type == Type.star)
                 {
                     UpdateImageAtt(initialColor.R / 255f, initialColor.G / 255f, initialColor.B / 255f,
                         initialColor.A / 255f * lifetime * lifetime / initialLifetime / initialLifetime);

@@ -23,7 +23,7 @@ namespace ChordingCoding
         {
             var t = new TrackBar()
             {
-                TickStyle = TickStyle.None, AutoSize = false, Height = 24, Maximum = 100, Minimum = 0
+                TickStyle = TickStyle.None, AutoSize = false, Height = 24, Maximum = 20, Minimum = 0, LargeChange = 2
             };
             return t;
         }

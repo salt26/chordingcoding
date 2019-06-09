@@ -24,13 +24,14 @@ namespace ChordingCoding
         public Chord(Form1.Theme theme)
         {
             Random r = new Random();
+            int rand;
 
             switch (theme)
             {
                 case Form1.Theme.Forest:
                     root = (Root)r.Next(12);
 
-                    int rand = r.Next(15);
+                    rand = r.Next(15);
                     switch (rand)
                     {
                         case 1:
@@ -97,8 +98,142 @@ namespace ChordingCoding
 
                     break;
                 case Form1.Theme.Rain:
+                    root = (Root)r.Next(12);
+
+                    rand = r.Next(15);
+                    switch (rand)
+                    {
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+                        case 6:
+                            type = Type.Major;
+                            break;
+                        case 7:
+                        case 8:
+                        case 9:
+                        case 10:
+                            type = Type.minor;
+                            break;
+                        case 11:
+                            type = Type.sus2;
+                            break;
+                        case 12:
+                        case 13:
+                            type = Type.sus4;
+                            break;
+                        case 14:
+                            type = Type.aug;
+                            break;
+                        default:
+                            type = Type.dim;
+                            break;
+                    }
+
+                    rand = r.Next(15);
+                    octave = 6;
+                    switch (rand)
+                    {
+                        case 0:
+                            octave -= 2;
+                            break;
+                        case 1:
+                        case 2:
+                        case 3:
+                            octave -= 1;
+                            break;
+                        case 4:
+                        case 5:
+                        case 6:
+                        case 7:
+                        case 8:
+                        case 9:
+                        case 10:
+                        case 11:
+                            break;
+                        case 12:
+                        case 13:
+                        case 14:
+                            octave += 1;
+                            break;
+                        default:
+                            octave += 2;
+                            break;
+                    }
+                    if (octave > maxOctave) octave = maxOctave;
+                    if (octave < minOctave) octave = minOctave;
+
                     break;
                 case Form1.Theme.Star:
+                    root = (Root)r.Next(12);
+
+                    rand = r.Next(15);
+                    switch (rand)
+                    {
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+                        case 6:
+                            type = Type.Major;
+                            break;
+                        case 7:
+                        case 8:
+                        case 9:
+                        case 10:
+                            type = Type.minor;
+                            break;
+                        case 11:
+                            type = Type.sus2;
+                            break;
+                        case 12:
+                        case 13:
+                            type = Type.sus4;
+                            break;
+                        case 14:
+                            type = Type.aug;
+                            break;
+                        default:
+                            type = Type.dim;
+                            break;
+                    }
+
+                    rand = r.Next(15);
+                    octave = 6;
+                    switch (rand)
+                    {
+                        case 0:
+                            octave -= 2;
+                            break;
+                        case 1:
+                        case 2:
+                        case 3:
+                            octave -= 1;
+                            break;
+                        case 4:
+                        case 5:
+                        case 6:
+                        case 7:
+                        case 8:
+                        case 9:
+                        case 10:
+                        case 11:
+                            break;
+                        case 12:
+                        case 13:
+                        case 14:
+                            octave += 1;
+                            break;
+                        default:
+                            octave += 2;
+                            break;
+                    }
+                    if (octave > maxOctave) octave = maxOctave;
+                    if (octave < minOctave) octave = minOctave;
+
                     break;
             }
         }
@@ -122,11 +257,13 @@ namespace ChordingCoding
         public Chord(Form1.Theme theme, Chord c)
         {
             Random r = new Random();
+            int rand;
+            int oldP, p;
 
             switch (theme)
             {
                 case Form1.Theme.Forest:
-                    int rand = r.Next(17);
+                    rand = r.Next(17);
                     switch (rand)
                     {
                         case 1:
@@ -266,8 +403,8 @@ namespace ChordingCoding
                     if (octave > maxOctave) octave = maxOctave;
                     if (octave < minOctave) octave = minOctave;
 
-                    int oldP = (int)c.root + c.octave * 12;
-                    int p = (int)root + octave * 12;
+                    oldP = (int)c.root + c.octave * 12;
+                    p = (int)root + octave * 12;
                     while (oldP + 12 < p)
                     {
                         octave--;
@@ -283,8 +420,318 @@ namespace ChordingCoding
 
                     break;
                 case Form1.Theme.Rain:
+                    rand = r.Next(17);
+                    switch (rand)
+                    {
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+                        case 6:
+                            type = Type.Major;
+                            break;
+                        case 7:
+                        case 8:
+                        case 9:
+                        case 10:
+                            type = Type.minor;
+                            break;
+                        case 11:
+                            type = Type.sus2;
+                            break;
+                        case 12:
+                        case 13:
+                            type = Type.sus4;
+                            break;
+                        case 14:
+                            type = Type.aug;
+                            break;
+                        case 15:
+                            type = Type.dim;
+                            break;
+                        default:
+                            type = c.type;
+                            break;
+                    }
+
+                    //root = (Root)r.Next(12);
+                    rand = r.Next(10);
+                    switch (rand)
+                    {
+                        case 1:
+                        case 2:
+                        case 3:
+                            root = c.root;
+                            break;
+                        case 4:
+                        case 5:
+                        case 6:
+                            root = (Root)(((int)c.root + 7) % 12);
+                            break;
+                        case 7:
+                        case 8:
+                        case 9:
+                            root = (Root)(((int)c.root + 5) % 12);
+                            break;
+                        case 10:
+                            if (c.type == Type.Major)
+                            {
+                                root = (Root)(((int)c.root - 3) % 12);
+                                type = Type.minor;
+                            }
+                            else if (c.type == Type.minor)
+                            {
+                                root = (Root)(((int)c.root + 3) % 12);
+                                type = Type.Major;
+                            }
+                            else if (c.type == Type.dim)
+                            {
+                                type = c.type;
+                                rand = r.Next(2);
+                                if (rand == 0)
+                                    root = (Root)(((int)c.root + 3) % 12);
+                                else
+                                    root = (Root)(((int)c.root - 3) % 12);
+                            }
+                            else if (c.type == Type.aug)
+                            {
+                                type = c.type;
+                                rand = r.Next(2);
+                                if (rand == 0)
+                                    root = (Root)(((int)c.root + 4) % 12);
+                                else
+                                    root = (Root)(((int)c.root - 4) % 12);
+                            }
+                            else
+                            {
+                                rand = r.Next(2);
+                                if (rand == 0)
+                                {
+                                    root = (Root)(((int)c.root + 3) % 12);
+                                    type = Type.Major;
+                                }
+                                else
+                                {
+                                    root = (Root)(((int)c.root - 3) % 12);
+                                    type = Type.minor;
+                                }
+                            }
+                            break;
+                        default:    // Unused
+                            root = (Root)r.Next(12);
+                            break;
+                    }
+
+                    rand = r.Next(15);
+                    octave = c.octave;
+                    switch (rand)
+                    {
+                        case 0:
+                            octave -= 1;
+                            if (octave < 3) octave = 4;
+                            break;
+                        case 1:
+                        case 2:
+                        case 3:
+                            octave -= 1;
+                            if (octave < 3) octave = 3;
+                            break;
+                        case 4:
+                        case 5:
+                        case 6:
+                        case 7:
+                        case 8:
+                        case 9:
+                        case 10:
+                        case 11:
+                            break;
+                        case 12:
+                        case 13:
+                        case 14:
+                            octave += 1;
+                            if (octave > 7) octave = 7;
+                            break;
+                        default:
+                            octave += 1;
+                            if (octave > 7) octave = 6;
+                            break;
+                    }
+                    if (octave > maxOctave) octave = maxOctave;
+                    if (octave < minOctave) octave = minOctave;
+
+                    oldP = (int)c.root + c.octave * 12;
+                    p = (int)root + octave * 12;
+                    while (oldP + 12 < p)
+                    {
+                        octave--;
+                        p = (int)root + octave * 12;
+                    }
+                    while (oldP - 12 > p)
+                    {
+                        octave++;
+                        p = (int)root + octave * 12;
+                    }
+                    if (octave > maxOctave) octave = maxOctave;
+                    if (octave < minOctave) octave = minOctave;
+
                     break;
                 case Form1.Theme.Star:
+                    rand = r.Next(17);
+                    switch (rand)
+                    {
+                        case 1:
+                        case 2:
+                        case 3:
+                        case 4:
+                        case 5:
+                        case 6:
+                            type = Type.Major;
+                            break;
+                        case 7:
+                        case 8:
+                        case 9:
+                        case 10:
+                            type = Type.minor;
+                            break;
+                        case 11:
+                            type = Type.sus2;
+                            break;
+                        case 12:
+                        case 13:
+                            type = Type.sus4;
+                            break;
+                        case 14:
+                            type = Type.aug;
+                            break;
+                        case 15:
+                            type = Type.dim;
+                            break;
+                        default:
+                            type = c.type;
+                            break;
+                    }
+
+                    //root = (Root)r.Next(12);
+                    rand = r.Next(10);
+                    switch (rand)
+                    {
+                        case 1:
+                        case 2:
+                        case 3:
+                            root = c.root;
+                            break;
+                        case 4:
+                        case 5:
+                        case 6:
+                            root = (Root)(((int)c.root + 7) % 12);
+                            break;
+                        case 7:
+                        case 8:
+                        case 9:
+                            root = (Root)(((int)c.root + 5) % 12);
+                            break;
+                        case 10:
+                            if (c.type == Type.Major)
+                            {
+                                root = (Root)(((int)c.root - 3) % 12);
+                                type = Type.minor;
+                            }
+                            else if (c.type == Type.minor)
+                            {
+                                root = (Root)(((int)c.root + 3) % 12);
+                                type = Type.Major;
+                            }
+                            else if (c.type == Type.dim)
+                            {
+                                type = c.type;
+                                rand = r.Next(2);
+                                if (rand == 0)
+                                    root = (Root)(((int)c.root + 3) % 12);
+                                else
+                                    root = (Root)(((int)c.root - 3) % 12);
+                            }
+                            else if (c.type == Type.aug)
+                            {
+                                type = c.type;
+                                rand = r.Next(2);
+                                if (rand == 0)
+                                    root = (Root)(((int)c.root + 4) % 12);
+                                else
+                                    root = (Root)(((int)c.root - 4) % 12);
+                            }
+                            else
+                            {
+                                rand = r.Next(2);
+                                if (rand == 0)
+                                {
+                                    root = (Root)(((int)c.root + 3) % 12);
+                                    type = Type.Major;
+                                }
+                                else
+                                {
+                                    root = (Root)(((int)c.root - 3) % 12);
+                                    type = Type.minor;
+                                }
+                            }
+                            break;
+                        default:    // Unused
+                            root = (Root)r.Next(12);
+                            break;
+                    }
+
+                    rand = r.Next(15);
+                    octave = c.octave;
+                    switch (rand)
+                    {
+                        case 0:
+                            octave -= 1;
+                            if (octave < 3) octave = 4;
+                            break;
+                        case 1:
+                        case 2:
+                        case 3:
+                            octave -= 1;
+                            if (octave < 3) octave = 3;
+                            break;
+                        case 4:
+                        case 5:
+                        case 6:
+                        case 7:
+                        case 8:
+                        case 9:
+                        case 10:
+                        case 11:
+                            break;
+                        case 12:
+                        case 13:
+                        case 14:
+                            octave += 1;
+                            if (octave > 7) octave = 7;
+                            break;
+                        default:
+                            octave += 1;
+                            if (octave > 7) octave = 6;
+                            break;
+                    }
+                    if (octave > maxOctave) octave = maxOctave;
+                    if (octave < minOctave) octave = minOctave;
+
+                    oldP = (int)c.root + c.octave * 12;
+                    p = (int)root + octave * 12;
+                    while (oldP + 12 < p)
+                    {
+                        octave--;
+                        p = (int)root + octave * 12;
+                    }
+                    while (oldP - 12 > p)
+                    {
+                        octave++;
+                        p = (int)root + octave * 12;
+                    }
+                    if (octave > maxOctave) octave = maxOctave;
+                    if (octave < minOctave) octave = minOctave;
+
                     break;
             }
         }
@@ -393,7 +840,72 @@ namespace ChordingCoding
             int h = 0;
             float s = 1f, v = 1f;
 
-            switch (chord.root)
+            h = HueOfPitch(chord.root);
+
+            switch (chord.type)
+            {
+                case Chord.Type.Major:
+                    s = 0.7f;
+                    v = 1f;
+                    break;
+                case Chord.Type.minor:
+                    s = 0.5f;
+                    v = 0.5f;
+                    h = (h + 60) % 360;
+                    break;
+                case Chord.Type.sus2:
+                    s = 0.5f;
+                    v = 0.9f;
+                    h = (h - 15) % 360;
+                    break;
+                case Chord.Type.sus4:
+                    s = 0.5f;
+                    v = 0.9f;
+                    h = (h + 15) % 360;
+                    break;
+                case Chord.Type.dim:
+                    s = 0.2f;
+                    v = 0.5f;
+                    break;
+                case Chord.Type.aug:
+                    s = 0.3f;
+                    v = 0.8f;
+                    break;
+            }
+
+            return HSVToColor(h, s, v);
+        }
+
+        /// <summary>
+        /// 현재 화음에 어울리는 색을 찾아서 반환합니다.
+        /// </summary>
+        /// <returns></returns>
+        public Color ChordColor()
+        {
+            return ChordColor(this);
+        }
+
+        /// <summary>
+        /// pitch의 음이름에 어울리는 색을 찾아서 반환합니다.
+        /// </summary>
+        /// <param name="pitch"></param>
+        /// <returns></returns>
+        public static Color PitchColor(Root pitch)
+        {
+            int h = HueOfPitch(pitch);
+            return HSVToColor(h, 0.7f, 1f);
+        }
+
+        /// <summary>
+        /// pitch의 음이름에 따른 색의 Hue 값을 반환합니다.
+        /// 반환하는 값은 0 이상 359 이하입니다.
+        /// </summary>
+        /// <param name="pitch"></param>
+        /// <returns></returns>
+        private static int HueOfPitch(Root pitch)
+        {
+            int h = 0;
+            switch (pitch)
             {
                 case Chord.Root.C:
                     h = 120;
@@ -432,37 +944,18 @@ namespace ChordingCoding
                     h = 150;
                     break;
             }
+            return h;
+        }
 
-            switch (chord.type)
-            {
-                case Chord.Type.Major:
-                    s = 0.7f;
-                    v = 1f;
-                    break;
-                case Chord.Type.minor:
-                    s = 0.5f;
-                    v = 0.5f;
-                    h = (h + 60) % 360;
-                    break;
-                case Chord.Type.sus2:
-                    s = 0.5f;
-                    v = 0.9f;
-                    h = (h - 15) % 360;
-                    break;
-                case Chord.Type.sus4:
-                    s = 0.5f;
-                    v = 0.9f;
-                    h = (h + 15) % 360;
-                    break;
-                case Chord.Type.dim:
-                    s = 0.2f;
-                    v = 0.5f;
-                    break;
-                case Chord.Type.aug:
-                    s = 0.3f;
-                    v = 0.8f;
-                    break;
-            }
+        private static Color HSVToColor(int h, float s, float v)
+        {
+            h = h % 360;
+
+            if (s < 0) s = 0;
+            else if (s > 1) s = 1;
+
+            if (v < 0) v = 0;
+            else if (v > 1) v = 1;
 
             /* HSV to RGB */
             float c = v * s;
@@ -522,15 +1015,6 @@ namespace ChordingCoding
             if (b > 255) b = 255;
 
             return Color.FromArgb((int)r, (int)g, (int)b);
-        }
-
-        /// <summary>
-        /// 현재 화음에 어울리는 색을 찾아서 반환합니다.
-        /// </summary>
-        /// <returns></returns>
-        public Color ChordColor()
-        {
-            return ChordColor(this);
         }
     }
 

@@ -257,6 +257,7 @@ namespace ChordingCoding
         public static void AddParticleToBasicParticleSystem(Chord.Root pitch = Chord.Root.C)
         {
             if (basicParticleSystem == null) return;
+
             if (theme == Theme.Rain)
             {
                 basicParticleSystem.AddParticleInBasic(Particle.Type.note, 64, Chord.PitchColor(pitch), 0.1f);

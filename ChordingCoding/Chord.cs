@@ -912,7 +912,7 @@ namespace ChordingCoding
 
         /// <summary>
         /// pitch의 음이름에 따른 색의 Hue 값을 반환합니다.
-        /// 반환하는 값은 0 이상 359 이하의 30의 배수입니다.
+        /// 반환하는 값은 0 이상 359 이하입니다.
         /// </summary>
         /// <param name="pitch"></param>
         /// <returns></returns>
@@ -961,56 +961,67 @@ namespace ChordingCoding
             return h;
         }
 
+        /// <summary>
+        /// HSV를 RGB로 변환한 색을 반환합니다.
+        /// </summary>
+        /// <param name="h">Hue, 0 이상 359 이하</param>
+        /// <param name="s">Saturation, 0.0f 이상 1.0f 이하</param>
+        /// <param name="v">Value(Brightness), 0.0f 이상 1.0f 이하</param>
+        /// <returns></returns>
         private static Color HSVToColor(int h, float s, float v)
         {
             h = h % 360;
 
-            if (s < 0) s = 0;
-            else if (s > 1) s = 1;
-
             if (v < 0) v = 0;
             else if (v > 1) v = 1;
 
+            if (s <= 0)
+            {
+                return Color.FromArgb((int)(v * 255), (int)(v * 255), (int)(v * 255));
+            }
+            else if (s > 1) s = 1;
+
             /* HSV to RGB */
-            float c = v * s;
-            float x = c * (1 - Math.Abs((h / 60) % 2 - 1));
-            float m = v - c;
+            int ff = h % 60;
+            float p = v * (1f - s);
+            float q = v * (1f - (s * (ff / 60f)));
+            float t = v * (1f - (s * (1f - (ff / 60f))));
             float r, g, b;
             if (h >= 0 && h < 60)
             {
-                r = c;
-                g = x;
-                b = 0;
+                r = v;
+                g = t;
+                b = p;
             }
             else if (h >= 60 && h < 120)
             {
-                r = x;
-                g = c;
-                b = 0;
+                r = q;
+                g = v;
+                b = p;
             }
             else if (h >= 120 && h < 180)
             {
-                r = 0;
-                g = c;
-                b = x;
+                r = p;
+                g = v;
+                b = t;
             }
             else if (h >= 180 && h < 240)
             {
-                r = 0;
-                g = x;
-                b = c;
+                r = p;
+                g = q;
+                b = v;
             }
             else if (h >= 240 && h < 300)
             {
-                r = x;
-                g = 0;
-                b = c;
+                r = t;
+                g = p;
+                b = v;
             }
             else if (h >= 300 && h < 360)
             {
-                r = c;
-                g = 0;
-                b = x;
+                r = v;
+                g = p;
+                b = q;
             }
             else
             {
@@ -1018,9 +1029,9 @@ namespace ChordingCoding
                 g = 0;
                 b = 0;
             }
-            r = (r + m) * 255;
-            g = (g + m) * 255;
-            b = (b + m) * 255;
+            r *= 255;
+            g *= 255;
+            b *= 255;
             if (r < 0) r = 0;
             if (r > 255) r = 255;
             if (g < 0) g = 0;
@@ -1028,7 +1039,7 @@ namespace ChordingCoding
             if (b < 0) b = 0;
             if (b > 255) b = 255;
 
-            return Color.FromArgb((int)r, (int)g, (int)b);
+            return Color.FromArgb((int)(r + 0.5f), (int)(g + 0.5f), (int)(b + 0.5f));
         }
     }
 

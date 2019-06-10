@@ -897,8 +897,22 @@ namespace ChordingCoding
         }
 
         /// <summary>
+        /// 주어진 색의 alpha(투명도)를 바꿔서 반환합니다.
+        /// alpha는 0 이상 255 이하입니다.
+        /// </summary>
+        /// <param name="c"></param>
+        /// <param name="alpha"></param>
+        /// <returns></returns>
+        public static Color SetAlpha(Color c, int alpha)
+        {
+            if (alpha < 0) alpha = 0;
+            if (alpha > 255) alpha = 255;
+            return Color.FromArgb(alpha, c);
+        }
+
+        /// <summary>
         /// pitch의 음이름에 따른 색의 Hue 값을 반환합니다.
-        /// 반환하는 값은 0 이상 359 이하입니다.
+        /// 반환하는 값은 0 이상 359 이하의 30의 배수입니다.
         /// </summary>
         /// <param name="pitch"></param>
         /// <returns></returns>

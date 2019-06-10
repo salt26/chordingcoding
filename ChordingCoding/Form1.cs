@@ -120,17 +120,27 @@ namespace ChordingCoding
             Form form = (Form)sender;
             form.ShowInTaskbar = false;
 
+            opacity = (int)Properties.Settings.Default["Opacity"];
+            volume = (int)Properties.Settings.Default["Volume"];
+
             Opacity = opacity / 100D;
             trackBarMenuItem1.Value = opacity / 5;
             trackBarMenuItem2.Value = volume / 5;
             불투명도ToolStripMenuItem.Text = "불투명도 (" + opacity + "%)";
             음량ToolStripMenuItem.Text = "음량 (" + volume + "%)";
 
-            숲속아침ToolStripMenuItem.CheckState = CheckState.Checked;
-            비오는날ToolStripMenuItem.CheckState = CheckState.Unchecked;
-            별헤는밤ToolStripMenuItem.CheckState = CheckState.Unchecked;
-            _theme = Theme.Forest;
-            basicParticleSystem = null;
+            switch ((string)Properties.Settings.Default["Theme"])
+            {
+                case "Forest":
+                    SetTheme(Theme.Forest);
+                    break;
+                case "Rain":
+                    SetTheme(Theme.Rain);
+                    break;
+                case "Star":
+                    SetTheme(Theme.Star);
+                    break;
+            }
 
             bitmap = new Bitmap(Width, Height);
             
@@ -154,6 +164,10 @@ namespace ChordingCoding
         {
             if (_isReady)
                 outDevice.Close();
+            Properties.Settings.Default["Theme"] = theme.ToString();
+            Properties.Settings.Default["Opacity"] = opacity;
+            Properties.Settings.Default["Volume"] = volume;
+            Properties.Settings.Default.Save();
             notifyIcon1.Dispose();
             _isReady = false;
         }
@@ -244,9 +258,11 @@ namespace ChordingCoding
         {
             if (basicParticleSystem == null) return;
             if (theme == Theme.Rain)
+            {
                 basicParticleSystem.AddParticleInBasic(Particle.Type.note, 64, Chord.PitchColor(pitch), 0.1f);
+            }
             else if (theme == Theme.Star)
-                basicParticleSystem.AddParticleInBasic(Particle.Type.star, 32, Chord.PitchColor(pitch), 2.3f);
+                basicParticleSystem.AddParticleInBasic(Particle.Type.star, 32, Chord.PitchColor(pitch), 1f);
         }
 
         /// <summary>
@@ -312,16 +328,7 @@ namespace ChordingCoding
         {
             if (_theme != Theme.Forest)
             {
-                숲속아침ToolStripMenuItem.CheckState = CheckState.Checked;
-                비오는날ToolStripMenuItem.CheckState = CheckState.Unchecked;
-                별헤는밤ToolStripMenuItem.CheckState = CheckState.Unchecked;
-                _theme = Theme.Forest;
-                basicParticleSystem = null;
-
-                StopPlaying(0);
-                StopPlaying(1);
-                StopPlaying(2);
-                particleSystems = new List<ParticleSystem>();
+                SetTheme(Theme.Forest);
             }
         }
 
@@ -329,20 +336,7 @@ namespace ChordingCoding
         {
             if (_theme != Theme.Rain)
             {
-                숲속아침ToolStripMenuItem.CheckState = CheckState.Unchecked;
-                비오는날ToolStripMenuItem.CheckState = CheckState.Checked;
-                별헤는밤ToolStripMenuItem.CheckState = CheckState.Unchecked;
-                _theme = Theme.Rain;
-                basicParticleSystem = new ParticleSystem(
-                                    /*cNum*/ 1, /*cRange*/ 0,
-                                    ParticleSystem.CreateFunction.TopRandom,
-                                    Particle.Type.rain, Color.CornflowerBlue,
-                                    /*pSize*/ 0.3f, /*pLife*/ 32);
-
-                StopPlaying(0);
-                StopPlaying(1);
-                StopPlaying(2);
-                particleSystems = new List<ParticleSystem>();
+                SetTheme(Theme.Rain);
             }
         }
 
@@ -350,20 +344,58 @@ namespace ChordingCoding
         {
             if (_theme != Theme.Star)
             {
-                숲속아침ToolStripMenuItem.CheckState = CheckState.Unchecked;
-                비오는날ToolStripMenuItem.CheckState = CheckState.Unchecked;
-                별헤는밤ToolStripMenuItem.CheckState = CheckState.Checked;
-                _theme = Theme.Star;
-                basicParticleSystem = new ParticleSystem(
-                                    /*cNum*/ 1, /*cRange*/ 0,
-                                    ParticleSystem.CreateFunction.Random,
-                                    Particle.Type.star, Color.Black,
-                                    /*pSize*/ 1f, /*pLife*/ 64);
+                SetTheme(Theme.Star);
+            }
+        }
 
-                StopPlaying(0);
-                StopPlaying(1);
-                StopPlaying(2);
-                particleSystems = new List<ParticleSystem>();
+        private void SetTheme(Theme theme)
+        {
+            switch (theme)
+            {
+                case Theme.Forest:
+                    숲속아침ToolStripMenuItem.CheckState = CheckState.Checked;
+                    비오는날ToolStripMenuItem.CheckState = CheckState.Unchecked;
+                    별헤는밤ToolStripMenuItem.CheckState = CheckState.Unchecked;
+                    _theme = Theme.Forest;
+                    basicParticleSystem = null;
+
+                    StopPlaying(0);
+                    StopPlaying(1);
+                    StopPlaying(2);
+                    particleSystems = new List<ParticleSystem>();
+                    break;
+                case Theme.Rain:
+                    숲속아침ToolStripMenuItem.CheckState = CheckState.Unchecked;
+                    비오는날ToolStripMenuItem.CheckState = CheckState.Checked;
+                    별헤는밤ToolStripMenuItem.CheckState = CheckState.Unchecked;
+                    _theme = Theme.Rain;
+                    basicParticleSystem = new ParticleSystem(
+                                        /*cNum*/ 1, /*cRange*/ 0,
+                                        ParticleSystem.CreateFunction.TopRandom,
+                                        Particle.Type.rain, Color.CornflowerBlue,
+                                        /*pSize*/ 0.3f, /*pLife*/ 32);
+
+                    StopPlaying(0);
+                    StopPlaying(1);
+                    StopPlaying(2);
+                    particleSystems = new List<ParticleSystem>();
+                    break;
+                case Theme.Star:
+                    숲속아침ToolStripMenuItem.CheckState = CheckState.Unchecked;
+                    비오는날ToolStripMenuItem.CheckState = CheckState.Unchecked;
+                    별헤는밤ToolStripMenuItem.CheckState = CheckState.Checked;
+                    _theme = Theme.Star;
+                    basicParticleSystem = new ParticleSystem(
+                                        /*cNum*/ 1, /*cRange*/ 0,
+                                        ParticleSystem.CreateFunction.Random,
+                                        Particle.Type.star, Color.Black,
+                                        /*pSize*/ 1f, /*pLife*/ 64);
+
+                    StopPlaying(0);
+                    StopPlaying(1);
+                    StopPlaying(2);
+                    particleSystems = new List<ParticleSystem>();
+                    break;
             }
         }
     }

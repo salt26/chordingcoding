@@ -241,7 +241,7 @@ namespace ChordingCoding
             float particleSize, int particleLifetime)
         {
             // 한 번에 활성화되는 파티클 시스템 수를 5개로 제한
-            if (particleSystems.Count > 5)
+            if (particleSystems.Count > 10)
             {
                 particleSystems.RemoveAt(0);
             }
@@ -254,16 +254,22 @@ namespace ChordingCoding
         /// <summary>
         /// 기본 파티클 시스템에 파티클을 추가합니다.
         /// </summary>
-        public static void AddParticleToBasicParticleSystem(Chord.Root pitch = Chord.Root.C)
+        public static void AddParticleToBasicParticleSystem(Chord.Root pitch)
         {
             if (basicParticleSystem == null) return;
 
-            if (theme == Theme.Rain)
+            if (theme == Theme.Forest)
+            {
+                basicParticleSystem.AddParticleInBasic(Particle.Type.leaf, 320, Color.White, 1f);
+            }
+            else if (theme == Theme.Rain)
             {
                 basicParticleSystem.AddParticleInBasic(Particle.Type.note, 64, Chord.PitchColor(pitch), 0.1f);
             }
             else if (theme == Theme.Star)
+            {
                 basicParticleSystem.AddParticleInBasic(Particle.Type.star, 32, Chord.PitchColor(pitch), 1f);
+            }
         }
 
         /// <summary>
@@ -358,7 +364,11 @@ namespace ChordingCoding
                     비오는날ToolStripMenuItem.CheckState = CheckState.Unchecked;
                     별헤는밤ToolStripMenuItem.CheckState = CheckState.Unchecked;
                     _theme = Theme.Forest;
-                    basicParticleSystem = null;
+                    basicParticleSystem = new ParticleSystem(
+                                        /*cNum*/ 1, /*cRange*/ 0,
+                                        ParticleSystem.CreateFunction.TopRandom,
+                                        Particle.Type.leaf, Color.White,
+                                        /*pSize*/ 1f, /*pLife*/ 128);
 
                     StopPlaying(0);
                     StopPlaying(1);
@@ -373,8 +383,8 @@ namespace ChordingCoding
                     basicParticleSystem = new ParticleSystem(
                                         /*cNum*/ 1, /*cRange*/ 0,
                                         ParticleSystem.CreateFunction.TopRandom,
-                                        Particle.Type.rain, Color.CornflowerBlue,
-                                        /*pSize*/ 0.3f, /*pLife*/ 32);
+                                        Particle.Type.rain, Color.White,
+                                        /*pSize*/ 0.2f, /*pLife*/ 32);
 
                     StopPlaying(0);
                     StopPlaying(1);

@@ -9,7 +9,7 @@ namespace ChordingCoding
 {
     public class ParticleSystem
     {
-        public enum CreateFunction { Gaussian, DiracDelta, TopRandom, Random }
+        public enum CreateFunction { Gaussian, DiracDelta, TopRandom, Random, BottomRandom }
         public float positionX;
         public float positionY;
         public float velocityX;
@@ -130,7 +130,7 @@ namespace ChordingCoding
                 // 파티클 시스템의 수명 감소
                 lifetime--;
             }
-            else if (isBasicParticleSystem && particleType != Particle.Type.star)
+            else if (isBasicParticleSystem && particleType == Particle.Type.rain)
             {
                 for (int i = 0; i < createNumber; i++)
                 {
@@ -211,11 +211,15 @@ namespace ChordingCoding
                     break;
                 case CreateFunction.TopRandom:
                     posX = (float)(random.NextDouble() * Form1.form1.Size.Width);
-                    posY = 0;
+                    posY = -50;
                     break;
                 case CreateFunction.Random:
                     posX = (float)(random.NextDouble() * Form1.form1.Size.Width);
                     posY = (float)(random.NextDouble() * Form1.form1.Size.Height);
+                    break;
+                case CreateFunction.BottomRandom:
+                    posX = (float)(random.NextDouble() * Form1.form1.Size.Width);
+                    posY = Form1.form1.Size.Height;
                     break;
             }
         }

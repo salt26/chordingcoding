@@ -91,10 +91,29 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Dot.png" />
+    <Content Include="Leaf11.png" />
+    <Content Include="Leaf12.png" />
+    <Content Include="Leaf13.png" />
+    <Content Include="Leaf14.png" />
+    <Content Include="Leaf15.png" />
+    <Content Include="Leaf16.png" />
+    <Content Include="Leaf21.png" />
+    <Content Include="Leaf22.png" />
+    <Content Include="Leaf23.png" />
+    <Content Include="Leaf24.png" />
+    <Content Include="Leaf25.png" />
+    <Content Include="Leaf26.png" />
+    <Content Include="Leaf31.png" />
+    <Content Include="Leaf32.png" />
+    <Content Include="Leaf33.png" />
+    <Content Include="Leaf34.png" />
+    <Content Include="Leaf35.png" />
+    <Content Include="Leaf36.png" />
     <Content Include="Note8_.png" />
     <Content Include="NoteWord.ico" />
     <None Include="Resources\NewIcon.png" />
     <Content Include="Rain.png" />
+    <Content Include="Rain_.png" />
     <Content Include="Star.png" />
     <Content Include="Tray.png" />
   </ItemGroup>

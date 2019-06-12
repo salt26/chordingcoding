@@ -18,13 +18,13 @@ namespace ChordingCoding
 {
     public partial class Form1 : Form
     {
-        public enum Theme { Forest, Rain, Star }
+        public enum Theme { Autumn, Rain, Star }
         static OutputDevice outDevice;
         static bool _isReady = false;
-        static int _opacity = 80;
-        static int _volume = 100;
+        static int[] _opacity = { 80, 80, 100 };
+        static int[] _volume = { 100, 100, 100 };
         static int frameNumber = 0;         // 실행 후 지금까지 지난 프레임 수
-        static Theme _theme = Theme.Forest;
+        static Theme _theme = Theme.Autumn;
         static List<ParticleSystem> particleSystems = new List<ParticleSystem>();
         static ParticleSystem basicParticleSystem = null;
         Bitmap bitmap;
@@ -33,6 +33,19 @@ namespace ChordingCoding
         public static Chord chord = new Chord(_theme);
 
         public delegate void TimerTickDelegate();
+
+        /*
+         * 새 Theme를 추가할 때
+         * 1. Theme에 이름 추가 (주의: 각 enum에 할당된 int 값을 임의로 바꾸지 말 것)
+         * 2. _opacity, _volume의 맨 뒤에 값 추가
+         * 3. 솔루션 탐색기 - ChordingCoding 속성 - 설정에서 OpacityX, VolumeX 추가
+         * 4. Form1_Load에서 switch문에 SetTheme() 호출 추가
+         * 5. Form1 디자인에서 contextMenuStrip1 안에 테마 안에 버튼 추가
+         * 6. 5.의 버튼 클릭 시 SetTheme() 호출하는 코드 추가
+         * 7. SetTheme() 안에 case 추가
+         * 8. SetTheme()의 다른 case에서도 5.의 버튼 체크가 해제되도록 코드 수정
+         * 9. InterceptKeys.cs와 Chord.cs에서 Form1.Theme이 쓰이는 코드 수정
+         */
 
         #region 프로퍼티 정의 (isReady, opacity, volume, volumeD, theme)
         public static bool isReady
@@ -47,13 +60,13 @@ namespace ChordingCoding
         {
             get
             {
-                return _opacity;
+                return _opacity[(int)theme];
             }
             set
             {
-                if (value < 0) _opacity = 0;
-                else if (value > 100) _opacity = 100;
-                else _opacity = value;
+                if (value < 0) _opacity[(int)theme] = 0;
+                else if (value > 100) _opacity[(int)theme] = 100;
+                else _opacity[(int)theme] = value;
             }
         }
 
@@ -61,13 +74,13 @@ namespace ChordingCoding
         {
             get
             {
-                return _volume;
+                return _volume[(int)theme];
             }
             set
             {
-                if (value < 0) _volume = 0;
-                else if (value > 100) _volume = 100;
-                else _volume = value;
+                if (value < 0) _volume[(int)theme] = 0;
+                else if (value > 100) _volume[(int)theme] = 100;
+                else _volume[(int)theme] = value;
             }
         }
 
@@ -75,7 +88,7 @@ namespace ChordingCoding
         {
             get
             {
-                return _volume / 100D;
+                return _volume[(int)theme] / 100D;
             }
         }
 
@@ -120,8 +133,11 @@ namespace ChordingCoding
             Form form = (Form)sender;
             form.ShowInTaskbar = false;
 
-            opacity = (int)Properties.Settings.Default["Opacity"];
-            volume = (int)Properties.Settings.Default["Volume"];
+            for (int i = 0; i < Enum.GetNames(typeof(Theme)).Length; i++)
+            {
+                _opacity[i] = (int)Properties.Settings.Default["Opacity" + i.ToString()];
+                _volume[i] = (int)Properties.Settings.Default["Volume" + i.ToString()];
+            }
 
             Opacity = opacity / 100D;
             trackBarMenuItem1.Value = opacity / 5;
@@ -129,10 +145,12 @@ namespace ChordingCoding
             불투명도ToolStripMenuItem.Text = "불투명도 (" + opacity + "%)";
             음량ToolStripMenuItem.Text = "음량 (" + volume + "%)";
 
+            outDevice = new OutputDevice(0);
+
             switch ((string)Properties.Settings.Default["Theme"])
             {
-                case "Forest":
-                    SetTheme(Theme.Forest);
+                case "Autumn":
+                    SetTheme(Theme.Autumn);
                     break;
                 case "Rain":
                     SetTheme(Theme.Rain);
@@ -150,11 +168,6 @@ namespace ChordingCoding
             timer.Start();
 
             notifyIcon1.ShowBalloonTip(8);
-            outDevice = new OutputDevice(0);
-            chord = new Chord(theme);
-            outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, 101));   // 사운드이펙트(고블린) -> 분위기를 만드는 역할
-            outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 1, 12));    // 마림바 -> 주 멜로디
-            outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 2, 123));   // 새 지저귀는 소리 -> 효과음
 
             form1 = this;
             _isReady = true;
@@ -165,8 +178,11 @@ namespace ChordingCoding
             if (_isReady)
                 outDevice.Close();
             Properties.Settings.Default["Theme"] = theme.ToString();
-            Properties.Settings.Default["Opacity"] = opacity;
-            Properties.Settings.Default["Volume"] = volume;
+            for (int i = 0; i < Enum.GetNames(typeof(Theme)).Length; i++)
+            {
+                Properties.Settings.Default["Opacity" + i.ToString()] = _opacity[i];
+                Properties.Settings.Default["Volume" + i.ToString()] = _volume[i];
+            }
             Properties.Settings.Default.Save();
             notifyIcon1.Dispose();
             _isReady = false;
@@ -258,7 +274,7 @@ namespace ChordingCoding
         {
             if (basicParticleSystem == null) return;
 
-            if (theme == Theme.Forest)
+            if (theme == Theme.Autumn)
             {
                 basicParticleSystem.AddParticleInBasic(Particle.Type.leaf, 320, Color.White, 1f);
             }
@@ -331,11 +347,11 @@ namespace ChordingCoding
             Close();
         }
 
-        private void 숲속아침ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void 가을산책ToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            if (_theme != Theme.Forest)
+            if (_theme != Theme.Autumn)
             {
-                SetTheme(Theme.Forest);
+                SetTheme(Theme.Autumn);
             }
         }
 
@@ -359,11 +375,11 @@ namespace ChordingCoding
         {
             switch (theme)
             {
-                case Theme.Forest:
-                    숲속아침ToolStripMenuItem.CheckState = CheckState.Checked;
+                case Theme.Autumn:
+                    가을산책ToolStripMenuItem.CheckState = CheckState.Checked;
                     비오는날ToolStripMenuItem.CheckState = CheckState.Unchecked;
                     별헤는밤ToolStripMenuItem.CheckState = CheckState.Unchecked;
-                    _theme = Theme.Forest;
+                    _theme = Theme.Autumn;
                     basicParticleSystem = new ParticleSystem(
                                         /*cNum*/ 1, /*cRange*/ 0,
                                         ParticleSystem.CreateFunction.TopRandom,
@@ -374,9 +390,14 @@ namespace ChordingCoding
                     StopPlaying(1);
                     StopPlaying(2);
                     particleSystems = new List<ParticleSystem>();
+                    
+                    // TODO
+                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, 101));   // 사운드이펙트(고블린) -> 분위기를 만드는 역할
+                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 1, 12));    // 마림바 -> 주 멜로디
+                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 2, 123));   // 새 지저귀는 소리 -> 효과음
                     break;
                 case Theme.Rain:
-                    숲속아침ToolStripMenuItem.CheckState = CheckState.Unchecked;
+                    가을산책ToolStripMenuItem.CheckState = CheckState.Unchecked;
                     비오는날ToolStripMenuItem.CheckState = CheckState.Checked;
                     별헤는밤ToolStripMenuItem.CheckState = CheckState.Unchecked;
                     _theme = Theme.Rain;
@@ -390,9 +411,13 @@ namespace ChordingCoding
                     StopPlaying(1);
                     StopPlaying(2);
                     particleSystems = new List<ParticleSystem>();
+
+                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, 101));   // 사운드이펙트(고블린) -> 분위기를 만드는 역할
+                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 1, 12));    // 마림바 -> 주 멜로디
+                    //outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 2, 123));   // 새 지저귀는 소리 -> 효과음
                     break;
                 case Theme.Star:
-                    숲속아침ToolStripMenuItem.CheckState = CheckState.Unchecked;
+                    가을산책ToolStripMenuItem.CheckState = CheckState.Unchecked;
                     비오는날ToolStripMenuItem.CheckState = CheckState.Unchecked;
                     별헤는밤ToolStripMenuItem.CheckState = CheckState.Checked;
                     _theme = Theme.Star;
@@ -406,8 +431,20 @@ namespace ChordingCoding
                     StopPlaying(1);
                     StopPlaying(2);
                     particleSystems = new List<ParticleSystem>();
+
+                    // TODO
+                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, 101));   // 사운드이펙트(고블린) -> 분위기를 만드는 역할
+                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 1, 12));    // 마림바 -> 주 멜로디
+                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 2, 123));   // 새 지저귀는 소리 -> 효과음
                     break;
             }
+
+            Opacity = opacity / 100D;
+            trackBarMenuItem1.Value = opacity / 5;
+            trackBarMenuItem2.Value = volume / 5;
+            불투명도ToolStripMenuItem.Text = "불투명도 (" + opacity + "%)";
+            음량ToolStripMenuItem.Text = "음량 (" + volume + "%)";
+            chord = new Chord(theme);
         }
     }
 }

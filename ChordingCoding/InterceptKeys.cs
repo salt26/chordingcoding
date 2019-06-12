@@ -51,7 +51,7 @@ namespace ChordingCoding
 
                     switch (Form1.theme)
                     {
-                        case Form1.Theme.Forest:
+                        case Form1.Theme.Autumn:
                             pitch = Form1.chord.NextNote();
                             Form1.PlayANote(pitch - 12, 14, 0, 96);
                             Form1.PlayANote(pitch, 16, 1);
@@ -85,7 +85,7 @@ namespace ChordingCoding
 
                     switch (Form1.theme)
                     {
-                        case Form1.Theme.Forest:
+                        case Form1.Theme.Autumn:
                             Form1.StopPlaying(0);
                             Form1.chord = new Chord(Form1.theme, Form1.chord);
                             pitch = Form1.chord.NextNote();
@@ -97,7 +97,7 @@ namespace ChordingCoding
                             }
                             if (Form1.form1 != null)
                             {
-                                // TODO
+                                Form1.AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
                             }
                             break;
 

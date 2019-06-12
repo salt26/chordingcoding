@@ -3,13 +3,25 @@
   <Profiles />
   <Settings>
     <Setting Name="Theme" Type="System.String" Scope="User">
-      <Value Profile="(Default)">Forest</Value>
+      <Value Profile="(Default)">Autumn</Value>
     </Setting>
-    <Setting Name="Volume" Type="System.Int32" Scope="User">
+    <Setting Name="Volume0" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">100</Value>
     </Setting>
-    <Setting Name="Opacity" Type="System.Int32" Scope="User">
+    <Setting Name="Opacity0" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">80</Value>
+    </Setting>
+    <Setting Name="Volume1" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="Opacity1" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">80</Value>
+    </Setting>
+    <Setting Name="Volume2" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">100</Value>
+    </Setting>
+    <Setting Name="Opacity2" Type="System.Int32" Scope="User">
+      <Value Profile="(Default)">100</Value>
     </Setting>
   </Settings>
 </SettingsFile>

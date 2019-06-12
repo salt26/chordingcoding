@@ -28,7 +28,7 @@ namespace ChordingCoding
 
             switch (theme)
             {
-                case Form1.Theme.Forest:
+                case Form1.Theme.Autumn:
                     root = (Root)r.Next(12);
 
                     rand = r.Next(15);
@@ -262,7 +262,7 @@ namespace ChordingCoding
 
             switch (theme)
             {
-                case Form1.Theme.Forest:
+                case Form1.Theme.Autumn:
                     rand = r.Next(17);
                     switch (rand)
                     {

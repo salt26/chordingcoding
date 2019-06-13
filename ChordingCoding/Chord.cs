@@ -30,6 +30,8 @@ namespace ChordingCoding
             {
                 case Form1.Theme.Autumn:
                     #region Autumn Chord
+                    maxOctave = 5;
+                    minOctave = 4;
                     root = (Root)r.Next(12);
 
                     rand = r.Next(15);
@@ -57,15 +59,15 @@ namespace ChordingCoding
                             type = Type.sus4;
                             break;
                         case 14:
-                            type = Type.aug;
+                            type = Type.M7;
                             break;
                         default:
-                            type = Type.dim;
+                            type = Type.m7;
                             break;
                     }
 
                     rand = r.Next(15);
-                    octave = 6;
+                    octave = 5;
                     switch (rand)
                     {
                         case 0:
@@ -190,9 +192,9 @@ namespace ChordingCoding
                         case 3:
                         case 4:
                         case 5:
-                        case 6:
                             type = Type.Major;
                             break;
+                        case 6:
                         case 7:
                         case 8:
                         case 9:
@@ -278,6 +280,8 @@ namespace ChordingCoding
             {
                 case Form1.Theme.Autumn:
                     #region Autumn Chord
+                    maxOctave = 5;
+                    minOctave = 4;
                     rand = r.Next(17);
                     switch (rand)
                     {
@@ -286,10 +290,8 @@ namespace ChordingCoding
                         case 3:
                         case 4:
                         case 5:
-                        case 6:
                             type = Type.Major;
                             break;
-                        case 7:
                         case 8:
                         case 9:
                         case 10:
@@ -303,10 +305,12 @@ namespace ChordingCoding
                             type = Type.sus4;
                             break;
                         case 14:
-                            type = Type.aug;
+                        case 6:
+                            type = Type.M7;
                             break;
                         case 15:
-                            type = Type.dim;
+                        case 7:
+                            type = Type.m7;
                             break;
                         default:
                             type = c.type;
@@ -612,9 +616,9 @@ namespace ChordingCoding
                         case 3:
                         case 4:
                         case 5:
-                        case 6:
                             type = Type.Major;
                             break;
+                        case 6:
                         case 7:
                         case 8:
                         case 9:

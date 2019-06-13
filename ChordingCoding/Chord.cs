@@ -391,13 +391,13 @@ namespace ChordingCoding
                     {
                         case 0:
                             octave -= 1;
-                            if (octave < 3) octave = 4;
+                            if (octave < minOctave) octave = minOctave + 1;
                             break;
                         case 1:
                         case 2:
                         case 3:
                             octave -= 1;
-                            if (octave < 3) octave = 3;
+                            if (octave < minOctave) octave = minOctave;
                             break;
                         case 4:
                         case 5:
@@ -412,11 +412,11 @@ namespace ChordingCoding
                         case 13:
                         case 14:
                             octave += 1;
-                            if (octave > 7) octave = 7;
+                            if (octave > maxOctave) octave = maxOctave;
                             break;
                         default:
                             octave += 1;
-                            if (octave > 7) octave = 6;
+                            if (octave > maxOctave) octave = maxOctave - 1;
                             break;
                     }
                     if (octave > maxOctave) octave = maxOctave;
@@ -556,13 +556,13 @@ namespace ChordingCoding
                     {
                         case 0:
                             octave -= 1;
-                            if (octave < 3) octave = 4;
+                            if (octave < minOctave) octave = minOctave + 1;
                             break;
                         case 1:
                         case 2:
                         case 3:
                             octave -= 1;
-                            if (octave < 3) octave = 3;
+                            if (octave < minOctave) octave = minOctave;
                             break;
                         case 4:
                         case 5:
@@ -577,11 +577,11 @@ namespace ChordingCoding
                         case 13:
                         case 14:
                             octave += 1;
-                            if (octave > 7) octave = 7;
+                            if (octave > maxOctave) octave = maxOctave;
                             break;
                         default:
                             octave += 1;
-                            if (octave > 7) octave = 6;
+                            if (octave > maxOctave) octave = maxOctave - 1;
                             break;
                     }
                     if (octave > maxOctave) octave = maxOctave;
@@ -608,106 +608,213 @@ namespace ChordingCoding
                     #region Star Chord
                     maxOctave = 8;
                     minOctave = 5;
-                    rand = r.Next(17);
-                    switch (rand)
+                    switch (c.type)
                     {
-                        case 1:
-                        case 2:
-                        case 3:
-                        case 4:
-                        case 5:
-                            type = Type.Major;
-                            break;
-                        case 6:
-                        case 7:
-                        case 8:
-                        case 9:
-                        case 10:
-                            type = Type.minor;
-                            break;
-                        case 11:
-                            type = Type.sus2;
-                            break;
-                        case 12:
-                        case 13:
-                            type = Type.sus4;
-                            break;
-                        case 14:
-                            type = Type.aug;
-                            break;
-                        case 15:
-                            type = Type.dim;
-                            break;
-                        default:
-                            type = c.type;
-                            break;
-                    }
-
-                    //root = (Root)r.Next(12);
-                    rand = r.Next(10);
-                    switch (rand)
-                    {
-                        case 1:
-                        case 2:
-                        case 3:
-                            root = c.root;
-                            break;
-                        case 4:
-                        case 5:
-                        case 6:
-                            root = (Root)(((int)c.root + 7) % 12);
-                            break;
-                        case 7:
-                        case 8:
-                        case 9:
-                            root = (Root)(((int)c.root + 5) % 12);
-                            break;
-                        case 10:
-                            if (c.type == Type.Major)
+                        case Type.Major:
+                        case Type.M7:
+                            rand = r.Next(8);
+                            switch (rand)
                             {
-                                root = (Root)(((int)c.root - 3) % 12);
-                                type = Type.minor;
-                            }
-                            else if (c.type == Type.minor)
-                            {
-                                root = (Root)(((int)c.root + 3) % 12);
-                                type = Type.Major;
-                            }
-                            else if (c.type == Type.dim)
-                            {
-                                type = c.type;
-                                rand = r.Next(2);
-                                if (rand == 0)
-                                    root = (Root)(((int)c.root + 3) % 12);
-                                else
-                                    root = (Root)(((int)c.root - 3) % 12);
-                            }
-                            else if (c.type == Type.aug)
-                            {
-                                type = c.type;
-                                rand = r.Next(2);
-                                if (rand == 0)
-                                    root = (Root)(((int)c.root + 4) % 12);
-                                else
-                                    root = (Root)(((int)c.root - 4) % 12);
-                            }
-                            else
-                            {
-                                rand = r.Next(2);
-                                if (rand == 0)
-                                {
-                                    root = (Root)(((int)c.root + 3) % 12);
-                                    type = Type.Major;
-                                }
-                                else
-                                {
+                                case 0:
                                     root = (Root)(((int)c.root - 3) % 12);
                                     type = Type.minor;
-                                }
+                                    break;
+                                case 1:
+                                    root = c.root;
+                                    type = Type.aug;
+                                    break;
+                                case 2:
+                                    root = (Root)(((int)c.root + 1) % 12);
+                                    type = Type.dim;
+                                    break;
+                                case 3:
+                                    root = (Root)(((int)c.root + 4) % 12);
+                                    type = Type.dim;
+                                    break;
+                                case 4:
+                                    root = (Root)(((int)c.root + 4) % 12);
+                                    type = Type.minor;
+                                    break;
+                                case 5:
+                                    root = c.root;
+                                    type = Type.minor;
+                                    break;
+                                case 6:
+                                    root = c.root;
+                                    type = Type.sus2;
+                                    break;
+                                case 7:
+                                    root = c.root;
+                                    type = Type.sus4;
+                                    break;
                             }
                             break;
-                        default:    // Unused
-                            root = (Root)r.Next(12);
+                        case Type.minor:
+                        case Type.m7:
+                            rand = r.Next(8);
+                            switch (rand)
+                            {
+                                case 0:
+                                    root = c.root;
+                                    type = Type.dim;
+                                    break;
+                                case 1:
+                                    root = (Root)(((int)c.root - 4) % 12);
+                                    type = Type.Major;
+                                    break;
+                                case 2:
+                                    root = (Root)(((int)c.root - 3) % 12);
+                                    type = Type.dim;
+                                    break;
+                                case 3:
+                                    root = (Root)(((int)c.root + 3) % 12);
+                                    type = Type.Major;
+                                    break;
+                                case 4:
+                                    root = (Root)(((int)c.root + 3) % 12);
+                                    type = Type.aug;
+                                    break;
+                                case 5:
+                                    root = c.root;
+                                    type = Type.Major;
+                                    break;
+                                case 6:
+                                    root = c.root;
+                                    type = Type.sus2;
+                                    break;
+                                case 7:
+                                    root = c.root;
+                                    type = Type.sus4;
+                                    break;
+                            }
+                            break;
+                        case Type.sus2:
+                            rand = r.Next(6);
+                            switch (rand)
+                            {
+                                case 0:
+                                    root = c.root;
+                                    type = Type.Major;
+                                    break;
+                                case 1:
+                                    root = c.root;
+                                    type = Type.minor;
+                                    break;
+                                case 2:
+                                    root = c.root;
+                                    type = Type.sus4;
+                                    break;
+                                case 3:
+                                    root = (Root)(((int)c.root - 5) % 12);
+                                    type = Type.minor;
+                                    break;
+                                case 4:
+                                    root = (Root)(((int)c.root - 5) % 12);
+                                    type = Type.Major;
+                                    break;
+                                case 5:
+                                    root = (Root)(((int)c.root - 5) % 12);
+                                    type = Type.sus2;
+                                    break;
+                            }
+                            break;
+                        case Type.sus4:
+                            rand = r.Next(6);
+                            switch (rand)
+                            {
+                                case 0:
+                                    root = c.root;
+                                    type = Type.Major;
+                                    break;
+                                case 1:
+                                    root = c.root;
+                                    type = Type.minor;
+                                    break;
+                                case 2:
+                                    root = c.root;
+                                    type = Type.sus2;
+                                    break;
+                                case 3:
+                                    root = (Root)(((int)c.root + 5) % 12);
+                                    type = Type.minor;
+                                    break;
+                                case 4:
+                                    root = (Root)(((int)c.root + 5) % 12);
+                                    type = Type.Major;
+                                    break;
+                                case 5:
+                                    root = (Root)(((int)c.root + 5) % 12);
+                                    type = Type.sus4;
+                                    break;
+                            }
+                            break;
+                        case Type.aug:
+                            rand = r.Next(6);
+                            switch (rand)
+                            {
+                                case 0:
+                                    root = c.root;
+                                    type = Type.Major;
+                                    break;
+                                case 1:
+                                    root = (Root)(((int)c.root - 3) % 12);
+                                    type = Type.minor;
+                                    break;
+                                case 2:
+                                    root = (Root)(((int)c.root + 1) % 12);
+                                    type = Type.minor;
+                                    break;
+                                case 3:
+                                    root = (Root)(((int)c.root + 4) % 12);
+                                    type = Type.Major;
+                                    break;
+                                case 4:
+                                    root = (Root)(((int)c.root - 4) % 12);
+                                    type = Type.Major;
+                                    break;
+                                case 5:
+                                    root = (Root)(((int)c.root + 5) % 12);
+                                    type = Type.minor;
+                                    break;
+                            }
+                            break;
+                        case Type.dim:
+                            rand = r.Next(11);
+                            switch (rand)
+                            {
+                                case 0:
+                                case 7:
+                                    root = c.root;
+                                    type = Type.minor;
+                                    break;
+                                case 1:
+                                case 8:
+                                    root = (Root)(((int)c.root - 4) % 12);
+                                    type = Type.Major;
+                                    break;
+                                case 2:
+                                    root = (Root)(((int)c.root - 3) % 12);
+                                    type = Type.dim;
+                                    break;
+                                case 3:
+                                    root = (Root)(((int)c.root + 3) % 12);
+                                    type = Type.dim;
+                                    break;
+                                case 4:
+                                case 9:
+                                    root = (Root)(((int)c.root + 3) % 12);
+                                    type = Type.minor;
+                                    break;
+                                case 5:
+                                case 10:
+                                    root = (Root)(((int)c.root - 1) % 12);
+                                    type = Type.Major;
+                                    break;
+                                case 6:
+                                    root = (Root)(((int)c.root + 6) % 12);
+                                    type = Type.dim;
+                                    break;
+                            }
                             break;
                     }
 
@@ -717,13 +824,13 @@ namespace ChordingCoding
                     {
                         case 0:
                             octave -= 1;
-                            if (octave < 3) octave = 4;
+                            if (octave < minOctave) octave = minOctave + 1;
                             break;
                         case 1:
                         case 2:
                         case 3:
                             octave -= 1;
-                            if (octave < 3) octave = 3;
+                            if (octave < minOctave) octave = minOctave;
                             break;
                         case 4:
                         case 5:
@@ -738,11 +845,11 @@ namespace ChordingCoding
                         case 13:
                         case 14:
                             octave += 1;
-                            if (octave > 7) octave = 7;
+                            if (octave > maxOctave) octave = maxOctave;
                             break;
                         default:
                             octave += 1;
-                            if (octave > 7) octave = 6;
+                            if (octave > maxOctave) octave = maxOctave - 1;
                             break;
                     }
                     if (octave > maxOctave) octave = maxOctave;

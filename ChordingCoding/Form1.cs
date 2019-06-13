@@ -443,11 +443,10 @@ namespace ChordingCoding
                     StopPlaying(2);
                     StopPlaying(3);
                     particleSystems = new List<ParticleSystem>();
-
-                    // TODO
-                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, 101));   // 사운드이펙트(고블린) -> 분위기를 만드는 역할
-                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 1, 12));    // 마림바 -> 주 멜로디
-                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 2, 123));   // 새 지저귀는 소리 -> 효과음
+                    
+                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, 49));    // 현악 합주 2 -> 분위기를 만드는 역할
+                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 1, 11));    // 비브라폰 -> 주 멜로디
+                    
                     break;
             }
 

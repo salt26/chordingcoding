@@ -15,8 +15,8 @@ namespace ChordingCoding
         public Root root;
         public Type type;
         public int octave;  // TODO 이전 화음에서 이어지도록
-        private const int maxOctave = 8;
-        private const int minOctave = 5;
+        private int maxOctave = 8;
+        private int minOctave = 5;
 
         /// <summary>
         /// 랜덤으로 화음을 초기화합니다.
@@ -101,6 +101,8 @@ namespace ChordingCoding
                     #endregion
                 case Form1.Theme.Rain:
                     #region Rain Chord
+                    maxOctave = 8;
+                    minOctave = 5;
                     root = (Root)r.Next(12);
 
                     rand = r.Next(15);
@@ -176,6 +178,8 @@ namespace ChordingCoding
                     #endregion
                 case Form1.Theme.Star:
                     #region Star Chord
+                    maxOctave = 8;
+                    minOctave = 5;
                     root = (Root)r.Next(12);
 
                     rand = r.Next(15);
@@ -433,6 +437,8 @@ namespace ChordingCoding
                     #endregion
                 case Form1.Theme.Rain:
                     #region Rain Chord
+                    maxOctave = 8;
+                    minOctave = 5;
                     rand = r.Next(17);
                     switch (rand)
                     {
@@ -596,6 +602,8 @@ namespace ChordingCoding
                     #endregion
                 case Form1.Theme.Star:
                     #region Star Chord
+                    maxOctave = 8;
+                    minOctave = 5;
                     rand = r.Next(17);
                     switch (rand)
                     {

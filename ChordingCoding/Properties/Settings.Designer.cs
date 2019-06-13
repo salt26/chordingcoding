@@ -85,7 +85,7 @@ namespace ChordingCoding.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        [global::System.Configuration.DefaultSettingValueAttribute("80")]
         public int Volume2 {
             get {
                 return ((int)(this["Volume2"]));

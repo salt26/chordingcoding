@@ -6,7 +6,7 @@
       <Value Profile="(Default)">Autumn</Value>
     </Setting>
     <Setting Name="Volume0" Type="System.Int32" Scope="User">
-      <Value Profile="(Default)">100</Value>
+      <Value Profile="(Default)">80</Value>
     </Setting>
     <Setting Name="Opacity0" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">80</Value>

@@ -54,8 +54,14 @@ namespace ChordingCoding
                     {
                         case Form1.Theme.Autumn:
                             pitch = Form1.chord.NextNote();
-                            Form1.PlayANote(pitch - 12, 14, 0, 96);
+                            Form1.PlayANote(pitch, 16, 0);
                             Form1.PlayANote(pitch, 16, 1);
+                            /*
+                            foreach (int p in Form1.chord.NextChord())
+                            {
+                                Form1.PlayANote(p - 12, 16, 0, 48);
+                            }
+                            */
                             Form1.AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
                             //Form1.PlayANote(vkCode % 24 + 50);
                             break;
@@ -67,7 +73,7 @@ namespace ChordingCoding
                             break;
                         case Form1.Theme.Star:
                             pitch = Form1.chord.NextNote();
-                            Form1.PlayANote(pitch - 12, 14, 0, 72);
+                            Form1.PlayANote(pitch - 12, 16, 0, 72);
                             Form1.PlayANote(pitch, 16, 1);
                             Form1.AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
                             //Form1.PlayANote(vkCode % 24 + 50);
@@ -92,10 +98,10 @@ namespace ChordingCoding
                             Form1.chord = new Chord(Form1.theme, Form1.chord);
                             pitch = Form1.chord.NextNote();
                             Form1.PlayANote(pitch, 16, 1);
-                            Form1.PlayANote(pitch % 12 + 54, 4, 2, 48);
+                            Form1.PlayANote(pitch % 12 + 54, 4, 2, 54);
                             foreach (int p in Form1.chord.NextChord())
                             {
-                                Form1.PlayANote((p + 6) % 12 + 54, 14, 0, 96);
+                                Form1.PlayANote(p, 16, 0, 64);
                             }
                             if (Form1.form1 != null)
                             {
@@ -139,7 +145,7 @@ namespace ChordingCoding
                             //Form1.PlayANote(pitch % 12 + 54, 4, 2, 48);
                             foreach (int p in Form1.chord.NextChord())
                             {
-                                Form1.PlayANote((p + 6) % 12 + 54, 14, 0, 72);
+                                Form1.PlayANote((p + 6) % 12 + 54, 16, 0, 72);
                             }
                             if (Form1.form1 != null)
                             {
@@ -147,7 +153,7 @@ namespace ChordingCoding
                                 Form1.AddParticleSystem(
                                     /*posX*/ (float)(r.NextDouble() * Form1.form1.Size.Width),
                                     /*posY*/ (float)(r.NextDouble() * Form1.form1.Size.Height * 5 / 6 - Form1.form1.Size.Height / 12),
-                                    /*velX*/ 2, /*velY*/ 8, /*life*/ 32,
+                                    /*velX*/ 2, /*velY*/ 8, /*life*/ 38,
                                     /*cNum*/ 7, /*cRange*/ 4,
                                     ParticleSystem.CreateFunction.Gaussian,
                                     Particle.Type.dot, Form1.chord.ChordColor(),

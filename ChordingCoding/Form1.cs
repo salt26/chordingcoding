@@ -196,7 +196,8 @@ namespace ChordingCoding
         /// <param name="e"></param>
         public void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            BeginInvoke(new TimerTickDelegate(UpdateFrame));
+            if (_isReady)
+                BeginInvoke(new TimerTickDelegate(UpdateFrame));
         }
 
         /// <summary>
@@ -232,6 +233,28 @@ namespace ChordingCoding
 
             if (opacity > 0)
                 Invalidate(true);   // 화면을 다시 그리게 함
+
+            // 기본 빗소리가 멈추는 것을 대비하여 
+            if (theme == Theme.Rain)
+            {
+                if (frameNumber % ((int)frame * 10) == 0)
+                {
+                    StopPlaying(3);
+                    frameNumber = 0;
+                    Score score = new Score();
+                    Note note = new Note(45, 1, 0, 0, 3);
+                    score.PlayANoteForever(outDevice, note, (int)Math.Round(48 * volumeD));     // 기본 빗소리 (사라지지 않아야 함)
+                }
+                if (frameNumber % ((int)frame * 10) == (int)frame * 5)
+                {
+                    StopPlaying(4);
+                    Score score = new Score();
+                    Note note = new Note(45, 1, 0, 0, 4);
+                    score.PlayANoteForever(outDevice, note, (int)Math.Round(48 * volumeD));     // 기본 빗소리 (사라지지 않아야 함)
+                }
+            }
+
+            frameNumber++;
         }
 
         private void Form1_Paint(object sender, PaintEventArgs e)
@@ -392,11 +415,12 @@ namespace ChordingCoding
                     StopPlaying(1);
                     StopPlaying(2);
                     StopPlaying(3);
+                    StopPlaying(4);
                     particleSystems = new List<ParticleSystem>();
                     
                     // TODO
-                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, 101));   // 사운드이펙트(고블린) -> 분위기를 만드는 역할
-                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 1, 12));    // 마림바 -> 주 멜로디
+                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, 32));   // 사운드이펙트(고블린) -> 분위기를 만드는 역할
+                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 1, 24));    // 어쿠스틱 기타(나일론) -> 주 멜로디
                     outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 2, 123));   // 새 지저귀는 소리 -> 효과음
                     break;
                 case Theme.Rain:
@@ -415,16 +439,19 @@ namespace ChordingCoding
                     StopPlaying(1);
                     StopPlaying(2);
                     StopPlaying(3);
+                    StopPlaying(4);
                     particleSystems = new List<ParticleSystem>();
 
                     outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, 101));   // 사운드이펙트(고블린) -> 분위기를 만드는 역할
                     outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 1, 12));    // 마림바 -> 주 멜로디
                     outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 2, 126));   // 박수 소리 -> 빗소리
                     outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 3, 126));   // 박수 소리 -> 빗소리
+                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 4, 126));   // 박수 소리 -> 빗소리
 
+                    frameNumber = 0;    // UpdateFrame()에서 기본 빗소리를 재생하도록 함
                     Score score = new Score();
-                    Note note = new Note(45, 1, 0, 0, 3);
-                    score.PlayANoteForever(outDevice, note, (int)Math.Round(48 * volumeD));     // 기본 빗소리 (사라지지 않음)
+                    Note note = new Note(45, 1, 0, 0, 4);
+                    score.PlayANoteForever(outDevice, note, (int)Math.Round(48 * volumeD));     // 기본 빗소리 (사라지지 않아야 함)
                     break;
                 case Theme.Star:
                     _theme = Theme.Star;
@@ -442,6 +469,7 @@ namespace ChordingCoding
                     StopPlaying(1);
                     StopPlaying(2);
                     StopPlaying(3);
+                    StopPlaying(4);
                     particleSystems = new List<ParticleSystem>();
                     
                     outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, 49));    // 현악 합주 2 -> 분위기를 만드는 역할

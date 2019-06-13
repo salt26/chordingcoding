@@ -58,6 +58,11 @@
     <Compile Include="InterceptKeys.cs" />
     <Compile Include="Particle.cs" />
     <Compile Include="ParticleSystem.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="TrackBarMenuItem.cs" />
     <Compile Include="Note.cs" />
     <Compile Include="Program.cs" />
@@ -68,14 +73,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -90,32 +90,32 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Dot.png" />
-    <Content Include="Leaf11.png" />
-    <Content Include="Leaf12.png" />
-    <Content Include="Leaf13.png" />
-    <Content Include="Leaf14.png" />
-    <Content Include="Leaf15.png" />
-    <Content Include="Leaf16.png" />
-    <Content Include="Leaf21.png" />
-    <Content Include="Leaf22.png" />
-    <Content Include="Leaf23.png" />
-    <Content Include="Leaf24.png" />
-    <Content Include="Leaf25.png" />
-    <Content Include="Leaf26.png" />
-    <Content Include="Leaf31.png" />
-    <Content Include="Leaf32.png" />
-    <Content Include="Leaf33.png" />
-    <Content Include="Leaf34.png" />
-    <Content Include="Leaf35.png" />
-    <Content Include="Leaf36.png" />
-    <Content Include="Note8_.png" />
+    <Content Include="Resources\Dot.png" />
+    <Content Include="Resources\Leaf11.png" />
+    <Content Include="Resources\Leaf12.png" />
+    <Content Include="Resources\Leaf13.png" />
+    <Content Include="Resources\Leaf14.png" />
+    <Content Include="Resources\Leaf15.png" />
+    <Content Include="Resources\Leaf16.png" />
+    <Content Include="Resources\Leaf21.png" />
+    <Content Include="Resources\Leaf22.png" />
+    <Content Include="Resources\Leaf23.png" />
+    <Content Include="Resources\Leaf24.png" />
+    <Content Include="Resources\Leaf25.png" />
+    <Content Include="Resources\Leaf26.png" />
+    <Content Include="Resources\Leaf31.png" />
+    <Content Include="Resources\Leaf32.png" />
+    <Content Include="Resources\Leaf33.png" />
+    <Content Include="Resources\Leaf34.png" />
+    <Content Include="Resources\Leaf35.png" />
+    <Content Include="Resources\Leaf36.png" />
+    <Content Include="Resources\Note8_.png" />
     <Content Include="NoteWord.ico" />
     <None Include="Resources\NewIcon.png" />
-    <Content Include="Rain.png" />
-    <Content Include="Rain_.png" />
-    <Content Include="Star.png" />
-    <Content Include="Tray.png" />
+    <Content Include="Resources\Rain.png" />
+    <Content Include="Resources\Rain_.png" />
+    <Content Include="Resources\Star.png" />
+    <Content Include="Resources\Tray.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

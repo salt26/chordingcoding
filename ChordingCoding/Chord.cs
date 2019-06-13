@@ -10,7 +10,7 @@ namespace ChordingCoding
     public class Chord
     {
         public enum Root { C, Db, D, Eb, E, F, Gb, G, Ab, A, Bb, B }
-        public enum Type { Major, minor, sus2, sus4, dim, aug }
+        public enum Type { Major, minor, sus2, sus4, dim, aug, M7, m7 }
 
         public Root root;
         public Type type;
@@ -29,6 +29,7 @@ namespace ChordingCoding
             switch (theme)
             {
                 case Form1.Theme.Autumn:
+                    #region Autumn Chord
                     root = (Root)r.Next(12);
 
                     rand = r.Next(15);
@@ -97,7 +98,9 @@ namespace ChordingCoding
                     if (octave < minOctave) octave = minOctave;
 
                     break;
+                    #endregion
                 case Form1.Theme.Rain:
+                    #region Rain Chord
                     root = (Root)r.Next(12);
 
                     rand = r.Next(15);
@@ -107,15 +110,19 @@ namespace ChordingCoding
                         case 2:
                         case 3:
                         case 4:
+                            type = Type.minor;
+                            break;
                         case 5:
                         case 6:
-                            type = Type.Major;
+                            type = Type.m7;
                             break;
                         case 7:
+                            type = Type.Major;
+                            break;
                         case 8:
                         case 9:
                         case 10:
-                            type = Type.minor;
+                            type = Type.M7;
                             break;
                         case 11:
                             type = Type.sus2;
@@ -166,7 +173,9 @@ namespace ChordingCoding
                     if (octave < minOctave) octave = minOctave;
 
                     break;
+                    #endregion
                 case Form1.Theme.Star:
+                    #region Star Chord
                     root = (Root)r.Next(12);
 
                     rand = r.Next(15);
@@ -235,6 +244,7 @@ namespace ChordingCoding
                     if (octave < minOctave) octave = minOctave;
 
                     break;
+                    #endregion
             }
         }
 
@@ -263,6 +273,7 @@ namespace ChordingCoding
             switch (theme)
             {
                 case Form1.Theme.Autumn:
+                    #region Autumn Chord
                     rand = r.Next(17);
                     switch (rand)
                     {
@@ -419,7 +430,9 @@ namespace ChordingCoding
                     if (octave < minOctave) octave = minOctave;
 
                     break;
+                    #endregion
                 case Form1.Theme.Rain:
+                    #region Rain Chord
                     rand = r.Next(17);
                     switch (rand)
                     {
@@ -427,15 +440,19 @@ namespace ChordingCoding
                         case 2:
                         case 3:
                         case 4:
+                            type = Type.minor;
+                            break;
                         case 5:
                         case 6:
-                            type = Type.Major;
+                            type = Type.m7;
                             break;
                         case 7:
+                            type = Type.Major;
+                            break;
                         case 8:
                         case 9:
                         case 10:
-                            type = Type.minor;
+                            type = Type.M7;
                             break;
                         case 11:
                             type = Type.sus2;
@@ -576,7 +593,9 @@ namespace ChordingCoding
                     if (octave < minOctave) octave = minOctave;
 
                     break;
+                    #endregion
                 case Form1.Theme.Star:
+                    #region Star Chord
                     rand = r.Next(17);
                     switch (rand)
                     {
@@ -733,6 +752,7 @@ namespace ChordingCoding
                     if (octave < minOctave) octave = minOctave;
 
                     break;
+                    #endregion
             }
         }
 
@@ -746,73 +766,147 @@ namespace ChordingCoding
             int v = 0;
             int p = (int)root + octave * 12;
             Random r = new Random();
-            switch (r.Next(18))
+            if (type != Type.M7 && type != Type.m7)
             {
-                case 0:
-                case 1:
-                case 2:
-                case 15:
-                    v = 0;
-                    break;
-                case 3:
-                case 4:
-                case 5:
-                case 16:
-                    v = 1;
-                    break;
-                case 6:
-                case 7:
-                case 8:
-                case 17:
-                    v = 2;
-                    break;
-                case 9:
-                case 10:
-                    v = 0;
-                    p += 12;
-                    break;
-                case 11:
-                case 12:
-                    v = 2;
-                    p -= 12;
-                    break;
-                case 13:
-                    v = 1;
-                    p += 12;
-                    break;
-                case 14:
-                    v = 1;
-                    p -= 12;
-                    break;
+                switch (r.Next(18))
+                {
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 15:
+                        v = 0;
+                        break;
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 16:
+                        v = 1;
+                        break;
+                    case 6:
+                    case 7:
+                    case 8:
+                    case 17:
+                        v = 2;
+                        break;
+                    case 9:
+                    case 10:
+                        v = 0;
+                        p += 12;
+                        break;
+                    case 11:
+                    case 12:
+                        v = 2;
+                        p -= 12;
+                        break;
+                    case 13:
+                        v = 1;
+                        p += 12;
+                        break;
+                    case 14:
+                        v = 1;
+                        p -= 12;
+                        break;
+                }
+            }
+            else
+            {
+                switch (r.Next(24))
+                {
+                    case 0:
+                    case 1:
+                    case 2:
+                    case 15:
+                        v = 0;
+                        break;
+                    case 3:
+                    case 4:
+                    case 5:
+                    case 16:
+                        v = 1;
+                        break;
+                    case 6:
+                    case 7:
+                    case 8:
+                    case 17:
+                        v = 2;
+                        break;
+                    case 18:
+                    case 19:
+                    case 20:
+                    case 21:
+                        v = 3;
+                        break;
+                    case 9:
+                    case 10:
+                        v = 0;
+                        p += 12;
+                        break;
+                    case 22:
+                    case 23:
+                        v = 3;
+                        p -= 12;
+                        break;
+                    case 11:
+                    case 12:
+                        v = 2;
+                        p -= 12;
+                        break;
+                    case 13:
+                        v = 1;
+                        p += 12;
+                        break;
+                    case 14:
+                        v = 1;
+                        p -= 12;
+                        break;
+                }
             }
             
             return (p + TypeToNote(v)) % 128;
         }
 
         /// <summary>
-        /// 3화음의 음들을 반환합니다.
+        /// 3화음 또는 7화음의 음들을 반환합니다.
         /// 반환값은 MIDI의 음 높이 배열입니다.
         /// </summary>
         /// <returns></returns>
         public int[] NextChord()
         {
-            int[] r = new int[3] {  (octave) * 12 + (int)root + TypeToNote(1),
-                                    (octave) * 12 + (int)root + TypeToNote(2),
-                                    (octave) * 12 + (int)root + TypeToNote(0) };
+            int[] r;
+            if (type != Type.M7 && type != Type.m7)
+            {
+                r = new int[3] {  (octave) * 12 + (int)root + TypeToNote(1),
+                                  (octave) * 12 + (int)root + TypeToNote(2),
+                                  (octave) * 12 + (int)root + TypeToNote(0) };
+            }
+            else
+            {
+                r = new int[4] {  (octave) * 12 + (int)root + TypeToNote(1),
+                                  (octave) * 12 + (int)root + TypeToNote(2),
+                                  (octave) * 12 + (int)root + TypeToNote(3),
+                                  (octave) * 12 + (int)root + TypeToNote(0) };
+            }
             return r;
         }
 
         private int TypeToNote(int order)
         {
-            if (order < 0 || order >= 3) return -1;
+            if (order < 0 || ((type != Type.M7 && type != Type.m7) && order >= 3 ||
+                (type == Type.M7 || type == Type.m7) && order >= 4)) return -1;
             int[] typeToNote;
             switch (type)
             {
                 case Type.Major:
                     typeToNote = new int[3] { 0, 4, 7 };
                     break;
+                case Type.M7:
+                    typeToNote = new int[4] { 0, 4, 7, 10 };
+                    break;
                 case Type.minor:
                     typeToNote = new int[3] { 0, 3, 7 };
+                    break;
+                case Type.m7:
+                    typeToNote = new int[4] { 0, 3, 7, 10 };
                     break;
                 case Type.sus2:
                     typeToNote = new int[3] { 0, 2, 7 };
@@ -848,9 +942,18 @@ namespace ChordingCoding
                     s = 0.7f;
                     v = 1f;
                     break;
+                case Chord.Type.M7:
+                    s = 0.7f;
+                    v = 0.8f;
+                    break;
                 case Chord.Type.minor:
                     s = 0.5f;
                     v = 0.5f;
+                    h = (h + 60) % 360;
+                    break;
+                case Chord.Type.m7:
+                    s = 0.5f;
+                    v = 0.4f;
                     h = (h + 60) % 360;
                     break;
                 case Chord.Type.sus2:

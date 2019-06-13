@@ -139,12 +139,13 @@ namespace ChordingCoding
                 _volume[i] = (int)Properties.Settings.Default["Volume" + i.ToString()];
             }
 
+            /*
             Opacity = opacity / 100D;
             trackBarMenuItem1.Value = opacity / 5;
             trackBarMenuItem2.Value = volume / 5;
             불투명도ToolStripMenuItem.Text = "불투명도 (" + opacity + "%)";
             음량ToolStripMenuItem.Text = "음량 (" + volume + "%)";
-
+            */
             outDevice = new OutputDevice(0);
 
             switch ((string)Properties.Settings.Default["Theme"])
@@ -376,10 +377,11 @@ namespace ChordingCoding
             switch (theme)
             {
                 case Theme.Autumn:
+                    _theme = Theme.Autumn;
                     가을산책ToolStripMenuItem.CheckState = CheckState.Checked;
                     비오는날ToolStripMenuItem.CheckState = CheckState.Unchecked;
                     별헤는밤ToolStripMenuItem.CheckState = CheckState.Unchecked;
-                    _theme = Theme.Autumn;
+                    테마ToolStripMenuItem.Text = "테마 (가을 산책)";
                     basicParticleSystem = new ParticleSystem(
                                         /*cNum*/ 1, /*cRange*/ 0,
                                         ParticleSystem.CreateFunction.TopRandom,
@@ -389,6 +391,7 @@ namespace ChordingCoding
                     StopPlaying(0);
                     StopPlaying(1);
                     StopPlaying(2);
+                    StopPlaying(3);
                     particleSystems = new List<ParticleSystem>();
                     
                     // TODO
@@ -397,10 +400,11 @@ namespace ChordingCoding
                     outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 2, 123));   // 새 지저귀는 소리 -> 효과음
                     break;
                 case Theme.Rain:
+                    _theme = Theme.Rain;
                     가을산책ToolStripMenuItem.CheckState = CheckState.Unchecked;
                     비오는날ToolStripMenuItem.CheckState = CheckState.Checked;
                     별헤는밤ToolStripMenuItem.CheckState = CheckState.Unchecked;
-                    _theme = Theme.Rain;
+                    테마ToolStripMenuItem.Text = "테마 (비 오는 날)";
                     basicParticleSystem = new ParticleSystem(
                                         /*cNum*/ 1, /*cRange*/ 0,
                                         ParticleSystem.CreateFunction.TopRandom,
@@ -410,17 +414,24 @@ namespace ChordingCoding
                     StopPlaying(0);
                     StopPlaying(1);
                     StopPlaying(2);
+                    StopPlaying(3);
                     particleSystems = new List<ParticleSystem>();
 
                     outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, 101));   // 사운드이펙트(고블린) -> 분위기를 만드는 역할
                     outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 1, 12));    // 마림바 -> 주 멜로디
-                    //outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 2, 123));   // 새 지저귀는 소리 -> 효과음
+                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 2, 126));   // 박수 소리 -> 빗소리
+                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 3, 126));   // 박수 소리 -> 빗소리
+
+                    Score score = new Score();
+                    Note note = new Note(45, 1, 0, 0, 3);
+                    score.PlayANoteForever(outDevice, note, (int)Math.Round(48 * volumeD));     // 기본 빗소리 (사라지지 않음)
                     break;
                 case Theme.Star:
+                    _theme = Theme.Star;
                     가을산책ToolStripMenuItem.CheckState = CheckState.Unchecked;
                     비오는날ToolStripMenuItem.CheckState = CheckState.Unchecked;
                     별헤는밤ToolStripMenuItem.CheckState = CheckState.Checked;
-                    _theme = Theme.Star;
+                    테마ToolStripMenuItem.Text = "테마 (별 헤는 밤)";
                     basicParticleSystem = new ParticleSystem(
                                         /*cNum*/ 1, /*cRange*/ 0,
                                         ParticleSystem.CreateFunction.Random,
@@ -430,6 +441,7 @@ namespace ChordingCoding
                     StopPlaying(0);
                     StopPlaying(1);
                     StopPlaying(2);
+                    StopPlaying(3);
                     particleSystems = new List<ParticleSystem>();
 
                     // TODO

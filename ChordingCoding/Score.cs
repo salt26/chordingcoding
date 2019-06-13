@@ -172,9 +172,36 @@ namespace ChordingCoding
         }
 
         /// <summary>
-        /// 음표 하나를 재생합니다.
-        /// 이미 재생 중인 악보는 중복하여 재생할 수 없습니다.
+        /// 음표 하나를 음표의 길이와 관계없이 영원히 재생합니다.
         /// 이미 재생 중인 다른 음표와 동시에 재생할 수 있습니다.
+        /// 재생을 멈추려면 해당 Staff에 Stop()을 호출해야 합니다.
+        /// </summary>
+        /// <param name="outDevice">출력 디바이스</param>
+        /// <param name="note">재생할 음표</param>
+        /// <param name="velocity">연주 세기 (0 ~ 127)</param>
+        // (만약 Unity에서 작업할 경우, 타입을 void 대신 IEnumerator로 바꿔서 Coroutine으로 사용하세요.)
+        public void PlayANoteForever(OutputDevice outDevice, Note note, int velocity = 127)
+        {
+            // 이미 재생 중인 악보이면 중복하여 재생하지 않습니다.
+            if (isPlaying || velocity < 0 || velocity >= 128) return;
+            isPlaying = true;
+            //Console.WriteLine("Playing...");
+
+            // 악보에 있는 모든 음표를 재생합니다.
+            KeyValuePair<float, int> p = note.ToMidi()[0];
+
+            if (p.Value > 0)
+            {
+                // 음표를 재생합니다.
+                // (Midi message pair를 번역하여 Midi message를 생성합니다.)
+                outDevice.Send(new ChannelMessage(ChannelCommand.NoteOn, p.Value >> 16, p.Value & 65535, velocity));
+            }
+            isPlaying = false;
+            //Console.WriteLine("End of note.");
+        }
+
+        /// <summary>
+        /// 재생 중인 Staff 하나의 재생을 멈춥니다.
         /// </summary>
         /// <param name="outDevice">출력 디바이스</param>
         // (만약 Unity에서 작업할 경우, 타입을 void 대신 IEnumerator로 바꿔서 Coroutine으로 사용하세요.)

@@ -21,8 +21,8 @@ namespace ChordingCoding
         public enum Theme { Autumn, Rain, Star }
         static OutputDevice outDevice;
         static bool _isReady = false;
-        static int[] _opacity = { 80, 80, 100 };
-        static int[] _volume = { 100, 100, 100 };
+        static int[] _opacity = { 40, 60, 80 };
+        static int[] _volume = { 80, 100, 80 };
         static int frameNumber = 0;         // 실행 후 지금까지 지난 프레임 수
         static Theme _theme = Theme.Autumn;
         static List<ParticleSystem> particleSystems = new List<ParticleSystem>();
@@ -133,11 +133,13 @@ namespace ChordingCoding
             Form form = (Form)sender;
             form.ShowInTaskbar = false;
 
+            /*
             for (int i = 0; i < Enum.GetNames(typeof(Theme)).Length; i++)
             {
                 _opacity[i] = (int)Properties.Settings.Default["Opacity" + i.ToString()];
                 _volume[i] = (int)Properties.Settings.Default["Volume" + i.ToString()];
             }
+            */
 
             /*
             Opacity = opacity / 100D;
@@ -148,6 +150,7 @@ namespace ChordingCoding
             */
             outDevice = new OutputDevice(0);
 
+            /*
             switch ((string)Properties.Settings.Default["Theme"])
             {
                 case "Autumn":
@@ -157,6 +160,20 @@ namespace ChordingCoding
                     SetTheme(Theme.Rain);
                     break;
                 case "Star":
+                    SetTheme(Theme.Star);
+                    break;
+            }
+            */
+            Random r = new Random();
+            switch (r.Next(3))
+            {
+                case 0:
+                    SetTheme(Theme.Autumn);
+                    break;
+                case 1:
+                    SetTheme(Theme.Rain);
+                    break;
+                case 2:
                     SetTheme(Theme.Star);
                     break;
             }
@@ -178,6 +195,7 @@ namespace ChordingCoding
         {
             if (_isReady)
                 outDevice.Close();
+            /*
             Properties.Settings.Default["Theme"] = theme.ToString();
             for (int i = 0; i < Enum.GetNames(typeof(Theme)).Length; i++)
             {
@@ -185,6 +203,7 @@ namespace ChordingCoding
                 Properties.Settings.Default["Volume" + i.ToString()] = _volume[i];
             }
             Properties.Settings.Default.Save();
+            */
             notifyIcon1.Dispose();
             _isReady = false;
         }

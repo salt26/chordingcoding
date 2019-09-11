@@ -132,6 +132,7 @@ namespace ChordingCoding
         {
             Form form = (Form)sender;
             form.ShowInTaskbar = false;
+            form1 = this;
 
             for (int i = 0; i < Enum.GetNames(typeof(Theme)).Length; i++)
             {
@@ -170,7 +171,6 @@ namespace ChordingCoding
 
             notifyIcon1.ShowBalloonTip(8);
 
-            form1 = this;
             _isReady = true;
         }
 
@@ -243,14 +243,14 @@ namespace ChordingCoding
                     frameNumber = 0;
                     Score score = new Score();
                     Note note = new Note(45, 1, 0, 0, 3);
-                    score.PlayANoteForever(outDevice, note, (int)Math.Round(48 * volumeD));     // 기본 빗소리 (사라지지 않아야 함)
+                    score.PlayANoteForever(outDevice, note, (int)Math.Round(24 * volumeD));     // 기본 빗소리 (사라지지 않아야 함)
                 }
                 if (frameNumber % ((int)frame * 10) == (int)frame * 5)
                 {
                     StopPlaying(4);
                     Score score = new Score();
                     Note note = new Note(45, 1, 0, 0, 4);
-                    score.PlayANoteForever(outDevice, note, (int)Math.Round(48 * volumeD));     // 기본 빗소리 (사라지지 않아야 함)
+                    score.PlayANoteForever(outDevice, note, (int)Math.Round(24 * volumeD));     // 기본 빗소리 (사라지지 않아야 함)
                 }
             }
 
@@ -300,11 +300,11 @@ namespace ChordingCoding
 
             if (theme == Theme.Autumn)
             {
-                basicParticleSystem.AddParticleInBasic(Particle.Type.leaf, 320, Color.White, 1f);
+                basicParticleSystem.AddParticleInBasic(Particle.Type.leaf, (Form1.form1.Size.Height + 150) / 4, Color.White, 1f);
             }
             else if (theme == Theme.Rain)
             {
-                basicParticleSystem.AddParticleInBasic(Particle.Type.note, 64, Chord.PitchColor(pitch), 0.1f);
+                basicParticleSystem.AddParticleInBasic(Particle.Type.note, (Form1.form1.Size.Height + 150) / 15, Chord.PitchColor(pitch), 0.1f);
             }
             else if (theme == Theme.Star)
             {
@@ -433,7 +433,7 @@ namespace ChordingCoding
                                         /*cNum*/ 1, /*cRange*/ 0,
                                         ParticleSystem.CreateFunction.TopRandom,
                                         Particle.Type.rain, Color.White,
-                                        /*pSize*/ 0.2f, /*pLife*/ 32);
+                                        /*pSize*/ 0.1f, /*pLife*/ (Form1.form1.Size.Height + 150) / 30);
 
                     StopPlaying(0);
                     StopPlaying(1);
@@ -451,7 +451,6 @@ namespace ChordingCoding
                     frameNumber = 0;    // UpdateFrame()에서 기본 빗소리를 재생하도록 함
                     Score score = new Score();
                     Note note = new Note(45, 1, 0, 0, 4);
-                    score.PlayANoteForever(outDevice, note, (int)Math.Round(48 * volumeD));     // 기본 빗소리 (사라지지 않아야 함)
                     break;
                 case Theme.Star:
                     _theme = Theme.Star;

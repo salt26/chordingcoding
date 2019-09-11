@@ -211,7 +211,7 @@ namespace ChordingCoding
                     break;
                 case CreateFunction.TopRandom:
                     posX = (float)(random.NextDouble() * Form1.form1.Size.Width);
-                    posY = -50;
+                    posY = -50f - 25f * (float)random.NextDouble();
                     break;
                 case CreateFunction.Random:
                     posX = (float)(random.NextDouble() * Form1.form1.Size.Width);
@@ -219,7 +219,7 @@ namespace ChordingCoding
                     break;
                 case CreateFunction.BottomRandom:
                     posX = (float)(random.NextDouble() * Form1.form1.Size.Width);
-                    posY = Form1.form1.Size.Height;
+                    posY = Form1.form1.Size.Height + 50f + 25f * (float)random.NextDouble();
                     break;
             }
         }

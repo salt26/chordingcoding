@@ -30,6 +30,8 @@ namespace ChordingCoding
         {
             this.size = size;
             this.type = type;
+            Random r = new Random();
+            float f;
 
             switch (type)
             {
@@ -41,9 +43,11 @@ namespace ChordingCoding
                     break;
                 case Type.rain:
                     image = Properties.Resources.Rain_;
+                    f = (float)r.NextDouble();
                     isBlackBase = false;
                     velocityX = 0;
-                    velocityY = 30;
+                    velocityY = 30 + 15 * f;
+                    this.size = size * (1 + f);
                     break;
                 case Type.note:
                     image = Properties.Resources.Note8_;
@@ -58,8 +62,7 @@ namespace ChordingCoding
                     velocityY = 0;
                     break;
                 case Type.leaf:
-                    Random r = new Random();
-                    float f = (float)r.NextDouble();
+                    f = (float)r.NextDouble();
                     isBlackBase = false;
                     velocityX = 0;
                     velocityY = 4 + 4 * f;

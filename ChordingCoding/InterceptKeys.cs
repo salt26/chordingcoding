@@ -117,7 +117,7 @@ namespace ChordingCoding
                             Form1.PlayANote(pitch, 16, 1);
                             rainPitch += 5;
                             rainPitch %= 12;
-                            Form1.PlayANote(rainPitch + 46, 64, 2, 48);
+                            Form1.PlayANote(rainPitch + 46, 64, 2, 24);
                             foreach (int p in Form1.chord.NextChord())
                             {
                                 Form1.PlayANote((p + 6) % 12 + 54, 14, 0, 96);
@@ -132,7 +132,7 @@ namespace ChordingCoding
                                     /*cNum*/ 1, /*cRange*/ 0,
                                     ParticleSystem.CreateFunction.TopRandom,
                                     Particle.Type.rain, Color.White,
-                                    /*pSize*/ 0.2f, /*pLife*/ 32);
+                                    /*pSize*/ 0.1f, /*pLife*/ (Form1.form1.Size.Height + 150) / 30);
                             }
                             break;
                             #endregion

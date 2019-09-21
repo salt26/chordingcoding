@@ -44,8 +44,7 @@ namespace ChordingCoding
                     (vkCode >= 96 && vkCode <= 111) ||
                     (vkCode >= 186 && vkCode <= 192) ||
                     (vkCode >= 219 && vkCode <= 223) ||
-                    (vkCode == 226)
-                    )
+                    (vkCode == 226))
                 {
                     // Characters
                     int pitch;
@@ -54,8 +53,8 @@ namespace ChordingCoding
                     {
                         case Form1.Theme.Autumn:
                             pitch = Form1.chord.NextNote();
-                            Form1.PlayANote(pitch, 16, 0);
-                            Form1.PlayANote(pitch, 16, 1);
+                            Form1.PlayANoteSync(pitch, 16, 0);
+                            Form1.PlayANoteSync(pitch, 16, 1);
                             /*
                             foreach (int p in Form1.chord.NextChord())
                             {
@@ -67,14 +66,14 @@ namespace ChordingCoding
                             break;
                         case Form1.Theme.Rain:
                             pitch = Form1.chord.NextNote();
-                            Form1.PlayANote(pitch - 12, 14, 0, 96);
-                            Form1.PlayANote(pitch, 16, 1);
+                            Form1.PlayANoteSync(pitch - 12, 14, 0, 96);
+                            Form1.PlayANoteSync(pitch, 16, 1);
                             Form1.AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
                             break;
                         case Form1.Theme.Star:
                             pitch = Form1.chord.NextNote();
-                            Form1.PlayANote(pitch - 12, 16, 0, 72);
-                            Form1.PlayANote(pitch, 16, 1);
+                            Form1.PlayANoteSync(pitch - 12, 16, 0, 72);
+                            Form1.PlayANoteSync(pitch, 16, 1);
                             Form1.AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
                             //Form1.PlayANote(vkCode % 24 + 50);
                             break;
@@ -84,8 +83,7 @@ namespace ChordingCoding
                 else if (
                     (vkCode == 32) ||
                     (vkCode == 9) ||
-                    (vkCode == 13)
-                    )
+                    (vkCode == 13))
                 {
                     // Whitespaces
                     int pitch;
@@ -97,11 +95,11 @@ namespace ChordingCoding
                             Form1.StopPlaying(0);
                             Form1.chord = new Chord(Form1.theme, Form1.chord);
                             pitch = Form1.chord.NextNote();
-                            Form1.PlayANote(pitch, 16, 1);
-                            Form1.PlayANote(pitch % 12 + 54, 4, 2, 54);
+                            Form1.PlayANoteSync(pitch, 16, 1);
+                            Form1.PlayANoteSync(pitch % 12 + 54, 4, 2, 54);
                             foreach (int p in Form1.chord.NextChord())
                             {
-                                Form1.PlayANote(p, 16, 0, 64);
+                                Form1.PlayANoteSync(p, 16, 0, 64);
                             }
                             if (Form1.form1 != null)
                             {
@@ -114,13 +112,13 @@ namespace ChordingCoding
                             Form1.StopPlaying(0);
                             Form1.chord = new Chord(Form1.theme, Form1.chord);
                             pitch = Form1.chord.NextNote();
-                            Form1.PlayANote(pitch, 16, 1);
+                            Form1.PlayANoteSync(pitch, 16, 1);
                             rainPitch += 5;
                             rainPitch %= 12;
-                            Form1.PlayANote(rainPitch + 46, 64, 2, 24);
+                            Form1.PlayANoteSync(rainPitch + 46, 64, 2, 24);
                             foreach (int p in Form1.chord.NextChord())
                             {
-                                Form1.PlayANote((p + 6) % 12 + 54, 14, 0, 96);
+                                Form1.PlayANoteSync((p + 6) % 12 + 54, 14, 0, 96);
                             }
                             if (Form1.form1 != null)
                             {
@@ -141,11 +139,11 @@ namespace ChordingCoding
                             Form1.StopPlaying(0);
                             Form1.chord = new Chord(Form1.theme, Form1.chord);
                             pitch = Form1.chord.NextNote();
-                            Form1.PlayANote(pitch, 16, 1);
+                            Form1.PlayANoteSync(pitch, 16, 1);
                             //Form1.PlayANote(pitch % 12 + 54, 4, 2, 48);
                             foreach (int p in Form1.chord.NextChord())
                             {
-                                Form1.PlayANote((p + 6) % 12 + 54, 16, 0, 72);
+                                Form1.PlayANoteSync((p + 6) % 12 + 54, 16, 0, 72);
                             }
                             if (Form1.form1 != null)
                             {

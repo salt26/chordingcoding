@@ -27,6 +27,7 @@ namespace ChordingCoding
         static Theme _theme = Theme.Autumn;
         static List<ParticleSystem> particleSystems = new List<ParticleSystem>();
         static ParticleSystem basicParticleSystem = null;
+        static List<KeyValuePair<Note, int>> syncPlayBuffer = new List<KeyValuePair<Note, int>>();
         Bitmap bitmap;
         public static Form1 form1;
         public const float frame = 32f;     // 1초에 전환되는 화면의 프레임 수
@@ -254,6 +255,17 @@ namespace ChordingCoding
                 }
             }
 
+            // 동기화된 박자(최소 단위 16분음표)에 맞춰 버퍼에 저장되어 있던 음표 재생
+            if (frameNumber % 4 == 0 && syncPlayBuffer.Count > 0)
+            {
+                Score score = new Score();
+                foreach (KeyValuePair<Note, int> p in syncPlayBuffer)
+                {
+                    score.PlayANote(outDevice, p.Key, (int)Math.Round(p.Value * volumeD));
+                }
+                syncPlayBuffer.Clear();
+            }
+
             frameNumber++;
         }
 
@@ -313,19 +325,20 @@ namespace ChordingCoding
         }
 
         /// <summary>
-        /// 재생 장치에서 음표 하나를 재생합니다.
+        /// 음표 하나를 버퍼에 저장했다가 다음 박자에 맞춰 재생 장치에서 재생합니다.
         /// </summary>
         /// <param name="pitch"></param>
         /// <param name="rhythm"></param>
         /// <param name="staff"></param>
         /// <param name="velocity"></param>
-        public static void PlayANote(int pitch, int rhythm, int staff, int velocity = 127)
+        public static void PlayANoteSync(int pitch, int rhythm, int staff, int velocity = 127)
         {
             if (!_isReady) return;
-            Score score = new Score();
+            //Score score = new Score();
 
             Note note = new Note(pitch, rhythm, 0, 0, staff);
-            score.PlayANote(outDevice, note, (int)Math.Round(velocity * volumeD));
+            syncPlayBuffer.Add(new KeyValuePair<Note, int>(note, velocity));
+            //score.PlayANote(outDevice, note, (int)Math.Round(velocity * volumeD));
         }
 
         /// <summary>

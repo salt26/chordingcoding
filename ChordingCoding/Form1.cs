@@ -23,6 +23,7 @@ namespace ChordingCoding
         static bool _isReady = false;
         static int[] _opacity = { 80, 80, 100 };
         static int[] _volume = { 100, 100, 100 };
+        static int noteResolution = 4;
         static int frameNumber = 0;         // 실행 후 지금까지 지난 프레임 수
         static Theme _theme = Theme.Autumn;
         static List<ParticleSystem> particleSystems = new List<ParticleSystem>();
@@ -163,6 +164,9 @@ namespace ChordingCoding
                     break;
             }
 
+            noteResolution = (int)Properties.Settings.Default["NoteResolution"];
+            SetNoteResolution(noteResolution);
+
             bitmap = new Bitmap(Width, Height);
             
             System.Timers.Timer timer = new System.Timers.Timer();
@@ -184,6 +188,7 @@ namespace ChordingCoding
             {
                 Properties.Settings.Default["Opacity" + i.ToString()] = _opacity[i];
                 Properties.Settings.Default["Volume" + i.ToString()] = _volume[i];
+                Properties.Settings.Default["NoteResolution"] = noteResolution;
             }
             Properties.Settings.Default.Save();
             notifyIcon1.Dispose();
@@ -255,8 +260,8 @@ namespace ChordingCoding
                 }
             }
 
-            // 동기화된 박자(최소 단위 16분음표)에 맞춰 버퍼에 저장되어 있던 음표 재생
-            if (frameNumber % 4 == 0 && syncPlayBuffer.Count > 0)
+            // 동기화된 박자(최소 리듬 단위)에 맞춰 버퍼에 저장되어 있던 음표 재생
+            if (noteResolution > 0 && frameNumber % noteResolution == 0 && syncPlayBuffer.Count > 0)
             {
                 Score score = new Score();
                 foreach (KeyValuePair<Note, int> p in syncPlayBuffer)
@@ -334,11 +339,17 @@ namespace ChordingCoding
         public static void PlayANoteSync(int pitch, int rhythm, int staff, int velocity = 127)
         {
             if (!_isReady) return;
-            //Score score = new Score();
-
             Note note = new Note(pitch, rhythm, 0, 0, staff);
-            syncPlayBuffer.Add(new KeyValuePair<Note, int>(note, velocity));
-            //score.PlayANote(outDevice, note, (int)Math.Round(velocity * volumeD));
+
+            if (noteResolution == 0)
+            {
+                Score score = new Score();
+                score.PlayANote(outDevice, note, (int)Math.Round(velocity * volumeD));
+            }
+            else
+            {
+                syncPlayBuffer.Add(new KeyValuePair<Note, int>(note, velocity));
+            }
         }
 
         /// <summary>
@@ -410,13 +421,14 @@ namespace ChordingCoding
 
         private void SetTheme(Theme theme)
         {
+            가을산책ToolStripMenuItem.CheckState = CheckState.Unchecked;
+            비오는날ToolStripMenuItem.CheckState = CheckState.Unchecked;
+            별헤는밤ToolStripMenuItem.CheckState = CheckState.Unchecked;
             switch (theme)
             {
                 case Theme.Autumn:
                     _theme = Theme.Autumn;
                     가을산책ToolStripMenuItem.CheckState = CheckState.Checked;
-                    비오는날ToolStripMenuItem.CheckState = CheckState.Unchecked;
-                    별헤는밤ToolStripMenuItem.CheckState = CheckState.Unchecked;
                     테마ToolStripMenuItem.Text = "테마 (가을 산책)";
                     basicParticleSystem = new ParticleSystem(
                                         /*cNum*/ 1, /*cRange*/ 0,
@@ -424,11 +436,9 @@ namespace ChordingCoding
                                         Particle.Type.leaf, Color.White,
                                         /*pSize*/ 1f, /*pLife*/ 128);
 
-                    StopPlaying(0);
-                    StopPlaying(1);
-                    StopPlaying(2);
-                    StopPlaying(3);
-                    StopPlaying(4);
+                    for (int i = 0; i <= 4; i++)
+                        StopPlaying(i);
+
                     particleSystems = new List<ParticleSystem>();
                     
                     // TODO
@@ -438,9 +448,7 @@ namespace ChordingCoding
                     break;
                 case Theme.Rain:
                     _theme = Theme.Rain;
-                    가을산책ToolStripMenuItem.CheckState = CheckState.Unchecked;
                     비오는날ToolStripMenuItem.CheckState = CheckState.Checked;
-                    별헤는밤ToolStripMenuItem.CheckState = CheckState.Unchecked;
                     테마ToolStripMenuItem.Text = "테마 (비 오는 날)";
                     basicParticleSystem = new ParticleSystem(
                                         /*cNum*/ 1, /*cRange*/ 0,
@@ -448,11 +456,9 @@ namespace ChordingCoding
                                         Particle.Type.rain, Color.White,
                                         /*pSize*/ 0.1f, /*pLife*/ (Form1.form1.Size.Height + 150) / 30);
 
-                    StopPlaying(0);
-                    StopPlaying(1);
-                    StopPlaying(2);
-                    StopPlaying(3);
-                    StopPlaying(4);
+                    for (int i = 0; i <= 4; i++)
+                        StopPlaying(i);
+
                     particleSystems = new List<ParticleSystem>();
 
                     outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, 101));   // 사운드이펙트(고블린) -> 분위기를 만드는 역할
@@ -467,8 +473,6 @@ namespace ChordingCoding
                     break;
                 case Theme.Star:
                     _theme = Theme.Star;
-                    가을산책ToolStripMenuItem.CheckState = CheckState.Unchecked;
-                    비오는날ToolStripMenuItem.CheckState = CheckState.Unchecked;
                     별헤는밤ToolStripMenuItem.CheckState = CheckState.Checked;
                     테마ToolStripMenuItem.Text = "테마 (별 헤는 밤)";
                     basicParticleSystem = new ParticleSystem(
@@ -477,11 +481,9 @@ namespace ChordingCoding
                                         Particle.Type.star, Color.Black,
                                         /*pSize*/ 1f, /*pLife*/ 64);
 
-                    StopPlaying(0);
-                    StopPlaying(1);
-                    StopPlaying(2);
-                    StopPlaying(3);
-                    StopPlaying(4);
+                    for (int i = 0; i <= 4; i++)
+                        StopPlaying(i);
+
                     particleSystems = new List<ParticleSystem>();
                     
                     outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, 49));    // 현악 합주 2 -> 분위기를 만드는 역할
@@ -496,6 +498,91 @@ namespace ChordingCoding
             불투명도ToolStripMenuItem.Text = "불투명도 (" + opacity + "%)";
             음량ToolStripMenuItem.Text = "음량 (" + volume + "%)";
             chord = new Chord(theme);
+        }
+
+        private void SetNoteResolution(int resolution)
+        {
+            if (!new int[] { 0, 2, 4, 8, 16 }.Contains(resolution)) return;
+
+            noteResolution = resolution;
+            _4분음표ToolStripMenuItem.CheckState = CheckState.Unchecked;
+            _8분음표ToolStripMenuItem.CheckState = CheckState.Unchecked;
+            _16분음표ToolStripMenuItem.CheckState = CheckState.Unchecked;
+            _32분음표ToolStripMenuItem.CheckState = CheckState.Unchecked;
+            _없음ToolStripMenuItem.CheckState = CheckState.Unchecked;
+
+            switch (resolution)
+            {
+                case 16:
+                    _4분음표ToolStripMenuItem.CheckState = CheckState.Checked;
+                    단위리듬ToolStripMenuItem.Text = "단위 리듬 (4분음표)";
+                    break;
+                case 8:
+                    _8분음표ToolStripMenuItem.CheckState = CheckState.Checked;
+                    단위리듬ToolStripMenuItem.Text = "단위 리듬 (8분음표)";
+                    break;
+                case 4:
+                    _16분음표ToolStripMenuItem.CheckState = CheckState.Checked;
+                    단위리듬ToolStripMenuItem.Text = "단위 리듬 (16분음표)";
+                    break;
+                case 2:
+                    _32분음표ToolStripMenuItem.CheckState = CheckState.Checked;
+                    단위리듬ToolStripMenuItem.Text = "단위 리듬 (32분음표)";
+                    break;
+                case 0:
+                    _없음ToolStripMenuItem.CheckState = CheckState.Checked;
+                    단위리듬ToolStripMenuItem.Text = "단위 리듬 (없음)";
+                    if (syncPlayBuffer.Count > 0)
+                    {
+                        Score score = new Score();
+                        foreach (KeyValuePair<Note, int> p in syncPlayBuffer)
+                        {
+                            score.PlayANote(outDevice, p.Key, (int)Math.Round(p.Value * volumeD));
+                        }
+                        syncPlayBuffer.Clear();
+                    }
+                    break;
+            }
+        }
+
+        private void _4분음표ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (noteResolution != 16)
+            {
+                SetNoteResolution(16);
+            }
+        }
+
+        private void _8분음표ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (noteResolution != 8)
+            {
+                SetNoteResolution(8);
+            }
+        }
+
+        private void _16분음표ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (noteResolution != 4)
+            {
+                SetNoteResolution(4);
+            }
+        }
+
+        private void _32분음표toolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (noteResolution != 2)
+            {
+                SetNoteResolution(2);
+            }
+        }
+
+        private void _제한없음ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (noteResolution != 0)
+            {
+                SetNoteResolution(0);
+            }
         }
     }
 }

@@ -19,6 +19,7 @@ namespace ChordingCoding
     public partial class Form1 : Form
     {
         public enum Theme { Autumn, Rain, Star }
+        //static List<Theme> themes = new List<Theme>();
         static OutputDevice outDevice;
         static bool _isReady = false;
         static int[] _opacity = { 80, 80, 100 };
@@ -445,6 +446,8 @@ namespace ChordingCoding
                     outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, 32));   // 사운드이펙트(고블린) -> 분위기를 만드는 역할
                     outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 1, 24));    // 어쿠스틱 기타(나일론) -> 주 멜로디
                     outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 2, 123));   // 새 지저귀는 소리 -> 효과음
+
+                    frameNumber = 0;
                     break;
                 case Theme.Rain:
                     _theme = Theme.Rain;
@@ -468,8 +471,6 @@ namespace ChordingCoding
                     outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 4, 126));   // 박수 소리 -> 빗소리
 
                     frameNumber = 0;    // UpdateFrame()에서 기본 빗소리를 재생하도록 함
-                    Score score = new Score();
-                    Note note = new Note(45, 1, 0, 0, 4);
                     break;
                 case Theme.Star:
                     _theme = Theme.Star;
@@ -488,7 +489,8 @@ namespace ChordingCoding
                     
                     outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, 49));    // 현악 합주 2 -> 분위기를 만드는 역할
                     outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 1, 11));    // 비브라폰 -> 주 멜로디
-                    
+
+                    frameNumber = 0;
                     break;
             }
 

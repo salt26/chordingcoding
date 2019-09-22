@@ -19,7 +19,7 @@ namespace ChordingCoding
     public partial class Form1 : Form
     {
         public enum Theme { Autumn, Rain, Star }
-        //static List<Theme> availableThemes = new List<Theme>();
+        static List<ChordingCoding.Theme> availableThemes = new List<ChordingCoding.Theme>();
         static OutputDevice outDevice;
         static bool _isReady = false;
         static int[] _opacity = { 80, 80, 100 };
@@ -152,6 +152,47 @@ namespace ChordingCoding
             */
             outDevice = new OutputDevice(0);
             ChordingCoding.Theme.Initialize();
+
+            availableThemes.Add(new ChordingCoding.Theme(
+                "Autumn", "가을 산책",
+                new ParticleSystem(/*cNum*/ 1, /*cRange*/ 0,
+                                   ParticleSystem.CreateFunction.TopRandom,
+                                   Particle.Type.leaf, Color.White,
+                                   /*pSize*/ 1f, /*pLife*/ 128),
+                null, new ChordingCoding.Theme.ParticleInfo(Particle.Type.leaf, (Form1.form1.Size.Height + 150) / 4, (pitch) => Color.White, 1f),
+                ChordingCoding.Theme.ChordTransition.SomewhatHappy, "Guitar", "Bird", null));
+
+            availableThemes.Add(new ChordingCoding.Theme(
+                "Rain", "비 오는 날",
+                new ParticleSystem(/*cNum*/ 1, /*cRange*/ 0,
+                                   ParticleSystem.CreateFunction.TopRandom,
+                                   Particle.Type.rain, Color.White,
+                                   /*pSize*/ 0.1f, /*pLife*/ (Form1.form1.Size.Height + 150) / 30),
+                new ParticleSystem(/*posX*/ 0,
+                                    /*posY*/ 0,
+                                    /*velX*/ 0, /*velY*/ 0, /*life*/ 160,
+                                    /*cNum*/ 1, /*cRange*/ 0,
+                                    ParticleSystem.CreateFunction.TopRandom,
+                                    Particle.Type.rain, Color.White,
+                                    /*pSize*/ 0.1f, /*pLife*/ (Form1.form1.Size.Height + 150) / 30),
+                new ChordingCoding.Theme.ParticleInfo(Particle.Type.note, (Form1.form1.Size.Height + 150) / 15, (pitch) => Chord.PitchColor(pitch), 0.1f),
+                ChordingCoding.Theme.ChordTransition.SomewhatBlue, "Forest", "Rain", null));
+
+            availableThemes.Add(new ChordingCoding.Theme(
+                "Star", "별 헤는 밤",
+                new ParticleSystem(/*cNum*/ 1, /*cRange*/ 0,
+                                   ParticleSystem.CreateFunction.Random,
+                                   Particle.Type.star, Color.Black,
+                                   /*pSize*/ 1f, /*pLife*/ 64),
+                new ParticleSystem(/*posX*/ (float)(new Random().NextDouble() * Form1.form1.Size.Width),
+                                   /*posY*/ (float)(new Random().NextDouble() * Form1.form1.Size.Height * 5 / 6 - Form1.form1.Size.Height / 12),
+                                   /*velX*/ 2, /*velY*/ 8, /*life*/ 38,
+                                   /*cNum*/ 7, /*cRange*/ 4,
+                                   ParticleSystem.CreateFunction.Gaussian,
+                                   Particle.Type.dot, Form1.chord.ChordColor(),
+                                   /*pSize*/ 1, /*pLife*/ 10),
+                new ChordingCoding.Theme.ParticleInfo(Particle.Type.star, 32, (pitch) => Chord.PitchColor(pitch), 1f),
+                ChordingCoding.Theme.ChordTransition.SimilarOne, "Star", null, null));
 
             switch ((string)Properties.Settings.Default["Theme"])
             {
@@ -289,7 +330,7 @@ namespace ChordingCoding
 
         /// <summary>
         /// 새 파티클 시스템을 추가합니다.
-        /// 파티클 시스템은 한 번에 5개까지만 활성화될 수 있습니다.
+        /// 파티클 시스템은 한 번에 10개까지만 활성화될 수 있습니다.
         /// </summary>
         public static void AddParticleSystem(
             float startPosX, float startPosY,
@@ -299,7 +340,7 @@ namespace ChordingCoding
             Particle.Type particleType, Color particleColor,
             float particleSize, int particleLifetime)
         {
-            // 한 번에 활성화되는 파티클 시스템 수를 5개로 제한
+            // 한 번에 활성화되는 파티클 시스템 수를 10개로 제한
             if (particleSystems.Count > 10)
             {
                 particleSystems.RemoveAt(0);
@@ -308,6 +349,20 @@ namespace ChordingCoding
                                                        createNumber, createRange, createFunction,
                                                        particleType, particleColor, particleSize, particleLifetime);
             particleSystems.Add(ps);
+        }
+        
+        /// <summary>
+        /// 새 파티클 시스템을 추가합니다.
+        /// 파티클 시스템은 한 번에 10개까지만 활성화될 수 있습니다.
+        /// </summary>
+        public static void AddParticleSystem(ParticleSystem particleSystem)
+        {
+            // 한 번에 활성화되는 파티클 시스템 수를 10개로 제한
+            if (particleSystems.Count > 10)
+            {
+                particleSystems.RemoveAt(0);
+            }
+            particleSystems.Add(particleSystem);
         }
 
         /// <summary>
@@ -319,7 +374,7 @@ namespace ChordingCoding
 
             if (theme == Theme.Autumn)
             {
-                basicParticleSystem.AddParticleInBasic(Particle.Type.leaf, (Form1.form1.Size.Height + 150) / 4, Color.White, 1f);
+                basicParticleSystem.AddParticleInBasic(Particle.Type.leaf, (Form1.form1.Size.Height + 150) / 4, Color.White, 1f); 
             }
             else if (theme == Theme.Rain)
             {

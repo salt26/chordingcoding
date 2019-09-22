@@ -19,7 +19,7 @@ namespace ChordingCoding
     public partial class Form1 : Form
     {
         public enum Theme { Autumn, Rain, Star }
-        //static List<Theme> themes = new List<Theme>();
+        //static List<Theme> availableThemes = new List<Theme>();
         static OutputDevice outDevice;
         static bool _isReady = false;
         static int[] _opacity = { 80, 80, 100 };
@@ -437,7 +437,7 @@ namespace ChordingCoding
                                         Particle.Type.leaf, Color.White,
                                         /*pSize*/ 1f, /*pLife*/ 128);
 
-                    for (int i = 0; i <= 4; i++)
+                    for (int i = 0; i <= 6; i++)
                         StopPlaying(i);
 
                     particleSystems = new List<ParticleSystem>();
@@ -459,7 +459,7 @@ namespace ChordingCoding
                                         Particle.Type.rain, Color.White,
                                         /*pSize*/ 0.1f, /*pLife*/ (Form1.form1.Size.Height + 150) / 30);
 
-                    for (int i = 0; i <= 4; i++)
+                    for (int i = 0; i <= 6; i++)
                         StopPlaying(i);
 
                     particleSystems = new List<ParticleSystem>();
@@ -482,7 +482,7 @@ namespace ChordingCoding
                                         Particle.Type.star, Color.Black,
                                         /*pSize*/ 1f, /*pLife*/ 64);
 
-                    for (int i = 0; i <= 4; i++)
+                    for (int i = 0; i <= 6; i++)
                         StopPlaying(i);
 
                     particleSystems = new List<ParticleSystem>();

@@ -13,10 +13,20 @@ namespace ChordingCoding
         public enum ChordTransition { SomewhatHappy, SomewhatBlue, SimilarOne };    // TODO 이것도 클래스화하여 List로 보관
         public struct ParticleInfo
         {
+            public delegate Color PitchToColor(Chord.Root pitch);
+
             public Particle.Type particleType;
             public int particleLifetime;
-            public Color particleColor;
+            public PitchToColor pitchToParticleColor;
             public float particleSize;
+
+            public ParticleInfo(Particle.Type type, int lifetime, PitchToColor pitchToColor, float size)
+            {
+                particleType = type;
+                particleLifetime = lifetime;
+                pitchToParticleColor = pitchToColor;
+                particleSize = size;
+            }
         }
         public struct InstrumentInfo
         {
@@ -69,18 +79,57 @@ namespace ChordingCoding
         public static List<InstrumentSet> availableInstrumentSets = new List<InstrumentSet>();
         public static bool isReady = false;
 
+        /* 
+         * Theme이 가질 수 있는 속성들입니다.
+         */
+        #region Theme Attributes
+
         public string name;                                 // 테마의 영어 이름
         public string displayName;                          // 테마의 한글(보여질) 이름
         public ParticleSystem basicParticleSystem;          // 기본 파티클 시스템
         public ParticleSystem particleSystemForWhitespace;  // 공백 문자를 입력할 때 추가로 생성될 파티클 시스템
         public ParticleInfo particleInfoForCharacter;       // 일반 문자를 입력할 때 기본 파티클 시스템 안에 생성할 파티클의 정보
 
+        public ChordTransition chordTransition;             // 화음 전이 확률 분포
+
         public InstrumentSet instrumentSetForCharacter;     // 일반 문자 입력 시 사용될 악기 세트
-        public InstrumentSet instrumentSetForWhitespace;    // 공백 문자 입력 시 추가로 사용될 악기 세트
-        public InstrumentSet instrumentSetForThemeSFX;      // 특정 테마의 효과음으로 사용될 악기 세트
+        public InstrumentSet instrumentSetForWhitespace;    // 공백 문자 입력 시 추가로 사용되거나 특정 테마의 효과음으로 사용될 악기 세트
         public InstrumentSet instrumentSetForAccompaniment; // 반주 생성에 사용될 악기 세트
 
-        public ChordTransition chordTransition;             // 화음 전이 확률 분포
+        #endregion
+
+        /// <summary>
+        /// 새 테마를 생성합니다.
+        /// Theme.Initialize()가 호출된 적이 없으면 name이 null인 테마가 생성됩니다.
+        /// </summary>
+        /// <param name="name">내부적으로 사용될 이름</param>
+        /// <param name="displayName">표시할 이름</param>
+        /// <param name="basicPS">기본 파티클 시스템</param>
+        /// <param name="PSForWhitespace">공백 문자 입력 시 생성될 파티클 시스템</param>
+        /// <param name="PIForCharacter">일반 문자 입력 시 기본 파티클 시스템 안에 생성될 파티클 정보</param>
+        /// <param name="transition">공백 문자 입력 시의 화음 전이 확률 분포</param>
+        /// <param name="instrumentSetNameForCharacter">일반 문자 입력 시 사용될 악기 세트 이름</param>
+        /// <param name="instrumentSetNameForWhitespace">공백 문자 입력 시와 특정 테마 효과음으로 사용될 악기 세트 이름</param>
+        /// <param name="instrumentSetNameForAccompaniment">반주 생성에 사용될 악기 세트 이름</param>
+        public Theme(string name, string displayName, ParticleSystem basicPS, ParticleSystem PSForWhitespace, ParticleInfo PIForCharacter,
+            ChordTransition transition, string instrumentSetNameForCharacter, string instrumentSetNameForWhitespace, string instrumentSetNameForAccompaniment)
+        {
+            if (!isReady)
+            {
+                this.name = null;
+                return;
+            }
+
+            this.name = name;
+            this.displayName = displayName;
+            basicParticleSystem = basicPS;
+            particleSystemForWhitespace = PSForWhitespace;
+            particleInfoForCharacter = PIForCharacter;
+            chordTransition = transition;
+            instrumentSetForCharacter = FindInstrumentSet(instrumentSetNameForCharacter, InstrumentSet.Type.character);
+            instrumentSetForWhitespace = FindInstrumentSet(instrumentSetNameForWhitespace, InstrumentSet.Type.whitespace);
+            instrumentSetForAccompaniment = FindInstrumentSet(instrumentSetNameForAccompaniment, InstrumentSet.Type.accompaniment);
+        }
 
         /// <summary>
         /// 사용할 수 있는 악기 세트를 초기화합니다. 새 테마를 초기화하는 어떤 코드보다도 먼저 호출되어야 합니다.
@@ -134,6 +183,18 @@ namespace ChordingCoding
             availableInstrumentSets.Add(new InstrumentSet("Rain", "비", InstrumentSet.Type.whitespace, instruments));
 
             isReady = true;
+        }
+
+        private InstrumentSet FindInstrumentSet(string name, InstrumentSet.Type type)
+        {
+            foreach (InstrumentSet i in availableInstrumentSets)
+            {
+                if (i.name.Equals(name) && i.type.Equals(type))
+                {
+                    return i;
+                }
+            }
+            return new InstrumentSet(null, null, InstrumentSet.Type.character, new Dictionary<int, InstrumentInfo>());
         }
     }
 }

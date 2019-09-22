@@ -151,6 +151,7 @@ namespace ChordingCoding
             음량ToolStripMenuItem.Text = "음량 (" + volume + "%)";
             */
             outDevice = new OutputDevice(0);
+            ChordingCoding.Theme.Initialize();
 
             switch ((string)Properties.Settings.Default["Theme"])
             {
@@ -443,7 +444,7 @@ namespace ChordingCoding
                     particleSystems = new List<ParticleSystem>();
                     
                     // TODO
-                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, 32));   // 사운드이펙트(고블린) -> 분위기를 만드는 역할
+                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 0, 32));   // 어쿠스틱 베이스 -> 분위기를 만드는 역할
                     outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 1, 24));    // 어쿠스틱 기타(나일론) -> 주 멜로디
                     outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, 2, 123));   // 새 지저귀는 소리 -> 효과음
 

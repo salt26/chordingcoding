@@ -10,6 +10,11 @@ namespace ChordingCoding
     public class ParticleSystem
     {
         public enum CreateFunction { Gaussian, DiracDelta, TopRandom, Random, BottomRandom }
+        public delegate Color ParticleColor();
+        public delegate float StartPosition();
+
+        public StartPosition startPositionX;
+        public StartPosition startPositionY;
         public float positionX;
         public float positionY;
         public float velocityX;
@@ -19,7 +24,7 @@ namespace ChordingCoding
         public float createRange;
         public CreateFunction createFunction = CreateFunction.Gaussian; // 생성하는 파티클의 초기 위치 분포 함수
         public Particle.Type particleType = Particle.Type.dot;
-        public Color particleColor;
+        public ParticleColor particleColor;
         public float particleSize;
         public int particleLifetime;                                    // 각 파티클의 초기 수명
         public bool isBasicParticleSystem = false;
@@ -31,13 +36,15 @@ namespace ChordingCoding
         /// <summary>
         /// 새 파티클 시스템을 생성합니다.
         /// </summary>
-        public ParticleSystem(float startPosX, float startPosY, float velocityX, float velocityY, int lifetime, 
+        public ParticleSystem(StartPosition startPosX, StartPosition startPosY, float velocityX, float velocityY, int lifetime, 
             int createNumber, float createRange, CreateFunction createFunction,
-            Particle.Type particleType, Color particleColor, float particleSize, int particleLifetime)
+            Particle.Type particleType, ParticleColor particleColor, float particleSize, int particleLifetime)
         {
             //Random r = new Random();
-            this.positionX = startPosX;//(float)r.NextDouble() * (maxPosX - minPosX) + minPosX;
-            this.positionY = startPosY;
+            this.startPositionX = startPosX;
+            this.startPositionY = startPosY;
+            this.positionX = startPosX();//(float)r.NextDouble() * (maxPosX - minPosX) + minPosX;
+            this.positionY = startPosY();
             this.velocityX = velocityX;
             this.velocityY = velocityY;
             this.lifetime = lifetime;
@@ -60,9 +67,11 @@ namespace ChordingCoding
         /// </summary>
         public ParticleSystem(
             int createNumber, float createRange, CreateFunction createFunction,
-            Particle.Type particleType, Color particleColor, float particleSize, int particleLifetime)
+            Particle.Type particleType, ParticleColor particleColor, float particleSize, int particleLifetime)
         {
             //Random r = new Random();
+            this.startPositionX = () => 0;
+            this.startPositionY = () => 0;
             this.positionX = 0;
             this.positionY = 0;
             this.velocityX = 0;
@@ -120,7 +129,7 @@ namespace ChordingCoding
                         particles.RemoveAt(0);
                     }
                     ParticlePosition(out float posX, out float posY);
-                    particles.Add(new Particle(particleType, posX, posY, particleLifetime, particleColor, particleSize));
+                    particles.Add(new Particle(particleType, posX, posY, particleLifetime, particleColor(), particleSize));
                 }
 
                 // 위치 이동
@@ -140,7 +149,7 @@ namespace ChordingCoding
                         particles.RemoveAt(0);
                     }
                     ParticlePosition(out float posX, out float posY);
-                    particles.Add(new Particle(particleType, posX, posY, particleLifetime, particleColor, particleSize));
+                    particles.Add(new Particle(particleType, posX, posY, particleLifetime, particleColor(), particleSize));
                 }
             }
         }

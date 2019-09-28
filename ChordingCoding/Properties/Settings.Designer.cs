@@ -38,72 +38,72 @@ namespace ChordingCoding.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("80")]
-        public int Volume0 {
+        public int VolumeAutumn {
             get {
-                return ((int)(this["Volume0"]));
+                return ((int)(this["VolumeAutumn"]));
             }
             set {
-                this["Volume0"] = value;
+                this["VolumeAutumn"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("80")]
-        public int Opacity0 {
+        public int OpacityAutumn {
             get {
-                return ((int)(this["Opacity0"]));
+                return ((int)(this["OpacityAutumn"]));
             }
             set {
-                this["Opacity0"] = value;
+                this["OpacityAutumn"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("100")]
-        public int Volume1 {
+        public int VolumeRain {
             get {
-                return ((int)(this["Volume1"]));
+                return ((int)(this["VolumeRain"]));
             }
             set {
-                this["Volume1"] = value;
+                this["VolumeRain"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("80")]
-        public int Opacity1 {
+        public int OpacityRain {
             get {
-                return ((int)(this["Opacity1"]));
+                return ((int)(this["OpacityRain"]));
             }
             set {
-                this["Opacity1"] = value;
+                this["OpacityRain"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("80")]
-        public int Volume2 {
+        public int VolumeStar {
             get {
-                return ((int)(this["Volume2"]));
+                return ((int)(this["VolumeStar"]));
             }
             set {
-                this["Volume2"] = value;
+                this["VolumeStar"] = value;
             }
         }
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("100")]
-        public int Opacity2 {
+        public int OpacityStar {
             get {
-                return ((int)(this["Opacity2"]));
+                return ((int)(this["OpacityStar"]));
             }
             set {
-                this["Opacity2"] = value;
+                this["OpacityStar"] = value;
             }
         }
         

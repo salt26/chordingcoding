@@ -3,13 +3,13 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Drawing;
+using System.Collections.Generic;
 
 namespace ChordingCoding
 {
     class InterceptKeys
     {
         private static Random r = new Random();
-        private static int rainPitch = 2;
 
         private const int WH_KEYBOARD_LL = 13;
         private const int WM_KEYDOWN = 0x0100;
@@ -37,7 +37,7 @@ namespace ChordingCoding
             {
                 int vkCode = Marshal.ReadInt32(lParam);
 
-                // TODO Do something when KeyDown event occurs.
+                // Do something when KeyDown event occurs.
                 //Console.WriteLine((Keys)vkCode);
                 Keys key = (Keys)vkCode;
                 if ((vkCode >= 48 && vkCode <= 90) ||
@@ -47,37 +47,16 @@ namespace ChordingCoding
                     (vkCode == 226))
                 {
                     // Characters
-                    int pitch;
-
-                    switch (Form1.theme)
+                    int pitch = Form1.chord.NextNote();
+                    foreach (KeyValuePair<int, Theme.InstrumentInfo> pair in Form1.theme.instrumentSet.instruments)
                     {
-                        case Form1.Theme.Autumn:
-                            pitch = Form1.chord.NextNote();
-                            Form1.PlayANoteSync(pitch, 16, 0);
-                            Form1.PlayANoteSync(pitch, 16, 1);
-                            /*
-                            foreach (int p in Form1.chord.NextChord())
-                            {
-                                Form1.PlayANote(p - 12, 16, 0, 48);
-                            }
-                            */
-                            Form1.AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
-                            //Form1.PlayANote(vkCode % 24 + 50);
-                            break;
-                        case Form1.Theme.Rain:
-                            pitch = Form1.chord.NextNote();
-                            Form1.PlayANoteSync(pitch - 12, 14, 0, 96);
-                            Form1.PlayANoteSync(pitch, 16, 1);
-                            Form1.AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
-                            break;
-                        case Form1.Theme.Star:
-                            pitch = Form1.chord.NextNote();
-                            Form1.PlayANoteSync(pitch - 12, 16, 0, 72);
-                            Form1.PlayANoteSync(pitch, 16, 1);
-                            Form1.AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
-                            //Form1.PlayANote(vkCode % 24 + 50);
-                            break;
+                        if (pair.Value.characterVolume > 0)
+                        {
+                            Form1.PlayANoteSync(pair.Value.characterPitchModulator(pitch),
+                                pair.Value.characterRhythm, pair.Key, pair.Value.characterVolume);
+                        }
                     }
+                    Form1.AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
 
                 }
                 else if (
@@ -87,80 +66,37 @@ namespace ChordingCoding
                 {
                     // Whitespaces
                     int pitch;
+                    Form1.StopPlaying(0);
+                    Form1.chord = new Chord(Form1.theme.chordTransition, Form1.chord);
+                    pitch = Form1.chord.NextNote();
 
-                    switch (Form1.theme)
+                    Theme.InstrumentInfo ii = Form1.theme.instrumentSet.instruments[0];
+                    foreach (int p in Form1.chord.NotesInChord())
                     {
-                        case Form1.Theme.Autumn:
-                            #region Autumn Input
-                            Form1.StopPlaying(0);
-                            Form1.chord = new Chord(Form1.theme, Form1.chord);
-                            pitch = Form1.chord.NextNote();
-                            Form1.PlayANoteSync(pitch, 16, 1);
-                            Form1.PlayANoteSync(pitch % 12 + 54, 4, 2, 54);
-                            foreach (int p in Form1.chord.NextChord())
-                            {
-                                Form1.PlayANoteSync(p, 16, 0, 64);
-                            }
-                            if (Form1.form1 != null)
-                            {
-                                Form1.AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
-                            }
-                            break;
-                            #endregion
-                        case Form1.Theme.Rain:
-                            #region Rain Input
-                            Form1.StopPlaying(0);
-                            Form1.chord = new Chord(Form1.theme, Form1.chord);
-                            pitch = Form1.chord.NextNote();
-                            Form1.PlayANoteSync(pitch, 16, 1);
-                            rainPitch += 5;
-                            rainPitch %= 12;
-                            Form1.PlayANoteSync(rainPitch + 46, 64, 2, 24);
-                            foreach (int p in Form1.chord.NextChord())
-                            {
-                                Form1.PlayANoteSync((p + 6) % 12 + 54, 14, 0, 96);
-                            }
-                            if (Form1.form1 != null)
-                            {
-                                /* Rain */
-                                Form1.AddParticleSystem(
-                                    /*posX*/ 0,
-                                    /*posY*/ 0,
-                                    /*velX*/ 0, /*velY*/ 0, /*life*/ 160,
-                                    /*cNum*/ 1, /*cRange*/ 0,
-                                    ParticleSystem.CreateFunction.TopRandom,
-                                    Particle.Type.rain, Color.White,
-                                    /*pSize*/ 0.1f, /*pLife*/ (Form1.form1.Size.Height + 150) / 30);
-                            }
-                            break;
-                            #endregion
-                        case Form1.Theme.Star:
-                            #region Star Input
-                            Form1.StopPlaying(0);
-                            Form1.chord = new Chord(Form1.theme, Form1.chord);
-                            pitch = Form1.chord.NextNote();
-                            Form1.PlayANoteSync(pitch, 16, 1);
-                            //Form1.PlayANote(pitch % 12 + 54, 4, 2, 48);
-                            foreach (int p in Form1.chord.NextChord())
-                            {
-                                Form1.PlayANoteSync((p + 6) % 12 + 54, 16, 0, 72);
-                            }
-                            if (Form1.form1 != null)
-                            {
-                                /* Starfall */
-                                Form1.AddParticleSystem(
-                                    /*posX*/ (float)(r.NextDouble() * Form1.form1.Size.Width),
-                                    /*posY*/ (float)(r.NextDouble() * Form1.form1.Size.Height * 5 / 6 - Form1.form1.Size.Height / 12),
-                                    /*velX*/ 2, /*velY*/ 8, /*life*/ 38,
-                                    /*cNum*/ 7, /*cRange*/ 4,
-                                    ParticleSystem.CreateFunction.Gaussian,
-                                    Particle.Type.dot, Form1.chord.ChordColor(),
-                                    /*pSize*/ 1, /*pLife*/ 10);
-                            }
-                            break;
-                            #endregion
+                        if (p != pitch)
+                        {
+                            Form1.PlayANoteSync(ii.whitespacePitchModulator(p),
+                                ii.whitespaceRhythm, 0, ii.whitespaceVolume);
+                        }
                     }
-                    
+                    foreach (KeyValuePair<int, Theme.InstrumentInfo> pair in Form1.theme.instrumentSet.instruments)
+                    {
+                        if (pair.Value.whitespaceVolume > 0)
+                        {
+                            Form1.PlayANoteSync(pair.Value.whitespacePitchModulator(pitch),
+                                pair.Value.whitespaceRhythm, pair.Key, pair.Value.whitespaceVolume);
+                        }
+                    }
+
+                    if (Form1.theme.particleSystemForWhitespace != null)
+                    {
+                        Form1.AddParticleSystem(Form1.theme.particleSystemForWhitespace);
+                    }
+                    else
+                    {
+                        Form1.AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
+                    }
+
                 }
             }
             return CallNextHookEx(_hookID, nCode, wParam, lParam);

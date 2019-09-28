@@ -21,14 +21,14 @@ namespace ChordingCoding
         /// <summary>
         /// 랜덤으로 화음을 초기화합니다.
         /// </summary>
-        public Chord(Form1.Theme theme)
+        public Chord(ChordingCoding.Theme.ChordTransition chordTransition)
         {
             Random r = new Random();
             int rand;
 
-            switch (theme)
+            switch (chordTransition)
             {
-                case Form1.Theme.Autumn:
+                case ChordingCoding.Theme.ChordTransition.SomewhatHappy:
                     #region Autumn Chord
                     maxOctave = 5;
                     minOctave = 4;
@@ -101,7 +101,7 @@ namespace ChordingCoding
 
                     break;
                     #endregion
-                case Form1.Theme.Rain:
+                case ChordingCoding.Theme.ChordTransition.SomewhatBlue:
                     #region Rain Chord
                     maxOctave = 8;
                     minOctave = 5;
@@ -178,7 +178,7 @@ namespace ChordingCoding
 
                     break;
                     #endregion
-                case Form1.Theme.Star:
+                case ChordingCoding.Theme.ChordTransition.SimilarOne:
                     #region Star Chord
                     maxOctave = 8;
                     minOctave = 5;
@@ -270,15 +270,15 @@ namespace ChordingCoding
         /// 주어진 화음과 자연스럽게 이어지도록 새 화음을 초기화합니다.
         /// </summary>
         /// <param name="c"></param>
-        public Chord(Form1.Theme theme, Chord c)
+        public Chord(ChordingCoding.Theme.ChordTransition chordTransition, Chord c)
         {
             Random r = new Random();
             int rand;
             int oldP, p;
 
-            switch (theme)
+            switch (chordTransition)
             {
-                case Form1.Theme.Autumn:
+                case ChordingCoding.Theme.ChordTransition.SomewhatHappy:
                     #region Autumn Chord
                     maxOctave = 5;
                     minOctave = 4;
@@ -439,7 +439,7 @@ namespace ChordingCoding
 
                     break;
                     #endregion
-                case Form1.Theme.Rain:
+                case ChordingCoding.Theme.ChordTransition.SomewhatBlue:
                     #region Rain Chord
                     maxOctave = 8;
                     minOctave = 5;
@@ -604,7 +604,7 @@ namespace ChordingCoding
 
                     break;
                     #endregion
-                case Form1.Theme.Star:
+                case ChordingCoding.Theme.ChordTransition.SimilarOne:
                     #region Star Chord
                     maxOctave = 8;
                     minOctave = 5;
@@ -989,7 +989,7 @@ namespace ChordingCoding
         /// 반환값은 MIDI의 음 높이 배열입니다.
         /// </summary>
         /// <returns></returns>
-        public int[] NextChord()
+        public int[] NotesInChord()
         {
             int[] r;
             if (type != Type.M7 && type != Type.m7)

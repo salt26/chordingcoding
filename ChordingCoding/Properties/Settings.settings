@@ -5,22 +5,22 @@
     <Setting Name="Theme" Type="System.String" Scope="User">
       <Value Profile="(Default)">Autumn</Value>
     </Setting>
-    <Setting Name="Volume0" Type="System.Int32" Scope="User">
+    <Setting Name="VolumeAutumn" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">80</Value>
     </Setting>
-    <Setting Name="Opacity0" Type="System.Int32" Scope="User">
+    <Setting Name="OpacityAutumn" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">80</Value>
     </Setting>
-    <Setting Name="Volume1" Type="System.Int32" Scope="User">
+    <Setting Name="VolumeRain" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">100</Value>
     </Setting>
-    <Setting Name="Opacity1" Type="System.Int32" Scope="User">
+    <Setting Name="OpacityRain" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">80</Value>
     </Setting>
-    <Setting Name="Volume2" Type="System.Int32" Scope="User">
+    <Setting Name="VolumeStar" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">80</Value>
     </Setting>
-    <Setting Name="Opacity2" Type="System.Int32" Scope="User">
+    <Setting Name="OpacityStar" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">100</Value>
     </Setting>
     <Setting Name="NoteResolution" Type="System.Int32" Scope="User">

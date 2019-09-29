@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
 
-namespace ChordingCoding
+namespace ChordingCoding.UI
 {
     /// <summary>
     /// 슬라이더(TrackBar)가 포함될 수 있는 우클릭 메뉴(ContextMenuStrip) 컴포넌트입니다.

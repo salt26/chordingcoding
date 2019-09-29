@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Threading;
 using Sanford.Multimedia.Midi;
 
-namespace ChordingCoding
+namespace ChordingCoding.SFX
 {
     /// <summary>
     /// 음표들을 담고 있는 악보 클래스입니다.

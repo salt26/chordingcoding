@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
+using ChordingCoding.UI;
 
-namespace ChordingCoding
+namespace ChordingCoding.VFX
 {
     public class ParticleSystem
     {

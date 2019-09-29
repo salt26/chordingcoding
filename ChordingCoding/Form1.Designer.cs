@@ -1,4 +1,4 @@
-﻿namespace ChordingCoding
+﻿namespace ChordingCoding.UI
 {
     partial class Form1
     {
@@ -47,8 +47,8 @@
             this.음량ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.종료ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.trackBarMenuItem1 = new ChordingCoding.TrackBarMenuItem();
-            this.trackBarMenuItem2 = new ChordingCoding.TrackBarMenuItem();
+            this.trackBarMenuItem1 = new ChordingCoding.UI.TrackBarMenuItem();
+            this.trackBarMenuItem2 = new ChordingCoding.UI.TrackBarMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 

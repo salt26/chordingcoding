@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 
-namespace ChordingCoding
+namespace ChordingCoding.SFX
 {
     public class Chord
     {
@@ -21,14 +21,14 @@ namespace ChordingCoding
         /// <summary>
         /// 랜덤으로 화음을 초기화합니다.
         /// </summary>
-        public Chord(ChordingCoding.Theme.ChordTransition chordTransition)
+        public Chord(SFXTheme.ChordTransitionType chordTransition)
         {
             Random r = new Random();
             int rand;
 
             switch (chordTransition)
             {
-                case ChordingCoding.Theme.ChordTransition.SomewhatHappy:
+                case SFXTheme.ChordTransitionType.SomewhatHappy:
                     #region Autumn Chord
                     maxOctave = 5;
                     minOctave = 4;
@@ -101,7 +101,7 @@ namespace ChordingCoding
 
                     break;
                     #endregion
-                case ChordingCoding.Theme.ChordTransition.SomewhatBlue:
+                case SFXTheme.ChordTransitionType.SomewhatBlue:
                     #region Rain Chord
                     maxOctave = 8;
                     minOctave = 5;
@@ -178,7 +178,7 @@ namespace ChordingCoding
 
                     break;
                     #endregion
-                case ChordingCoding.Theme.ChordTransition.SimilarOne:
+                case SFXTheme.ChordTransitionType.SimilarOne:
                     #region Star Chord
                     maxOctave = 8;
                     minOctave = 5;
@@ -270,7 +270,7 @@ namespace ChordingCoding
         /// 주어진 화음과 자연스럽게 이어지도록 새 화음을 초기화합니다.
         /// </summary>
         /// <param name="c"></param>
-        public Chord(ChordingCoding.Theme.ChordTransition chordTransition, Chord c)
+        public Chord(SFXTheme.ChordTransitionType chordTransition, Chord c)
         {
             Random r = new Random();
             int rand;
@@ -278,7 +278,7 @@ namespace ChordingCoding
 
             switch (chordTransition)
             {
-                case ChordingCoding.Theme.ChordTransition.SomewhatHappy:
+                case SFXTheme.ChordTransitionType.SomewhatHappy:
                     #region Autumn Chord
                     maxOctave = 5;
                     minOctave = 4;
@@ -439,7 +439,7 @@ namespace ChordingCoding
 
                     break;
                     #endregion
-                case ChordingCoding.Theme.ChordTransition.SomewhatBlue:
+                case SFXTheme.ChordTransitionType.SomewhatBlue:
                     #region Rain Chord
                     maxOctave = 8;
                     minOctave = 5;
@@ -604,7 +604,7 @@ namespace ChordingCoding
 
                     break;
                     #endregion
-                case ChordingCoding.Theme.ChordTransition.SimilarOne:
+                case SFXTheme.ChordTransitionType.SimilarOne:
                     #region Star Chord
                     maxOctave = 8;
                     minOctave = 5;

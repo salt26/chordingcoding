@@ -4,8 +4,9 @@ using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Drawing;
 using System.Collections.Generic;
+using ChordingCoding.SFX;
 
-namespace ChordingCoding
+namespace ChordingCoding.UI
 {
     class InterceptKeys
     {
@@ -47,15 +48,7 @@ namespace ChordingCoding
                     (vkCode == 226))
                 {
                     // Characters
-                    int pitch = Form1.chord.NextNote();
-                    foreach (KeyValuePair<int, Theme.InstrumentInfo> pair in Form1.theme.instrumentSet.instruments)
-                    {
-                        if (pair.Value.characterVolume > 0)
-                        {
-                            Form1.PlayANoteSync(pair.Value.characterPitchModulator(pitch),
-                                pair.Value.characterRhythm, pair.Key, pair.Value.characterVolume);
-                        }
-                    }
+                    int pitch = Music.PlayNoteInChord();
                     Form1.AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
 
                 }
@@ -65,32 +58,11 @@ namespace ChordingCoding
                     (vkCode == 13))
                 {
                     // Whitespaces
-                    int pitch;
-                    Form1.StopPlaying(0);
-                    Form1.chord = new Chord(Form1.theme.chordTransition, Form1.chord);
-                    pitch = Form1.chord.NextNote();
+                    int pitch = Music.PlayChordTransition();
 
-                    Theme.InstrumentInfo ii = Form1.theme.instrumentSet.instruments[0];
-                    foreach (int p in Form1.chord.NotesInChord())
+                    if (Theme.CurrentTheme.ParticleSystemForWhitespace != null)
                     {
-                        if (p != pitch)
-                        {
-                            Form1.PlayANoteSync(ii.whitespacePitchModulator(p),
-                                ii.whitespaceRhythm, 0, ii.whitespaceVolume);
-                        }
-                    }
-                    foreach (KeyValuePair<int, Theme.InstrumentInfo> pair in Form1.theme.instrumentSet.instruments)
-                    {
-                        if (pair.Value.whitespaceVolume > 0)
-                        {
-                            Form1.PlayANoteSync(pair.Value.whitespacePitchModulator(pitch),
-                                pair.Value.whitespaceRhythm, pair.Key, pair.Value.whitespaceVolume);
-                        }
-                    }
-
-                    if (Form1.theme.particleSystemForWhitespace != null)
-                    {
-                        Form1.AddParticleSystem(Form1.theme.particleSystemForWhitespace);
+                        Form1.AddParticleSystem(Theme.CurrentTheme.ParticleSystemForWhitespace);
                     }
                     else
                     {

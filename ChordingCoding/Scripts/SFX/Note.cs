@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ChordingCoding
+namespace ChordingCoding.SFX
 {
     /// <summary>
     /// 음표 클래스입니다.

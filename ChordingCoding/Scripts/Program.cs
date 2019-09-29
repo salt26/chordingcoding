@@ -9,6 +9,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Security.AccessControl;
 using System.Security.Principal;
+using ChordingCoding.UI;
 
 namespace ChordingCoding
 {

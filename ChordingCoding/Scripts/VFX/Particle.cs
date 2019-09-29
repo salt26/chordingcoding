@@ -7,7 +7,7 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.Runtime.InteropServices;
 
-namespace ChordingCoding
+namespace ChordingCoding.VFX
 {
     public class Particle
     {

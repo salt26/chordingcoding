@@ -39,11 +39,11 @@ namespace ChordingCoding.SFX
         /// </summary>
         public Dictionary<int, InstrumentInfo> Instruments { get; }
 
+        private int _volume;
+
         /// <summary>
         /// 테마의 음량 (변경 가능)
         /// </summary>
-        private int _volume;
-
         public int Volume
         {
             get
@@ -57,6 +57,16 @@ namespace ChordingCoding.SFX
                 else _volume = value;
             }
         }
+
+        /// <summary>
+        /// 테마의 채널 1에 사용되는 악기가 낼 수 있는 음의 최소 옥타브
+        /// </summary>
+        public int MinOctave { get; private set; }
+
+        /// <summary>
+        /// 테마의 채널 1에 사용되는 악기가 낼 수 있는 음의 최대 옥타브
+        /// </summary>
+        public int MaxOctave { get; private set; }
 
         #endregion
 
@@ -140,7 +150,8 @@ namespace ChordingCoding.SFX
             /// <param name="aPitchModulator">반주 음 높이 변경 함수</param>
             /// <param name="aRhythm">반주 음 길이 (16분음표: 1, 온음표: 16)</param>
             /// <param name="aVolume">반주 음량 (0 ~ 127)</param>
-            public CharacterInstrumentInfo(int code, PitchModulator cPitchModulator, int cRhythm, int cVolume,
+            public CharacterInstrumentInfo(int code,
+                PitchModulator cPitchModulator, int cRhythm, int cVolume,
                 PitchModulator wPitchModulator, int wRhythm, int wVolume,
                 PitchModulator aPitchModulator = null, int aRhythm = 0, int aVolume = 0)
             {
@@ -296,16 +307,40 @@ namespace ChordingCoding.SFX
             public Type type;
 
             /// <summary>
+            /// 악기가 연주할 수 있는 음의 최소 옥타브 (type이 character일 때에만 유효, 0 ~ 9 사이의 값)
+            /// </summary>
+            public int minOctave;
+
+            /// <summary>
+            /// 악기가 연주할 수 있는 음의 최대 옥타브 (type이 character일 때에만 유효, 0 ~ 9 사이의 값)
+            /// </summary>
+            public int maxOctave;
+
+            /// <summary>
             /// 악기들. Key는 악기가 사용될 채널(staff), Value는 악기 정보
             /// </summary>
             public Dictionary<int, InstrumentInfo> instruments;
 
-            public InstrumentSet(string name, string displayName, Dictionary<int, InstrumentInfo> instruments, Type type = Type.general)
+            public InstrumentSet(string name, string displayName, Dictionary<int, InstrumentInfo> instruments, Type type = Type.general, int minOctave = -1, int maxOctave = -1)
             {
                 this.name = name;
                 this.displayName = displayName;
                 this.instruments = instruments;
                 this.type = type;
+                if (type == Type.character)
+                {
+                    if (minOctave < 0) minOctave = 0;
+                    if (minOctave > 9) minOctave = 9;
+                    if (maxOctave > 9) maxOctave = 9;
+                    if (maxOctave < minOctave) maxOctave = minOctave;
+                    this.minOctave = minOctave;
+                    this.maxOctave = maxOctave;
+                }
+                else
+                {
+                    this.minOctave = -1;
+                    this.maxOctave = -1;
+                }
             }
         }
 
@@ -337,6 +372,7 @@ namespace ChordingCoding.SFX
             ConcatenateInstrumentSet(Instruments, FindInstrumentSet(instrumentSetNameForCharacter, InstrumentSet.Type.character));
             ConcatenateInstrumentSet(Instruments, FindInstrumentSet(instrumentSetNameForWhitespace, InstrumentSet.Type.whitespace));
             ConcatenateInstrumentSet(Instruments, FindInstrumentSet(instrumentSetNameForAccompaniment, InstrumentSet.Type.accompaniment));
+            Console.WriteLine("minOctave " + MinOctave + ", maxOctave " + MaxOctave);
             Volume = 100;
         }
 
@@ -347,11 +383,21 @@ namespace ChordingCoding.SFX
         {
             if (IsReady) return;
 
-            /* 악기가 적용될 채널(staff)에 따른, 새 InsturmentInfo 만드는 법
+            /* [악기가 적용될 채널(staff)에 따른, 새 InsturmentInfo 만드는 법]
              * 채널 0 또는 1 : CharacterInstrumentInfo
              * 채널 2        : WhitespaceInstrumentInfo
              * 채널 3 또는 4 : SFXInstrumentInfo
              * 채널 5 또는 6 : AccompanimentInstrumentInfo
+             *
+             * [PitchModulator와 옥타브 범위와의 관계]
+             * channel 1로 쓰일 악기는 항상 PitchModulator가 `(pitch) => pitch`이어야 합니다.
+             * 대신 minOctave와 maxOctave를 Type이 character인 InstrumentSet을 만들 때 지정합니다.
+             * 그리고 이 옥타브 범위를 그대로 따릅니다.
+             * 
+             * channel 1 외의 다른 악기에서 나오는 pitch는 기본적으로
+             * Type이 character인 InstrumentSet에서 지정한 minOctave와 maxOctave 사이의 임의의 음입니다.
+             * 즉, channel 1로 함께 쓰인 악기의 옥타브 범위에 영향을 받습니다.
+             * 이들의 음 옥타브 범위를 따로 지정하려면 PitchModulator를 활용해야 합니다.
              */
             // availableInstruments에 새 악기 정보를 추가할 때에는 맨 뒤에 추가바람. (순서가 중요!)
             List<InstrumentInfo> availableInstruments = new List<InstrumentInfo>();
@@ -368,22 +414,22 @@ namespace ChordingCoding.SFX
             Dictionary<int, InstrumentInfo> instruments;
 
             /* 
-             * InstrumentSet.Type.character
+             * InstrumentSet.Type.character (minOctave와 maxOctave 지정)
              */
             instruments = new Dictionary<int, InstrumentInfo>();
             instruments.Add(0, availableInstruments[0]);
             instruments.Add(1, availableInstruments[1]);
-            availableInstrumentSets.Add(new InstrumentSet("Guitar", "기타", instruments, InstrumentSet.Type.character));
+            availableInstrumentSets.Add(new InstrumentSet("Guitar", "기타", instruments, InstrumentSet.Type.character, 4, 5));
 
             instruments = new Dictionary<int, InstrumentInfo>();
             instruments.Add(0, availableInstruments[3]);
             instruments.Add(1, availableInstruments[4]);
-            availableInstrumentSets.Add(new InstrumentSet("Forest", "숲", instruments, InstrumentSet.Type.character));
+            availableInstrumentSets.Add(new InstrumentSet("Forest", "숲", instruments, InstrumentSet.Type.character, 5, 8));
 
             instruments = new Dictionary<int, InstrumentInfo>();
             instruments.Add(0, availableInstruments[7]);
             instruments.Add(1, availableInstruments[8]);
-            availableInstrumentSets.Add(new InstrumentSet("Star", "별", instruments, InstrumentSet.Type.character));
+            availableInstrumentSets.Add(new InstrumentSet("Star", "별", instruments, InstrumentSet.Type.character, 5, 8));
 
             /* 
              * InstrumentSet.Type.whitespace
@@ -412,6 +458,7 @@ namespace ChordingCoding.SFX
             availableSFXThemes.Add(new SFXTheme("Autumn", "가을 산책", ChordTransitionType.SomewhatHappy, "Guitar", "Bird", null));
             availableSFXThemes.Add(new SFXTheme("Rain", "비 오는 날", ChordTransitionType.SomewhatBlue, "Forest", "Rain", null));
             availableSFXThemes.Add(new SFXTheme("Star", "별 헤는 밤", ChordTransitionType.SimilarOne, "Star", null, null));
+            availableSFXThemes.Add(new SFXTheme("Forest", "숲 속 아침", ChordTransitionType.SimilarOne, "Forest", "Bird", null));
 
             IsReady = true;
         }
@@ -489,6 +536,11 @@ namespace ChordingCoding.SFX
             {
                 if (!main.ContainsKey(p.Key))
                     main.Add(p.Key, p.Value);
+            }
+            if (additional.type == InstrumentSet.Type.character && additional.name != null)
+            {
+                MinOctave = additional.minOctave;
+                MaxOctave = additional.maxOctave;
             }
         }
     }

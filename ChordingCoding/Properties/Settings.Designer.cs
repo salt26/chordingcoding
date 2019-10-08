@@ -118,5 +118,29 @@ namespace ChordingCoding.Properties {
                 this["NoteResolution"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int VolumeForest {
+            get {
+                return ((int)(this["VolumeForest"]));
+            }
+            set {
+                this["VolumeForest"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("100")]
+        public int OpacityForest {
+            get {
+                return ((int)(this["OpacityForest"]));
+            }
+            set {
+                this["OpacityForest"] = value;
+            }
+        }
     }
 }

@@ -25,13 +25,13 @@ namespace ChordingCoding.SFX
         {
             Random r = new Random();
             int rand;
+            minOctave = SFXTheme.CurrentSFXTheme.MinOctave;
+            maxOctave = SFXTheme.CurrentSFXTheme.MaxOctave;
 
             switch (chordTransition)
             {
                 case SFXTheme.ChordTransitionType.SomewhatHappy:
                     #region Autumn Chord
-                    maxOctave = 5;
-                    minOctave = 4;
                     root = (Root)r.Next(12);
 
                     rand = r.Next(15);
@@ -103,8 +103,6 @@ namespace ChordingCoding.SFX
                     #endregion
                 case SFXTheme.ChordTransitionType.SomewhatBlue:
                     #region Rain Chord
-                    maxOctave = 8;
-                    minOctave = 5;
                     root = (Root)r.Next(12);
 
                     rand = r.Next(15);
@@ -180,8 +178,6 @@ namespace ChordingCoding.SFX
                     #endregion
                 case SFXTheme.ChordTransitionType.SimilarOne:
                     #region Star Chord
-                    maxOctave = 8;
-                    minOctave = 5;
                     root = (Root)r.Next(12);
 
                     rand = r.Next(15);
@@ -275,13 +271,13 @@ namespace ChordingCoding.SFX
             Random r = new Random();
             int rand;
             int oldP, p;
+            minOctave = SFXTheme.CurrentSFXTheme.MinOctave;
+            maxOctave = SFXTheme.CurrentSFXTheme.MaxOctave;
 
             switch (chordTransition)
             {
                 case SFXTheme.ChordTransitionType.SomewhatHappy:
                     #region Autumn Chord
-                    maxOctave = 5;
-                    minOctave = 4;
                     rand = r.Next(17);
                     switch (rand)
                     {
@@ -441,8 +437,6 @@ namespace ChordingCoding.SFX
                     #endregion
                 case SFXTheme.ChordTransitionType.SomewhatBlue:
                     #region Rain Chord
-                    maxOctave = 8;
-                    minOctave = 5;
                     rand = r.Next(17);
                     switch (rand)
                     {
@@ -606,8 +600,6 @@ namespace ChordingCoding.SFX
                     #endregion
                 case SFXTheme.ChordTransitionType.SimilarOne:
                     #region Star Chord
-                    maxOctave = 8;
-                    minOctave = 5;
                     switch (c.type)
                     {
                         case Type.Major:

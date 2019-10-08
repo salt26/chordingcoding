@@ -41,7 +41,12 @@ namespace ChordingCoding.UI
          */
         /*
          * 새 Theme을 추가할 때
-         * 
+         * 1. SFXTheme.cs의 Initialize()에서 availableSFXThemes.Add()로 새 음악 테마 생성
+         * 2. Theme.cs의 Initialize()에서 _availableThemes.Add()로 새 테마(시각 효과)를 생성하고 음악 테마와 연동
+         * 3. Form1.cs [디자인]의 contextMenuStrip1 안에 테마 안에 새 테마 버튼 추가
+         * 4. 3.에서 만든 버튼을 클릭했을 때 호출될 이벤트 메서드(테마이름ToolStripMenuItem_Click)를 Form1.cs에 구현
+         * 5. Form1.cs의 SetTheme()에서 CheckState 관련 코드 추가
+         * 6. 솔루션 탐색기 - ChordingCoding 속성 - 설정에서 새 테마의 Volume, Opacity 항목 추가
          */
 
         #region 프로퍼티 정의 (isReady, opacity, volume, volumeD, theme, (private)theme.name)
@@ -358,6 +363,14 @@ namespace ChordingCoding.UI
             }
         }
 
+        private void 숲속아침ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (Theme.CurrentTheme.Name != "Forest")
+            {
+                SetTheme(Theme.AvailableThemes.Find((theme) => theme.Name.Equals("Forest")));
+            }
+        }
+
         /// <summary>
         /// 현재 테마를 설정하고 UI와 시각 효과를 이에 맞게 변화시킵니다.
         /// </summary>
@@ -367,6 +380,7 @@ namespace ChordingCoding.UI
             가을산책ToolStripMenuItem.CheckState = CheckState.Unchecked;
             비오는날ToolStripMenuItem.CheckState = CheckState.Unchecked;
             별헤는밤ToolStripMenuItem.CheckState = CheckState.Unchecked;
+            숲속아침ToolStripMenuItem.CheckState = CheckState.Unchecked;
 
             Theme.CurrentTheme = theme;
             switch (theme.Name)
@@ -380,6 +394,9 @@ namespace ChordingCoding.UI
                     break;
                 case "Star":
                     별헤는밤ToolStripMenuItem.CheckState = CheckState.Checked;
+                    break;
+                case "Forest":
+                    숲속아침ToolStripMenuItem.CheckState = CheckState.Checked;
                     break;
             }
             테마ToolStripMenuItem.Text = "테마 (" + theme.DisplayName + ")";

@@ -27,6 +27,7 @@ namespace ChordingCoding.UI
         public static Form1 form1;
 
         /*
+         * [Deprecated]
          * 새 Theme를 추가할 때
          * 1. Theme에 이름 추가 (주의: 각 enum에 할당된 int 값을 임의로 바꾸지 말 것)
          * 2. _opacity, _volume의 맨 뒤에 값 추가
@@ -37,6 +38,10 @@ namespace ChordingCoding.UI
          * 7. SetTheme() 안에 case 추가
          * 8. SetTheme()의 다른 case에서도 5.의 버튼 체크가 해제되도록 코드 수정
          * 9. InterceptKeys.cs와 Chord.cs에서 Form1.Theme이 쓰이는 코드 수정
+         */
+        /*
+         * 새 Theme을 추가할 때
+         * 
          */
 
         #region 프로퍼티 정의 (isReady, opacity, volume, volumeD, theme, (private)theme.name)
@@ -131,14 +136,9 @@ namespace ChordingCoding.UI
             Theme.Initialize();
 
             bool themeExist = false;
-            Console.WriteLine(Theme.AvailableThemes.Count);
-            foreach (string s in Theme.GetAllThemeName())
-            {
-                Console.WriteLine(s);
-            }
             foreach (Theme t in Theme.AvailableThemes)
             {
-                Console.WriteLine(t.Name);
+                //Console.WriteLine(t.Name);
                 _opacity[t.Name] = (int)Properties.Settings.Default["Opacity" + t.Name];
                 //_volume[t.Name] = (int)Properties.Settings.Default["Volume" + t.Name];
                 t.SFX.Volume = (int)Properties.Settings.Default["Volume" + t.Name];
@@ -153,9 +153,12 @@ namespace ChordingCoding.UI
             {
                 SetTheme(Theme.AvailableThemes[0]);
             }
-            
-            SetNoteResolution((int)Properties.Settings.Default["NoteResolution"]);
-            Music.tickDelegate += UpdateFrame;
+
+            int resolution = (int)Properties.Settings.Default["NoteResolution"];
+            Music.Initialize(Theme.CurrentTheme.SFX.Name, resolution,
+                new Music.TimerTickDelegate[] { MarshallingUpdateFrame });
+
+            SetNoteResolution(resolution);
 
             //bitmap = new Bitmap(Width, Height);
 
@@ -180,7 +183,18 @@ namespace ChordingCoding.UI
         }
 
         /// <summary>
-        /// 매 프레임마다 화면의 시각 효과를 업데이트하기 위해, 동기화된 리듬을 갖는 음악에 맞춰 호출됩니다.
+        /// Cross-thread 환경에서 Marshalling을 통해 안전하게 UpdateFrame 메서드를 호출하게 합니다.
+        /// </summary>
+        private void MarshallingUpdateFrame()
+        {
+            if (isReady)
+            {
+                BeginInvoke(new Music.TimerTickDelegate(UpdateFrame));
+            }
+        }
+
+        /// <summary>
+        /// 매 프레임마다 화면의 시각 효과를 업데이트하기 위해, 동기화된 리듬을 갖는 음악 타이머에 맞춰 호출됩니다.
         /// </summary>
         private void UpdateFrame()
         {
@@ -271,7 +285,10 @@ namespace ChordingCoding.UI
         /// </summary>
         public static void AddParticleToBasicParticleSystem(Chord.Root pitch)
         {
-            if (basicParticleSystem == null) return;
+            if (basicParticleSystem == null)
+            {
+                return;
+            }
 
             basicParticleSystem.AddParticleInBasic(
                 Theme.CurrentTheme.ParticleInfoForCharacter.particleType,
@@ -341,6 +358,10 @@ namespace ChordingCoding.UI
             }
         }
 
+        /// <summary>
+        /// 현재 테마를 설정하고 UI와 시각 효과를 이에 맞게 변화시킵니다.
+        /// </summary>
+        /// <param name="theme"></param>
         private void SetTheme(Theme theme)
         {
             가을산책ToolStripMenuItem.CheckState = CheckState.Unchecked;
@@ -364,23 +385,18 @@ namespace ChordingCoding.UI
             테마ToolStripMenuItem.Text = "테마 (" + theme.DisplayName + ")";
             basicParticleSystem = theme.BasicParticleSystem;
             particleSystems = new List<ParticleSystem>();
-            /*
-            for (int i = 0; i <= 6; i++) StopPlaying(i);
-
-            foreach (KeyValuePair<int, Theme.InstrumentInfo> p in theme.instrumentSet.instruments)
-            {
-                outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, p.Key, p.Value.instrumentCode));
-            }
-            */
 
             Opacity = opacity / 100D;
             trackBarMenuItem1.Value = opacity / 5;
             trackBarMenuItem2.Value = SFXTheme.CurrentSFXTheme.Volume / 5;
             불투명도ToolStripMenuItem.Text = "불투명도 (" + opacity + "%)";
             음량ToolStripMenuItem.Text = "음량 (" + SFXTheme.CurrentSFXTheme.Volume + "%)";
-            //chord = new Chord(theme.chordTransition);
         }
 
+        /// <summary>
+        /// 음악의 단위 리듬을 설정하고 UI를 이에 맞게 변화시킵니다.
+        /// </summary>
+        /// <param name="resolution"></param>
         private void SetNoteResolution(int resolution)
         {
             /*

@@ -181,6 +181,7 @@ namespace ChordingCoding.VFX
         public void AddParticleInBasic(Particle.Type particleType, int particleLifetime, Color particleColor, float particleSize)
         {
             if (!isBasicParticleSystem) return;
+            //Console.WriteLine(particleType.ToString() + " " + particleLifetime);
 
             // 새 파티클 생성
             for (int i = 0; i < createNumber; i++)

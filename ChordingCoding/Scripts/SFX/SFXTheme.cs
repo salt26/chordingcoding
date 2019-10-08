@@ -77,6 +77,8 @@ namespace ChordingCoding.SFX
 
         public static bool IsReady { get; private set; } = false;
 
+        private static bool isInstrumentsReady = false;
+
         private static SFXTheme _theme;
 
         public static SFXTheme CurrentSFXTheme
@@ -88,14 +90,11 @@ namespace ChordingCoding.SFX
             set
             {
                 _theme = value;
-                for (int i = 0; i <= 6; i++) Music.StopPlaying(i);
 
-                foreach (KeyValuePair<int, InstrumentInfo> p in _theme.Instruments)
+                if (Music.IsReady)
                 {
-                    Music.outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, p.Key, p.Value.instrumentCode));
+                    Music.ThemeChanged();
                 }
-                Music.chord = new Chord(_theme.ChordTransition);
-                Music.tickNumber = 0;
             }
         }
 
@@ -324,7 +323,7 @@ namespace ChordingCoding.SFX
         public SFXTheme(string name, string displayName, ChordTransitionType transition,
             string instrumentSetNameForCharacter, string instrumentSetNameForWhitespace, string instrumentSetNameForAccompaniment)
         {
-            if (!IsReady || name == null)
+            if (!isInstrumentsReady || name == null)
             {
                 this.Name = null;
                 Instruments = new Dictionary<int, InstrumentInfo>();
@@ -402,8 +401,9 @@ namespace ChordingCoding.SFX
             /* 
              * InstrumentSet.Type.accompaniment
              */
-            
+
             // TODO
+            isInstrumentsReady = true;
 
             /*
              * Default SFXTheme
@@ -424,14 +424,17 @@ namespace ChordingCoding.SFX
         /// <returns></returns>
         public static SFXTheme FindSFXTheme(string name)
         {
+            SFXTheme empty = new SFXTheme(null, null, ChordTransitionType.SomewhatHappy, null, null, null);
+            if (!IsReady || name == null) return empty;
+            
             foreach (SFXTheme t in availableSFXThemes)
             {
-                if (name != null && name.Equals(t.Name))
+                if (name.Equals(t.Name))
                 {
                     return t;
                 }
             }
-            return new SFXTheme(null, null, ChordTransitionType.SomewhatHappy, null, null, null);
+            return empty;
         }
 
         /// <summary>
@@ -441,6 +444,8 @@ namespace ChordingCoding.SFX
         public static List<string> GetAllSFXThemeName()
         {
             List<string> list = new List<string>();
+            if (!IsReady) return list;
+
             foreach (SFXTheme t in availableSFXThemes)
             {
                 if (t.Name != null)
@@ -460,6 +465,9 @@ namespace ChordingCoding.SFX
         /// <returns></returns>
         private InstrumentSet FindInstrumentSet(string name, InstrumentSet.Type type)
         {
+            InstrumentSet empty = new InstrumentSet(null, null, new Dictionary<int, InstrumentInfo>(), InstrumentSet.Type.character);
+            if (!isInstrumentsReady) return empty;
+
             foreach (InstrumentSet i in availableInstrumentSets)
             {
                 if (i.name.Equals(name) && i.type.Equals(type))
@@ -467,7 +475,7 @@ namespace ChordingCoding.SFX
                     return i;
                 }
             }
-            return new InstrumentSet(null, null, new Dictionary<int, InstrumentInfo>(), InstrumentSet.Type.character);
+            return empty;
         }
 
         /// <summary>

@@ -186,7 +186,6 @@ namespace ChordingCoding.SFX
             if (isPlaying || velocity < 0 || velocity >= 128) return;
             isPlaying = true;
             //Console.WriteLine("Playing...");
-            Console.WriteLine("PlayANoteForever");
 
             // 악보에 있는 모든 음표를 재생합니다.
             KeyValuePair<float, int> p = note.ToMidi()[0];

@@ -384,6 +384,7 @@ namespace ChordingCoding.UI
             }
             테마ToolStripMenuItem.Text = "테마 (" + theme.DisplayName + ")";
             basicParticleSystem = theme.BasicParticleSystem;
+            basicParticleSystem.particles = new List<Particle>();
             particleSystems = new List<ParticleSystem>();
 
             Opacity = opacity / 100D;

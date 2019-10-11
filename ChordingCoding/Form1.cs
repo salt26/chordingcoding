@@ -25,20 +25,7 @@ namespace ChordingCoding.UI
         static ParticleSystem basicParticleSystem = null;
         //Bitmap bitmap;
         public static Form1 form1;
-
-        /*
-         * [Deprecated]
-         * 새 Theme를 추가할 때
-         * 1. Theme에 이름 추가 (주의: 각 enum에 할당된 int 값을 임의로 바꾸지 말 것)
-         * 2. _opacity, _volume의 맨 뒤에 값 추가
-         * 3. 솔루션 탐색기 - ChordingCoding 속성 - 설정에서 OpacityX, VolumeX 추가
-         * 4. Form1_Load에서 switch문에 SetTheme() 호출 추가
-         * 5. Form1 디자인에서 contextMenuStrip1 안에 테마 안에 버튼 추가
-         * 6. 5.의 버튼 클릭 시 SetTheme() 호출하는 코드 추가
-         * 7. SetTheme() 안에 case 추가
-         * 8. SetTheme()의 다른 case에서도 5.의 버튼 체크가 해제되도록 코드 수정
-         * 9. InterceptKeys.cs와 Chord.cs에서 Form1.Theme이 쓰이는 코드 수정
-         */
+        
         /*
          * 새 Theme을 추가할 때
          * 1. SFXTheme.cs의 Initialize()에서 availableSFXThemes.Add()로 새 음악 테마 생성

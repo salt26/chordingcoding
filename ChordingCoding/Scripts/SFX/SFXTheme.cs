@@ -410,6 +410,8 @@ namespace ChordingCoding.SFX
             availableInstruments.Add(new SFXInstrumentInfo(126, (pitch) => 45, 1, 24));                                                             // [6] Rain channel 3/4, Applause
             availableInstruments.Add(new CharacterInstrumentInfo(49, (pitch) => pitch - 12, 16, 72, (pitch) => (pitch + 6) % 12 + 54, 16, 72));     // [7] Star channel 0, String ensemble 2
             availableInstruments.Add(new CharacterInstrumentInfo(11, (pitch) => pitch, 16, 127, (pitch) => pitch, 16, 127));                        // [8] Star channel 1, Vibraphone
+            availableInstruments.Add(new CharacterInstrumentInfo(0, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12 , 32, 80, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12, 32, 80));       // [9] Classic channel 0, Acoustic grand piano
+            availableInstruments.Add(new CharacterInstrumentInfo(0, (pitch) => pitch, 32, 127, (pitch) => pitch, 32, 127));                        // [10] Classic channel 1, Acoustic grand piano
 
             Dictionary<int, InstrumentInfo> instruments;
 
@@ -430,6 +432,21 @@ namespace ChordingCoding.SFX
             instruments.Add(0, availableInstruments[7]);
             instruments.Add(1, availableInstruments[8]);
             availableInstrumentSets.Add(new InstrumentSet("Star", "별", instruments, InstrumentSet.Type.character, 5, 8));
+
+            instruments = new Dictionary<int, InstrumentInfo>();
+            instruments.Add(0, availableInstruments[9]);
+            instruments.Add(1, availableInstruments[10]);
+            availableInstrumentSets.Add(new InstrumentSet("Piano", "피아노", instruments, InstrumentSet.Type.character, 1, 9));
+
+            instruments = new Dictionary<int, InstrumentInfo>();
+            instruments.Add(0, availableInstruments[9]);
+            instruments.Add(1, availableInstruments[10]);
+            availableInstrumentSets.Add(new InstrumentSet("Piano low", "피아노 저음", instruments, InstrumentSet.Type.character, 2, 6));
+            
+            instruments = new Dictionary<int, InstrumentInfo>();
+            instruments.Add(0, availableInstruments[9]);
+            instruments.Add(1, availableInstruments[10]);
+            availableInstrumentSets.Add(new InstrumentSet("Piano high", "피아노 고음", instruments, InstrumentSet.Type.character, 5, 8));
 
             /* 
              * InstrumentSet.Type.whitespace
@@ -459,6 +476,8 @@ namespace ChordingCoding.SFX
             availableSFXThemes.Add(new SFXTheme("Rain", "비 오는 날", ChordTransitionType.SomewhatBlue, "Forest", "Rain", null));
             availableSFXThemes.Add(new SFXTheme("Star", "별 헤는 밤", ChordTransitionType.SimilarOne, "Star", null, null));
             availableSFXThemes.Add(new SFXTheme("Forest", "숲 속 아침", ChordTransitionType.SimilarOne, "Forest", "Bird", null));
+            availableSFXThemes.Add(new SFXTheme("Pianoforte low", "피아노포르테(저음)", ChordTransitionType.SomewhatBlue, "Piano low", null, null));
+            availableSFXThemes.Add(new SFXTheme("Pianoforte high", "피아노포르테(고음)", ChordTransitionType.SomewhatHappy, "Piano high", null, null));
 
             IsReady = true;
         }

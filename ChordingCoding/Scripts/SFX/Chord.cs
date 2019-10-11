@@ -67,7 +67,7 @@ namespace ChordingCoding.SFX
                     }
 
                     rand = r.Next(15);
-                    octave = 5;
+                    octave = (minOctave + maxOctave) / 2;
                     switch (rand)
                     {
                         case 0:
@@ -142,7 +142,7 @@ namespace ChordingCoding.SFX
                     }
 
                     rand = r.Next(15);
-                    octave = 6;
+                    octave = (minOctave + maxOctave) / 2;
                     switch (rand)
                     {
                         case 0:
@@ -213,7 +213,7 @@ namespace ChordingCoding.SFX
                     }
 
                     rand = r.Next(15);
-                    octave = 6;
+                    octave = (minOctave + maxOctave) / 2;
                     switch (rand)
                     {
                         case 0:

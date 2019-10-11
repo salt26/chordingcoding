@@ -103,7 +103,12 @@ namespace ChordingCoding.SFX
 
             foreach (KeyValuePair<int, SFXTheme.InstrumentInfo> p in SFXTheme.CurrentSFXTheme.Instruments)
             {
-                outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, p.Key, p.Value.instrumentCode));
+                try
+                {
+                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, p.Key, p.Value.instrumentCode));
+                }
+                catch (ObjectDisposedException) { }
+                catch (OutputDeviceException) { }
             }
             chord = new Chord(SFXTheme.CurrentSFXTheme.ChordTransition);
             tickNumber = 0;

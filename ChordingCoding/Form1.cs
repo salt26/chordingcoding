@@ -10,6 +10,7 @@ using System.Windows.Forms.Design;
 using Sanford.Multimedia.Midi;
 using System.Runtime.InteropServices;
 using System.Reflection;
+using System.Configuration;
 using ChordingCoding.SFX;
 using ChordingCoding.VFX;
 
@@ -17,10 +18,8 @@ namespace ChordingCoding.UI
 {
     public partial class Form1 : Form
     {
-        //public enum Theme { Autumn, Rain, Star }
         static bool _isReady = false;
         static Dictionary<string, int> _opacity = new Dictionary<string, int>();
-        //static Dictionary<string, int> _volume = new Dictionary<string, int>();
         static List<ParticleSystem> particleSystems = new List<ParticleSystem>();
         static ParticleSystem basicParticleSystem = null;
         //Bitmap bitmap;
@@ -30,13 +29,9 @@ namespace ChordingCoding.UI
          * 새 Theme을 추가할 때
          * 1. SFXTheme.cs의 Initialize()에서 availableSFXThemes.Add()로 새 음악 테마 생성
          * 2. Theme.cs의 Initialize()에서 _availableThemes.Add()로 새 테마(시각 효과)를 생성하고 음악 테마와 연동
-         * 3. Form1.cs [디자인]의 contextMenuStrip1 안에 테마 안에 새 테마 버튼 추가
-         * 4. 3.에서 만든 버튼을 클릭했을 때 호출될 이벤트 메서드(테마이름ToolStripMenuItem_Click)를 Form1.cs에 구현
-         * 5. Form1.cs의 SetTheme()에서 CheckState 관련 코드 추가
-         * 6. 솔루션 탐색기 - ChordingCoding 속성 - 설정에서 새 테마의 Volume, Opacity 항목 추가
          */
 
-        #region 프로퍼티 정의 (isReady, opacity, volume, volumeD, theme, (private)theme.name)
+        #region 프로퍼티 정의 (isReady, opacity)
         public static bool isReady
         {
             get
@@ -58,38 +53,6 @@ namespace ChordingCoding.UI
                 else _opacity[Theme.CurrentTheme.Name] = value;
             }
         }
-
-        /*
-        public static int volume
-        {
-            get
-            {
-                return _volume[theme.Name];
-            }
-            set
-            {
-                if (value < 0) _volume[theme.Name] = 0;
-                else if (value > 100) _volume[theme.Name] = 100;
-                else _volume[theme.Name] = value;
-            }
-        }
-
-        public static double volumeD
-        {
-            get
-            {
-                return _volume[theme.Name] / 100D;
-            }
-        }
-        
-        public static Theme theme
-        {
-            get
-            {
-                return _theme;
-            }
-        }
-        */
         #endregion
 
         #region 마우스 클릭을 투명하게 통과시키는 코드
@@ -130,9 +93,7 @@ namespace ChordingCoding.UI
             bool themeExist = false;
             foreach (Theme t in Theme.AvailableThemes)
             {
-                //Console.WriteLine(t.Name);
                 _opacity[t.Name] = (int)Properties.Settings.Default["Opacity" + t.Name];
-                //_volume[t.Name] = (int)Properties.Settings.Default["Volume" + t.Name];
                 t.SFX.Volume = (int)Properties.Settings.Default["Volume" + t.Name];
 
                 if (t.Name.Equals((string)Properties.Settings.Default["Theme"]))
@@ -141,6 +102,13 @@ namespace ChordingCoding.UI
                     SetTheme(t);
                 }
             }
+            /*
+             * TODO
+             * 테마를 추가했다가 삭제하는 경우를 처리해야 함.
+             * Theme.AvailableThemes에 themeName의 테마가 없는데
+             * Properties.Settings.Default["Opacity/Volume" + themeName]이 남아있는 경우
+             * Properties.Settings.Default.Properties.Remove() 사용하여 제거 바람.
+             */
             if (!themeExist && Theme.AvailableThemes.Count > 0)
             {
                 SetTheme(Theme.AvailableThemes[0]);
@@ -166,9 +134,9 @@ namespace ChordingCoding.UI
             foreach (Theme theme in Theme.AvailableThemes)
             {
                 Properties.Settings.Default["Opacity" + theme.Name] = _opacity[theme.Name];
-                Properties.Settings.Default["Volume" + theme.Name] = theme.SFX.Volume; // _volume[theme.Name];
-                Properties.Settings.Default["NoteResolution"] = Music.NoteResolution;
+                Properties.Settings.Default["Volume" + theme.Name] = theme.SFX.Volume;
             }
+            Properties.Settings.Default["NoteResolution"] = Music.NoteResolution;
             Properties.Settings.Default.Save();
             notifyIcon1.Dispose();
             _isReady = false;
@@ -289,6 +257,66 @@ namespace ChordingCoding.UI
                 Theme.CurrentTheme.ParticleInfoForCharacter.particleSize);
         }
 
+        /// <summary>
+        /// 새 theme이 만들어질 때, UI에서 사용자가 이 테마로 설정할 수 있도록 UI를 변경합니다.
+        /// </summary>
+        /// <param name="theme"></param>
+        public void AddNewThemeToolStripMenuItem(Theme theme)
+        {
+            ToolStripMenuItem item = new ToolStripMenuItem()
+            {
+                Name = theme.Name.Replace(' ', '_') + "ToolStripMenuItem",
+                Text = theme.DisplayName,
+            };
+            item.Click += (object sender, EventArgs e) => {
+                if (Theme.CurrentTheme.Name != theme.Name)
+                {
+                    SetTheme(theme);
+                }
+            };
+            테마ToolStripMenuItem.DropDownItems.Add(item);
+
+            bool hasAddProperties = false;
+            try
+            {
+                int temp = (int)Properties.Settings.Default["Opacity" + theme.Name];
+            }
+            catch (SettingsPropertyNotFoundException)
+            {
+                SettingsProperty opacityProperty = new SettingsProperty("Opacity" + theme.Name);
+                opacityProperty.DefaultValue = 80;
+                opacityProperty.IsReadOnly = false;
+                opacityProperty.PropertyType = typeof(int);
+                opacityProperty.Provider = Properties.Settings.Default.Providers["LocalFileSettingsProvider"];
+                opacityProperty.Attributes.Add(typeof(UserScopedSettingAttribute), new UserScopedSettingAttribute());
+                Properties.Settings.Default.Properties.Add(opacityProperty);
+
+                hasAddProperties = true;
+            }
+            try
+            {
+                int temp = (int)Properties.Settings.Default["Volume" + theme.Name];
+            }
+            catch (SettingsPropertyNotFoundException)
+            {
+                SettingsProperty volumeProperty = new SettingsProperty("Volume" + theme.Name);
+                volumeProperty.DefaultValue = 80;
+                volumeProperty.IsReadOnly = false;
+                volumeProperty.PropertyType = typeof(int);
+                volumeProperty.Provider = Properties.Settings.Default.Providers["LocalFileSettingsProvider"];
+                volumeProperty.Attributes.Add(typeof(UserScopedSettingAttribute), new UserScopedSettingAttribute());
+                Properties.Settings.Default.Properties.Add(volumeProperty);
+
+                hasAddProperties = true;
+            }
+
+            if (hasAddProperties)
+            {
+                Properties.Settings.Default.Reload();
+                Properties.Settings.Default.Save();
+            }
+        }
+
         private void notifyIcon1_MouseClick(object sender, MouseEventArgs e)
         {
             if (e.Button == MouseButtons.Left)
@@ -321,70 +349,25 @@ namespace ChordingCoding.UI
             Close();
         }
 
-        /*
-         * TODO
-         * 현재 availableThemes에 있는 목록에 따라서 동적으로 ToolStripMenuItem을 변경해야 한다.
-         * ToolStripMenuItem_Click 이벤트의 콜백 함수에 인자로 해당 버튼의 테마 이름을 넘겨주도록 해야 한다.
-         */ 
-        private void 가을산책ToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (Theme.CurrentTheme.Name != "Autumn")
-            {
-                SetTheme(Theme.AvailableThemes.Find((theme) => theme.Name.Equals("Autumn")));
-            }
-        }
-
-        private void 비오는날ToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (Theme.CurrentTheme.Name != "Rain")
-            {
-                SetTheme(Theme.AvailableThemes.Find((theme) => theme.Name.Equals("Rain")));
-            }
-        }
-
-        private void 별헤는밤ToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (Theme.CurrentTheme.Name != "Star")
-            {
-                SetTheme(Theme.AvailableThemes.Find((theme) => theme.Name.Equals("Star")));
-            }
-        }
-
-        private void 숲속아침ToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            if (Theme.CurrentTheme.Name != "Forest")
-            {
-                SetTheme(Theme.AvailableThemes.Find((theme) => theme.Name.Equals("Forest")));
-            }
-        }
-
         /// <summary>
         /// 현재 테마를 설정하고 UI와 시각 효과를 이에 맞게 변화시킵니다.
         /// </summary>
         /// <param name="theme"></param>
         private void SetTheme(Theme theme)
         {
-            가을산책ToolStripMenuItem.CheckState = CheckState.Unchecked;
-            비오는날ToolStripMenuItem.CheckState = CheckState.Unchecked;
-            별헤는밤ToolStripMenuItem.CheckState = CheckState.Unchecked;
-            숲속아침ToolStripMenuItem.CheckState = CheckState.Unchecked;
-
             Theme.CurrentTheme = theme;
-            switch (theme.Name)
+
+            foreach (ToolStripMenuItem item in 테마ToolStripMenuItem.DropDownItems)
             {
-                /* TODO */
-                case "Autumn":
-                    가을산책ToolStripMenuItem.CheckState = CheckState.Checked;
-                    break;
-                case "Rain":
-                    비오는날ToolStripMenuItem.CheckState = CheckState.Checked;
-                    break;
-                case "Star":
-                    별헤는밤ToolStripMenuItem.CheckState = CheckState.Checked;
-                    break;
-                case "Forest":
-                    숲속아침ToolStripMenuItem.CheckState = CheckState.Checked;
-                    break;
+                if (item.Name.Substring(0,
+                    item.Name.IndexOf("ToolStripMenuItem")).Equals(theme.Name))
+                {
+                    item.CheckState = CheckState.Checked;
+                }
+                else
+                {
+                    item.CheckState = CheckState.Unchecked;
+                }
             }
             테마ToolStripMenuItem.Text = "테마 (" + theme.DisplayName + ")";
             basicParticleSystem = theme.BasicParticleSystem;
@@ -404,10 +387,6 @@ namespace ChordingCoding.UI
         /// <param name="resolution"></param>
         private void SetNoteResolution(int resolution)
         {
-            /*
-             * TODO
-             */
-
             if (!new int[] { 0, 2, 4, 8, 16 }.Contains(resolution)) return;
 
             Music.NoteResolution = resolution;
@@ -438,17 +417,6 @@ namespace ChordingCoding.UI
                 case 0:
                     _없음ToolStripMenuItem.CheckState = CheckState.Checked;
                     단위리듬ToolStripMenuItem.Text = "단위 리듬 (없음)";
-                    /*
-                    if (syncPlayBuffer.Count > 0)
-                    {
-                        Score score = new Score();
-                        foreach (KeyValuePair<Note, int> p in syncPlayBuffer)
-                        {
-                            score.PlayANote(outDevice, p.Key, (int)Math.Round(p.Value * volumeD));
-                        }
-                        syncPlayBuffer.Clear();
-                    }
-                    */
                     break;
             }
         }

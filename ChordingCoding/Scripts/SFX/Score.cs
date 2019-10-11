@@ -127,13 +127,23 @@ namespace ChordingCoding.SFX
                 {
                     // 음표를 재생합니다.
                     // (Midi message pair를 번역하여 Midi message를 생성합니다.)
-                    outDevice.Send(new ChannelMessage(ChannelCommand.NoteOn, p.Value >> 16, p.Value & 65535, 127));
+                    try
+                    {
+                        outDevice.Send(new ChannelMessage(ChannelCommand.NoteOn, p.Value >> 16, p.Value & 65535, 127));
+                    }
+                    catch (ObjectDisposedException) { }
+                    catch (OutputDeviceException) { }
                 }
                 else
                 {
                     // 음표의 재생을 멈춥니다.
                     // (Midi message pair를 번역하여 Midi message를 생성합니다.)
-                    outDevice.Send(new ChannelMessage(ChannelCommand.NoteOff, -p.Value >> 16, -p.Value & 65535, 127));
+                    try
+                    {
+                        outDevice.Send(new ChannelMessage(ChannelCommand.NoteOff, -p.Value >> 16, -p.Value & 65535, 127));
+                    }
+                    catch (ObjectDisposedException) { }
+                    catch (OutputDeviceException) { }
                 }
             }
             isPlaying = false;
@@ -163,7 +173,12 @@ namespace ChordingCoding.SFX
             {
                 // 음표를 재생합니다.
                 // (Midi message pair를 번역하여 Midi message를 생성합니다.)
-                outDevice.Send(new ChannelMessage(ChannelCommand.NoteOn, p.Value >> 16, p.Value & 65535, velocity));
+                try
+                {
+                    outDevice.Send(new ChannelMessage(ChannelCommand.NoteOn, p.Value >> 16, p.Value & 65535, velocity));
+                }
+                catch (ObjectDisposedException) { }
+                catch (OutputDeviceException) { }
             }
             Thread t1 = new Thread(new ThreadStart(() => NoteOff(outDevice, note)));
             t1.Start();
@@ -194,7 +209,12 @@ namespace ChordingCoding.SFX
             {
                 // 음표를 재생합니다.
                 // (Midi message pair를 번역하여 Midi message를 생성합니다.)
-                outDevice.Send(new ChannelMessage(ChannelCommand.NoteOn, p.Value >> 16, p.Value & 65535, velocity));
+                try
+                {
+                    outDevice.Send(new ChannelMessage(ChannelCommand.NoteOn, p.Value >> 16, p.Value & 65535, velocity));
+                }
+                catch (ObjectDisposedException) { }
+                catch (OutputDeviceException) { }
             }
             isPlaying = false;
             //Console.WriteLine("End of note.");
@@ -216,7 +236,12 @@ namespace ChordingCoding.SFX
             {
                 // 음표의 재생을 멈춥니다.
                 // (Midi message pair를 번역하여 Midi message를 생성합니다.)
-                outDevice.Send(new ChannelMessage(ChannelCommand.NoteOff, staff, p, 32));
+                try
+                {
+                    outDevice.Send(new ChannelMessage(ChannelCommand.NoteOff, staff, p, 32));
+                }
+                catch (ObjectDisposedException) { }
+                catch (OutputDeviceException) { }
             }
             isPlaying = false;
             //Console.WriteLine("End of note.");
@@ -241,7 +266,12 @@ namespace ChordingCoding.SFX
             {
                 // 음표의 재생을 멈춥니다.
                 // (Midi message pair를 번역하여 Midi message를 생성합니다.)
-                outDevice.Send(new ChannelMessage(ChannelCommand.NoteOff, -p.Value >> 16, -p.Value & 65535, 127));
+                try
+                {
+                    outDevice.Send(new ChannelMessage(ChannelCommand.NoteOff, -p.Value >> 16, -p.Value & 65535, 127));
+                }
+                catch (ObjectDisposedException) { }
+                catch (OutputDeviceException) { }
             }
         }
 

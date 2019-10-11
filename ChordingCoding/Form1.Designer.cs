@@ -33,9 +33,6 @@
             this.notifyIcon1 = new System.Windows.Forms.NotifyIcon(this.components);
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.테마ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.가을산책ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.비오는날ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.별헤는밤ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.단위리듬ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._4분음표ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this._8분음표ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -49,7 +46,6 @@
             this.trackBarMenuItem2 = new ChordingCoding.UI.TrackBarMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.종료ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.숲속아침ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -81,35 +77,9 @@
             // 
             // 테마ToolStripMenuItem
             // 
-            this.테마ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.가을산책ToolStripMenuItem,
-            this.비오는날ToolStripMenuItem,
-            this.별헤는밤ToolStripMenuItem,
-            this.숲속아침ToolStripMenuItem});
             this.테마ToolStripMenuItem.Name = "테마ToolStripMenuItem";
             this.테마ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.테마ToolStripMenuItem.Text = "테마";
-            // 
-            // 가을산책ToolStripMenuItem
-            // 
-            this.가을산책ToolStripMenuItem.Name = "가을산책ToolStripMenuItem";
-            this.가을산책ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.가을산책ToolStripMenuItem.Text = "가을 산책";
-            this.가을산책ToolStripMenuItem.Click += new System.EventHandler(this.가을산책ToolStripMenuItem_Click);
-            // 
-            // 비오는날ToolStripMenuItem
-            // 
-            this.비오는날ToolStripMenuItem.Name = "비오는날ToolStripMenuItem";
-            this.비오는날ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.비오는날ToolStripMenuItem.Text = "비 오는 날";
-            this.비오는날ToolStripMenuItem.Click += new System.EventHandler(this.비오는날ToolStripMenuItem_Click);
-            // 
-            // 별헤는밤ToolStripMenuItem
-            // 
-            this.별헤는밤ToolStripMenuItem.Name = "별헤는밤ToolStripMenuItem";
-            this.별헤는밤ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.별헤는밤ToolStripMenuItem.Text = "별 헤는 밤";
-            this.별헤는밤ToolStripMenuItem.Click += new System.EventHandler(this.별헤는밤ToolStripMenuItem_Click);
             // 
             // 단위리듬ToolStripMenuItem
             // 
@@ -212,13 +182,6 @@
             this.종료ToolStripMenuItem.Text = "종료                 ";
             this.종료ToolStripMenuItem.Click += new System.EventHandler(this.종료ToolStripMenuItem_Click);
             // 
-            // 숲속아침ToolStripMenuItem
-            // 
-            this.숲속아침ToolStripMenuItem.Name = "숲속아침ToolStripMenuItem";
-            this.숲속아침ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.숲속아침ToolStripMenuItem.Text = "숲 속 아침";
-            this.숲속아침ToolStripMenuItem.Click += new System.EventHandler(this.숲속아침ToolStripMenuItem_Click);
-            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
@@ -262,9 +225,6 @@
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripMenuItem 종료ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem 테마ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 가을산책ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 비오는날ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 별헤는밤ToolStripMenuItem;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator2;
         private System.Windows.Forms.ToolStripMenuItem 단위리듬ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _4분음표ToolStripMenuItem;
@@ -272,7 +232,6 @@
         private System.Windows.Forms.ToolStripMenuItem _16분음표ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _32분음표ToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem _없음ToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem 숲속아침ToolStripMenuItem;
     }
 }
 

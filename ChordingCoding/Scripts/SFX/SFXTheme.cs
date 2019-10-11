@@ -441,12 +441,12 @@ namespace ChordingCoding.SFX
             instruments = new Dictionary<int, InstrumentInfo>();
             instruments.Add(0, availableInstruments[9]);
             instruments.Add(1, availableInstruments[10]);
-            availableInstrumentSets.Add(new InstrumentSet("Piano low", "피아노 저음", instruments, InstrumentSet.Type.character, 2, 6));
+            availableInstrumentSets.Add(new InstrumentSet("Piano_low", "피아노 저음", instruments, InstrumentSet.Type.character, 2, 6));
             
             instruments = new Dictionary<int, InstrumentInfo>();
             instruments.Add(0, availableInstruments[9]);
             instruments.Add(1, availableInstruments[10]);
-            availableInstrumentSets.Add(new InstrumentSet("Piano high", "피아노 고음", instruments, InstrumentSet.Type.character, 5, 8));
+            availableInstrumentSets.Add(new InstrumentSet("Piano_high", "피아노 고음", instruments, InstrumentSet.Type.character, 5, 8));
 
             /* 
              * InstrumentSet.Type.whitespace
@@ -476,8 +476,8 @@ namespace ChordingCoding.SFX
             availableSFXThemes.Add(new SFXTheme("Rain", "비 오는 날", ChordTransitionType.SomewhatBlue, "Forest", "Rain", null));
             availableSFXThemes.Add(new SFXTheme("Star", "별 헤는 밤", ChordTransitionType.SimilarOne, "Star", null, null));
             availableSFXThemes.Add(new SFXTheme("Forest", "숲 속 아침", ChordTransitionType.SimilarOne, "Forest", "Bird", null));
-            availableSFXThemes.Add(new SFXTheme("Pianoforte low", "피아노포르테(저음)", ChordTransitionType.SomewhatBlue, "Piano low", null, null));
-            availableSFXThemes.Add(new SFXTheme("Pianoforte high", "피아노포르테(고음)", ChordTransitionType.SomewhatHappy, "Piano high", null, null));
+            availableSFXThemes.Add(new SFXTheme("Pianoforte_low", "피아노포르테 저음", ChordTransitionType.SomewhatBlue, "Piano_low", null, null));
+            availableSFXThemes.Add(new SFXTheme("Pianoforte_high", "피아노포르테 고음", ChordTransitionType.SomewhatHappy, "Piano_high", null, null));
 
             IsReady = true;
         }

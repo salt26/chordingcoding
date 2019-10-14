@@ -186,9 +186,9 @@ namespace ChordingCoding
                                    /*pSize*/ 0.7f, /*pLife*/ 40),
                 new Theme.ParticleInfo(Particle.Type.rain, (Form1.form1.Size.Height + 150) / 4, (pitch) => Color.White, 0.2f),
                 "Forest"));
-
+            
             _availableThemes.Add(new Theme(
-                "Pianoforte_low", "피아노포르테 저음",
+                "Pianoforte", "피아노포르테",
                 new ParticleSystem(/*cNum*/ 4, /*cRange*/ 0,
                                    ParticleSystem.CreateFunction.TopRandom,
                                    Particle.Type.leaf, () => Color.White,
@@ -201,23 +201,39 @@ namespace ChordingCoding
                                    Particle.Type.leaf, () => Music.chord.ChordColor(),
                                    /*pSize*/ 0.7f, /*pLife*/ 40),
                 new Theme.ParticleInfo(Particle.Type.rain, (Form1.form1.Size.Height + 150) / 4, (pitch) => Color.White, 0.2f),
-                "Pianoforte_low"));
-
+                "Pianoforte"));
+            
             _availableThemes.Add(new Theme(
-                "Pianoforte_high", "피아노포르테 고음",
-                new ParticleSystem(/*cNum*/ 4, /*cRange*/ 0,
-                                   ParticleSystem.CreateFunction.TopRandom,
-                                   Particle.Type.leaf, () => Color.White,
-                                   /*pSize*/ 0.1f, /*pLife*/ 128),
+                "Sky", "구름 너머",
+                new ParticleSystem(/*cNum*/ 1, /*cRange*/ 0,
+                                   ParticleSystem.CreateFunction.Random,
+                                   Particle.Type.star, () => Color.Black,
+                                   /*pSize*/ 1f, /*pLife*/ 64),
                 new ParticleSystem(/*posX*/ () => (float)(new Random().NextDouble() * Form1.form1.Size.Width),
                                    /*posY*/ () => (float)(new Random().NextDouble() * Form1.form1.Size.Height * 5 / 6 - Form1.form1.Size.Height / 12),
-                                   /*velX*/ 0, /*velY*/ 16, /*life*/ 38,
-                                   /*cNum*/ 2, /*cRange*/ 200,
+                                   /*velX*/ 2, /*velY*/ 8, /*life*/ 38,
+                                   /*cNum*/ 7, /*cRange*/ 4,
                                    ParticleSystem.CreateFunction.Gaussian,
-                                   Particle.Type.leaf, () => Music.chord.ChordColor(),
-                                   /*pSize*/ 0.7f, /*pLife*/ 40),
-                new Theme.ParticleInfo(Particle.Type.rain, (Form1.form1.Size.Height + 150) / 4, (pitch) => Color.White, 0.2f),
-                "Pianoforte_high"));
+                                   Particle.Type.dot, () => Music.chord.ChordColor(),
+                                   /*pSize*/ 1, /*pLife*/ 10),
+                new Theme.ParticleInfo(Particle.Type.star, 32, (pitch) => Chord.PitchColor(pitch), 1f),
+                "Sky"));
+            
+            _availableThemes.Add(new Theme(
+                "Medieval", "중세 탐방",
+                new ParticleSystem(/*cNum*/ 1, /*cRange*/ 0,
+                                   ParticleSystem.CreateFunction.TopRandom,
+                                   Particle.Type.rain, () => Color.White,
+                                   /*pSize*/ 0.1f, /*pLife*/ (Form1.form1.Size.Height + 150) / 30),
+                new ParticleSystem(/*posX*/ () => 0,
+                                   /*posY*/ () => 0,
+                                   /*velX*/ 0, /*velY*/ 0, /*life*/ 160,
+                                   /*cNum*/ 1, /*cRange*/ 0,
+                                   ParticleSystem.CreateFunction.TopRandom,
+                                   Particle.Type.rain, () => Color.White,
+                                   /*pSize*/ 0.1f, /*pLife*/ (Form1.form1.Size.Height + 150) / 30),
+                new Theme.ParticleInfo(Particle.Type.note, (Form1.form1.Size.Height + 150) / 15, (pitch) => Chord.PitchColor(pitch), 0.1f),
+                "Medieval"));
 
             IsReady = true;
         }

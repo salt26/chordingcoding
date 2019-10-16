@@ -12,10 +12,16 @@ namespace ChordingCoding.SFX
     class Note
     {
         /// <summary>
-        /// 음 높이(0 ~ 127).
+        /// 음 높이(1 ~ 127)를 반환하는 함수 대리자입니다.
+        /// </summary>
+        /// <returns></returns>
+        public delegate int Pitch();
+        
+        /// <summary>
+        /// 음 높이(1 ~ 127)를 반환하는 함수.
         /// 예) 60: C4 / 64: E4 / 67: G4 / 72: C5
         /// </summary>
-        private int pitch;
+        private Pitch pitch;
 
         /// <summary>
         /// 음표의 길이(1 이상). 4/4박에서 한 마디를 16등분한 길이를 기준으로 합니다.
@@ -23,20 +29,35 @@ namespace ChordingCoding.SFX
         /// </summary>
         private int rhythm;
 
+        private int measure;
+
         /// <summary>
         /// 음표가 위치한 마디 번호(0부터 시작).
         /// </summary>
-        private int measure;
+        public int Measure
+        {
+            get { return measure; }
+        }
+
+        private int position;
 
         /// <summary>
         /// 음표의 마디 내 위치(0 ~ 15). 4/4박에서 한 마디를 16등분한 길이를 기준으로 합니다.
         /// </summary>
-        private int position;
+        public int Position
+        {
+            get { return position; }
+        }
+
+        private int staff;
 
         /// <summary>
         /// 음표가 놓일 Staff 번호(0 ~ 15). 9번 Staff는 타악기 전용 Staff입니다.
         /// </summary>
-        private int staff;
+        public int Staff
+        {
+            get { return staff; }
+        }
 
         /// <summary>
         /// 음표를 생성합니다.
@@ -49,6 +70,32 @@ namespace ChordingCoding.SFX
         public Note(int pitch, int rhythm, int measure, int position, int staff = 0)
         {
             if (pitch < 1 || pitch > 127) pitch = 60;
+            this.pitch = () => pitch;
+
+            if (rhythm < 1) rhythm = 4;
+            this.rhythm = rhythm;
+
+            if (position < 0 || position > 15) measure += position / 16;
+            if (measure < 0) measure = 0;
+            this.measure = measure;
+
+            if (position < 0 || position > 15) position %= 16;
+            this.position = position;
+
+            if (staff < 0 || staff > 15) staff = 0;
+            this.staff = staff;
+        }
+
+        /// <summary>
+        /// 음표를 생성합니다.
+        /// </summary>
+        /// <param name="pitch">음 높이(1 ~ 127)를 반환하는 함수. 예) () => 60: C4 / () => 64: E4 / () = > 67: G4 / () => 72: C5</param>
+        /// <param name="rhythm">음표의 길이(1 이상). 4/4박에서 한 마디를 16등분한 길이를 기준으로 합니다. 예) 16: 온음표 / 4: 4분음표 / 1: 16분음표</param>
+        /// <param name="measure">음표가 위치한 마디 번호(0부터 시작).</param>
+        /// <param name="position">음표의 마디 내 위치(0 ~ 15). 4/4박에서 한 마디를 16등분한 길이를 기준으로 합니다.</param>
+        /// <param name="staff">음표가 놓일 Staff 번호(0 ~ 15). 9번 Staff는 타악기 전용 Staff입니다.</param>
+        public Note(Pitch pitch, int rhythm, int measure, int position, int staff = 0)
+        {
             this.pitch = pitch;
 
             if (rhythm < 1) rhythm = 4;
@@ -72,6 +119,9 @@ namespace ChordingCoding.SFX
         /// <returns></returns>
         public List<KeyValuePair<float, int>> ToMidi()
         {
+            int pitch = this.pitch();
+            if (pitch < 1 || pitch > 127) pitch = 60;
+
             // KeyValuePair의 float 값은 타이밍, int 값은 음 높이와 Staff 번호에 해당합니다.
             List<KeyValuePair<float, int>> res = new List<KeyValuePair<float, int>>
             {

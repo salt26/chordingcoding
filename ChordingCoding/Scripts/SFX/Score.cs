@@ -49,6 +49,20 @@ namespace ChordingCoding.SFX
         }
 
         /// <summary>
+        /// 음표를 생성하여 악보에 추가합니다.
+        /// </summary>
+        /// <param name="pitch">음 높이(0 ~ 127)를 반환하는 함수. 예) () => 60: C4 / () => 64: E4 / () => 67: G4 / () => 72: C5</param>
+        /// <param name="rhythm">음표의 길이(1 이상). 4/4박에서 한 마디를 16등분한 길이를 기준으로 합니다. 예) 16: 온음표 / 4: 4분음표 / 1: 16분음표</param>
+        /// <param name="measure">음표가 위치한 마디 번호(0부터 시작).</param>
+        /// <param name="position">음표의 마디 내 위치(0 ~ 15). 4/4박에서 한 마디를 16등분한 길이를 기준으로 합니다.</param>
+        /// <param name="staff">음표가 놓일 Staff 번호(0 ~ 15). 9번 Staff는 타악기 전용 Staff입니다.</param>
+        public void AddNote(Note.Pitch pitch, int rhythm, int measure, int position, int staff = 0)
+        {
+            Note note = new Note(pitch, rhythm, measure, position, staff);
+            score.Add(note);
+        }
+
+        /// <summary>
         /// 음표를 악보에 추가합니다.
         /// </summary>
         /// <param name="note">음표</param>
@@ -102,14 +116,19 @@ namespace ChordingCoding.SFX
         /// 이미 재생 중인 악보는 중복하여 재생할 수 없습니다.
         /// </summary>
         /// <param name="outDevice">출력 디바이스</param>
+        /// <param name="measure">재생할 음표의 마디 번호 (0부터 시작)</param>
+        /// <param name="position">재생할 음표의 마디 내 위치(0 ~ 15). 4/4박에서 한 마디를 16등분한 길이를 기준으로 합니다.</param>
+        /// <param name="staff">재생할 음표의 채널(Staff 번호). 인자로 -1을 주면 모든 채널의 음표를 재생합니다.</param>
+        /// <param name="velocity">연주 세기 (0 ~ 127)</param>
         // (만약 Unity에서 작업할 경우, 타입을 void 대신 IEnumerator로 바꿔서 Coroutine으로 사용하세요.)
-        public void Play(OutputDevice outDevice)
+        public void Play(OutputDevice outDevice, int measure, int position, int staff = -1, int velocity = 127)
         {
             // 이미 재생 중인 악보이면 중복하여 재생하지 않습니다.
             if (isPlaying) return;
             isPlaying = true;
             //Console.WriteLine("Playing...");
 
+            /*
             float last = 0;
 
             // 악보에 있는 모든 음표를 재생합니다.
@@ -146,6 +165,20 @@ namespace ChordingCoding.SFX
                     catch (OutputDeviceException) { }
                 }
             }
+            */
+            foreach (Note note in score)
+            {
+                if (note.Measure == measure && note.Position == position && (staff == -1 || note.Staff == staff))
+                {
+                    Console.WriteLine("Play velocity=" + velocity);
+                    PlayANote(outDevice, note, velocity);
+                    /*
+                    Thread t1 = new Thread(new ThreadStart(() => PlayANote(outDevice, note, velocity)));
+                    t1.Start();
+                    */
+                }
+            }
+
             isPlaying = false;
             //Console.WriteLine("End of score.");
         }
@@ -159,11 +192,10 @@ namespace ChordingCoding.SFX
         /// <param name="note">재생할 음표</param>
         /// <param name="velocity">연주 세기 (0 ~ 127)</param>
         // (만약 Unity에서 작업할 경우, 타입을 void 대신 IEnumerator로 바꿔서 Coroutine으로 사용하세요.)
-        public void PlayANote(OutputDevice outDevice, Note note, int velocity = 127)
+        public static void PlayANote(OutputDevice outDevice, Note note, int velocity = 127)
         {
             // 이미 재생 중인 악보이면 중복하여 재생하지 않습니다.
-            if (isPlaying || velocity < 0 || velocity >= 128) return;
-            isPlaying = true;
+            if (velocity < 0 || velocity >= 128) return;
             //Console.WriteLine("Playing...");
 
             // 악보에 있는 모든 음표를 재생합니다.
@@ -182,7 +214,6 @@ namespace ChordingCoding.SFX
             }
             Thread t1 = new Thread(new ThreadStart(() => NoteOff(outDevice, note)));
             t1.Start();
-            isPlaying = false;
             //Console.WriteLine("End of note.");
         }
 
@@ -195,11 +226,10 @@ namespace ChordingCoding.SFX
         /// <param name="note">재생할 음표</param>
         /// <param name="velocity">연주 세기 (0 ~ 127)</param>
         // (만약 Unity에서 작업할 경우, 타입을 void 대신 IEnumerator로 바꿔서 Coroutine으로 사용하세요.)
-        public void PlayANoteForever(OutputDevice outDevice, Note note, int velocity = 127)
+        public static void PlayANoteForever(OutputDevice outDevice, Note note, int velocity = 127)
         {
             // 이미 재생 중인 악보이면 중복하여 재생하지 않습니다.
-            if (isPlaying || velocity < 0 || velocity >= 128) return;
-            isPlaying = true;
+            if (velocity < 0 || velocity >= 128) return;
             //Console.WriteLine("Playing...");
 
             // 악보에 있는 모든 음표를 재생합니다.
@@ -216,7 +246,6 @@ namespace ChordingCoding.SFX
                 catch (ObjectDisposedException) { }
                 catch (OutputDeviceException) { }
             }
-            isPlaying = false;
             //Console.WriteLine("End of note.");
         }
 
@@ -225,11 +254,10 @@ namespace ChordingCoding.SFX
         /// </summary>
         /// <param name="outDevice">출력 디바이스</param>
         // (만약 Unity에서 작업할 경우, 타입을 void 대신 IEnumerator로 바꿔서 Coroutine으로 사용하세요.)
-        public void Stop(OutputDevice outDevice, int staff = 0)
+        public static void Stop(OutputDevice outDevice, int staff = 0)
         {
             // 이미 재생 중인 악보이면 중복하여 재생하지 않습니다.
-            if (isPlaying || staff < 0 || staff >= 16) return;
-            isPlaying = true;
+            if (staff < 0 || staff >= 16) return;
             //Console.WriteLine("Playing...");
             
             for (int p = 0; p < 128; p++)
@@ -243,11 +271,10 @@ namespace ChordingCoding.SFX
                 catch (ObjectDisposedException) { }
                 catch (OutputDeviceException) { }
             }
-            isPlaying = false;
             //Console.WriteLine("End of note.");
         }
 
-        void NoteOff(OutputDevice outDevice, Note note)
+        static void NoteOff(OutputDevice outDevice, Note note)
         {
             float last = 0;
 

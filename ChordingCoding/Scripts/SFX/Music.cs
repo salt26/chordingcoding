@@ -88,7 +88,11 @@ namespace ChordingCoding.SFX
         public static void Dispose()
         {
             if (IsReady)
+            {
+                for (int i = 0; i <= 8; i++) StopPlaying(i);
                 outDevice.Close();
+                IsReady = false;
+            }
         }
         
         private static void Timer_Elapsed(object sender, ElapsedEventArgs e)
@@ -236,7 +240,7 @@ namespace ChordingCoding.SFX
             if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(7) ||
                 SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(8))
             {
-                if (accompanimentTickNumber >= Accompaniment.currentPattern.Value)
+                if (accompanimentTickNumber >= Accompaniment.currentPattern.Value * 4)
                 {
                     Accompaniment.SetNewCurrentPattern();
                     accompanimentTickNumber = 0;
@@ -246,6 +250,7 @@ namespace ChordingCoding.SFX
                 // 16분음표 단위로 음을 하나씩 재생
                 if (accompanimentTickNumber % 4 == 0)
                 {
+                    Console.WriteLine(SFXTheme.CurrentSFXTheme.Instruments[7].accompanimentVolume);
                     int measure = accompanimentTickNumber / 64;
                     int position = (accompanimentTickNumber / 4) % 16;
                     if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(7))

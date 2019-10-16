@@ -295,7 +295,7 @@ namespace ChordingCoding.SFX
                 // (Midi message pair를 번역하여 Midi message를 생성합니다.)
                 try
                 {
-                    outDevice.Send(new ChannelMessage(ChannelCommand.NoteOff, -p.Value >> 16, -p.Value & 65535, 127));
+                    outDevice.Send(new ChannelMessage(ChannelCommand.NoteOff, -p.Value >> 16, -p.Value & 65535, 10));
                 }
                 catch (ObjectDisposedException) { }
                 catch (OutputDeviceException) { }

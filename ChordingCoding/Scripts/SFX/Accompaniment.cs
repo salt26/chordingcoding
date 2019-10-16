@@ -11,17 +11,55 @@ namespace ChordingCoding.SFX
     /// </summary>
     class Accompaniment
     {
-        /// <summary>
-        /// 사용 가능한 반주 패턴 목록 (Key는 Score, Value는 반주 패턴의 총 길이를 tick 수로 환산한 수(예: 1마디 = 온음표 = 2초 = 64 tick))
-        /// </summary>
-        public static List<KeyValuePair<Score, int>> availablePatterns = new List<KeyValuePair<Score, int>>();
+        // 1마디 = 온음표 = 2초 = 64 tick
 
         /// <summary>
-        /// 현재 재생할 반주 패턴 (Key는 Score, Value는 반주 패턴의 총 길이를 tick 수로 환산한 수(예: 1마디 = 온음표 = 2초 = 64 tick))
+        /// 사용 가능한 반주 패턴 목록
         /// </summary>
-        public static KeyValuePair<Score, int> currentPattern;
+        public static Pattern availablePatterns = new Pattern();
+
+        /// <summary>
+        /// 현재 재생할 반주 패턴
+        /// </summary>
+        public static Pattern currentPattern;
 
         public static bool IsReady { get; private set; } = false;
+
+        /// <summary>
+        /// 반주 패턴 구조체입니다.
+        /// </summary>
+        public struct Pattern
+        {
+            /// <summary>
+            /// 반주 패턴의 영어 이름
+            /// </summary>
+            public string name;
+
+            /// <summary>
+            /// 반주 패턴의 한글(보여질) 이름
+            /// </summary>
+            public string displayName;
+
+            /// <summary>
+            /// 반주 패턴 악보. 재생할 음표들이 담겨 있습니다.
+            /// </summary>
+            public Score score;
+
+            /// <summary>
+            /// 반주 패턴 악보의 길이 (16분음표로 채우는 개수, 예: 1마디 = 16)
+            /// </summary>
+            public int length;
+
+            /// <summary>
+            /// 반주 패턴을 연속으로 재생할 반복 횟수
+            /// </summary>
+            public int iteration;
+
+            public Pattern()
+            {
+                // TODO
+            }
+        }
 
         /// <summary>
         /// 사용 가능한 반주 패턴 목록과 현재 재생할 반주 패턴을 초기화합니다.
@@ -32,10 +70,25 @@ namespace ChordingCoding.SFX
 
             score = new Score();
             score.AddNote(() => Music.chord.NotesInChord()[0], 4, 0, 0, 7);
+            score.AddNote(() => Music.chord.NotesInChord()[2] - 12, 8, 0, 0, 7);
+            score.AddNote(() => Music.chord.NotesInChord()[1] - 12, 8, 0, 0, 7);
+            score.AddNote(() => Music.chord.NotesInChord()[0] - 12, 8, 0, 0, 7);
             score.AddNote(() => Music.chord.NotesInChord()[2], 4, 0, 4, 7);
             score.AddNote(() => Music.chord.NotesInChord()[1], 4, 0, 8, 7);
+            score.AddNote(() => Music.chord.NotesInChord()[0], 4, 0, 8, 7);
             score.AddNote(() => Music.chord.NotesInChord()[2], 4, 0, 12, 7);
-            availablePatterns.Add(new KeyValuePair<Score, int>(score, 64));  // TODO
+            availablePatterns.Add(new KeyValuePair<Score, int>(score, 16));
+
+            score = new Score();
+            score.AddNote(() => Music.chord.NotesInChord()[2] - 12, 8, 0, 0, 7);
+            score.AddNote(() => Music.chord.NotesInChord()[0] - 12, 8, 0, 0, 7);
+            score.AddNote(() => Music.chord.NotesInChord()[0], 2, 0, 2, 7);
+            score.AddNote(() => Music.chord.NotesInChord()[1], 2, 0, 4, 7);
+            score.AddNote(() => Music.chord.NotesInChord()[2], 2, 0, 6, 7);
+            score.AddNote(() => Music.chord.NotesInChord()[0] + 12, 4, 0, 8, 7);
+            score.AddNote(() => Music.chord.NotesInChord()[2], 2, 0, 10, 7);
+            score.AddNote(() => Music.chord.NotesInChord()[1], 4, 0, 12, 7);
+            availablePatterns.Add(new KeyValuePair<Score, int>(score, 16));
 
             SetNewCurrentPattern();
 

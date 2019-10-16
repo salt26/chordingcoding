@@ -117,6 +117,18 @@ namespace ChordingCoding.UI
             int resolution = (int)Properties.Settings.Default["NoteResolution"];
             Music.Initialize(Theme.CurrentTheme.SFX.Name, resolution,
                 new Music.TimerTickDelegate[] { MarshallingUpdateFrame });
+            Music.OnPlayNotes += (pitch) => AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
+            Music.OnChordTransition += (pitch) =>
+            {
+                if (Theme.CurrentTheme.ParticleSystemForWhitespace != null)
+                {
+                    AddParticleSystem(Theme.CurrentTheme.ParticleSystemForWhitespace);
+                }
+                else
+                {
+                    AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
+                }
+            };
 
             SetNoteResolution(resolution);
 

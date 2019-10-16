@@ -56,7 +56,7 @@ namespace ChordingCoding.SFX
         /// <param name="measure">음표가 위치한 마디 번호(0부터 시작).</param>
         /// <param name="position">음표의 마디 내 위치(0 ~ 15). 4/4박에서 한 마디를 16등분한 길이를 기준으로 합니다.</param>
         /// <param name="staff">음표가 놓일 Staff 번호(0 ~ 15). 9번 Staff는 타악기 전용 Staff입니다.</param>
-        public void AddNote(Note.Pitch pitch, int rhythm, int measure, int position, int staff = 0)
+        public void AddNote(Note.PitchGenerator pitch, int rhythm, int measure, int position, int staff = 0)
         {
             Note note = new Note(pitch, rhythm, measure, position, staff);
             score.Add(note);
@@ -170,7 +170,6 @@ namespace ChordingCoding.SFX
             {
                 if (note.Measure == measure && note.Position == position && (staff == -1 || note.Staff == staff))
                 {
-                    Console.WriteLine("Play velocity=" + velocity);
                     PlayANote(outDevice, note, velocity);
                     /*
                     Thread t1 = new Thread(new ThreadStart(() => PlayANote(outDevice, note, velocity)));

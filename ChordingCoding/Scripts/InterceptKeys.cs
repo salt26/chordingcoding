@@ -48,9 +48,8 @@ namespace ChordingCoding.UI
                     (vkCode == 226))
                 {
                     // Characters
-                    int pitch = Music.PlayNoteInChord();
-                    Form1.AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
-
+                    Music.PlayNoteInChord();
+                    // 음표 재생 후에 Music.OnPlayNotes()가 호출되면서 시각 효과 발생
                 }
                 else if (
                     (vkCode == 32) ||
@@ -58,17 +57,8 @@ namespace ChordingCoding.UI
                     (vkCode == 13))
                 {
                     // Whitespaces
-                    int pitch = Music.PlayChordTransition();
-
-                    if (Theme.CurrentTheme.ParticleSystemForWhitespace != null)
-                    {
-                        Form1.AddParticleSystem(Theme.CurrentTheme.ParticleSystemForWhitespace);
-                    }
-                    else
-                    {
-                        Form1.AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
-                    }
-
+                    Music.PlayChordTransitionSync();
+                    // 화음 전이 후에 Music.OnChordTransition()이 호출되면서 시각 효과 발생
                 }
             }
             return CallNextHookEx(_hookID, nCode, wParam, lParam);

@@ -372,7 +372,7 @@ namespace ChordingCoding.SFX
             ConcatenateInstrumentSet(Instruments, FindInstrumentSet(instrumentSetNameForCharacter, InstrumentSet.Type.character));
             ConcatenateInstrumentSet(Instruments, FindInstrumentSet(instrumentSetNameForWhitespace, InstrumentSet.Type.whitespace));
             ConcatenateInstrumentSet(Instruments, FindInstrumentSet(instrumentSetNameForAccompaniment, InstrumentSet.Type.accompaniment));
-            Console.WriteLine("minOctave " + MinOctave + ", maxOctave " + MaxOctave);
+            //Console.WriteLine("minOctave " + MinOctave + ", maxOctave " + MaxOctave);
             Volume = 100;
         }
 

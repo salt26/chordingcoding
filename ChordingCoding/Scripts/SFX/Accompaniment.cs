@@ -16,7 +16,7 @@ namespace ChordingCoding.SFX
         /// <summary>
         /// 사용 가능한 반주 패턴 목록
         /// </summary>
-        public static Pattern availablePatterns = new Pattern();
+        public static List<Pattern> availablePatterns = new List<Pattern>();
 
         /// <summary>
         /// 현재 재생할 반주 패턴
@@ -55,9 +55,13 @@ namespace ChordingCoding.SFX
             /// </summary>
             public int iteration;
 
-            public Pattern()
+            public Pattern(string name, string displayName, Score score, int length, int iteration = 1)
             {
-                // TODO
+                this.name = name;
+                this.displayName = displayName;
+                this.score = score;
+                this.length = length;
+                this.iteration = iteration;
             }
         }
 
@@ -77,7 +81,7 @@ namespace ChordingCoding.SFX
             score.AddNote(() => Music.chord.NotesInChord()[1], 4, 0, 8, 7);
             score.AddNote(() => Music.chord.NotesInChord()[0], 4, 0, 8, 7);
             score.AddNote(() => Music.chord.NotesInChord()[2], 4, 0, 12, 7);
-            availablePatterns.Add(new KeyValuePair<Score, int>(score, 16));
+            availablePatterns.Add(new Pattern("4", "4", score, 16, 4)); // TODO 이름 바꾸기
 
             score = new Score();
             score.AddNote(() => Music.chord.NotesInChord()[2] - 12, 8, 0, 0, 7);
@@ -88,7 +92,7 @@ namespace ChordingCoding.SFX
             score.AddNote(() => Music.chord.NotesInChord()[0] + 12, 4, 0, 8, 7);
             score.AddNote(() => Music.chord.NotesInChord()[2], 2, 0, 10, 7);
             score.AddNote(() => Music.chord.NotesInChord()[1], 4, 0, 12, 7);
-            availablePatterns.Add(new KeyValuePair<Score, int>(score, 16));
+            availablePatterns.Add(new Pattern("7", "7", score, 16, 4)); // TODO 이름 바꾸기
 
             SetNewCurrentPattern();
 

@@ -986,16 +986,16 @@ namespace ChordingCoding.SFX
             int[] r;
             if (type != Type.M7 && type != Type.m7)
             {
-                r = new int[3] {  (octave) * 12 + (int)root + TypeToNote(1),
-                                  (octave) * 12 + (int)root + TypeToNote(2),
-                                  (octave) * 12 + (int)root + TypeToNote(0) };
+                r = new int[3] {  (octave) * 12 + (int)root + TypeToNote(0),
+                                  (octave) * 12 + (int)root + TypeToNote(1),
+                                  (octave) * 12 + (int)root + TypeToNote(2) };
             }
             else
             {
-                r = new int[4] {  (octave) * 12 + (int)root + TypeToNote(1),
+                r = new int[4] {  (octave) * 12 + (int)root + TypeToNote(0),
+                                  (octave) * 12 + (int)root + TypeToNote(1),
                                   (octave) * 12 + (int)root + TypeToNote(2),
-                                  (octave) * 12 + (int)root + TypeToNote(3),
-                                  (octave) * 12 + (int)root + TypeToNote(0) };
+                                  (octave) * 12 + (int)root + TypeToNote(3) };
             }
             return r;
         }

@@ -8,6 +8,7 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 using System.ComponentModel;
 using System.Data;
+using System.Threading;
 using Sanford.Multimedia.Midi;
 
 namespace ChordingCoding.SFX
@@ -21,7 +22,11 @@ namespace ChordingCoding.SFX
 
         public const float TICK_PER_SECOND = 32f;   // 1초에 호출되는 tick 수
         public static int tickNumber = 0;           // 테마 변경 후 지금까지 지난 tick 수
+        private static int accompanimentTickNumber = 0; // 반주 재생에 사용되는, 새 패턴을 재생하고 나서 지금까지 지난 tick 수
 
+        /// <summary>
+        /// 현재 화음
+        /// </summary>
         public static Chord chord;
 
         private static int _noteResolution = 4;
@@ -61,6 +66,7 @@ namespace ChordingCoding.SFX
             SFXTheme.CurrentSFXTheme = SFXTheme.FindSFXTheme(SFXThemeName);
             ThemeChanged();
             NoteResolution = noteResolution;
+            Accompaniment.Initialize();
 
             tickDelegate += Tick;
             if (timerTickDelegates != null)
@@ -99,7 +105,7 @@ namespace ChordingCoding.SFX
         {
             if (SFXTheme.CurrentSFXTheme == null) return;
 
-            for (int i = 0; i <= 6; i++) StopPlaying(i);
+            for (int i = 0; i <= 8; i++) StopPlaying(i);
 
             foreach (KeyValuePair<int, SFXTheme.InstrumentInfo> p in SFXTheme.CurrentSFXTheme.Instruments)
             {
@@ -112,6 +118,7 @@ namespace ChordingCoding.SFX
             }
             chord = new Chord(SFXTheme.CurrentSFXTheme.ChordTransition);
             tickNumber = 0;
+            accompanimentTickNumber = 0;
         }
 
         /// <summary>
@@ -128,8 +135,7 @@ namespace ChordingCoding.SFX
 
             if (NoteResolution == 0)
             {
-                Score score = new Score();
-                score.PlayANote(outDevice, note, (int)Math.Round(velocity * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
+                Score.PlayANote(outDevice, note, (int)Math.Round(velocity * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
             }
             else
             {
@@ -144,8 +150,7 @@ namespace ChordingCoding.SFX
         public static void StopPlaying(int staff)
         {
             if (!IsReady) return;
-            Score score = new Score();
-            score.Stop(outDevice, staff);
+            Score.Stop(outDevice, staff);
         }
 
         /// <summary>
@@ -209,26 +214,53 @@ namespace ChordingCoding.SFX
         public static void Tick()
         {
             // 지속 효과음이 멈추는 것을 대비하여 
-            if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(3) &&
-                SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(4))
+            if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(5) &&
+                SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(6))
             {
                 if (tickNumber % ((int)TICK_PER_SECOND * 10) == 0)
                 {
-                    StopPlaying(3);
-                    tickNumber = 0;
-                    Score score = new Score();
-                    SFXTheme.InstrumentInfo inst = SFXTheme.CurrentSFXTheme.Instruments[3];
-                    Note note = new Note(inst.sfxPitchModulator(45), inst.sfxRhythm, 0, 0, 3);
-                    score.PlayANoteForever(outDevice, note, (int)Math.Round(inst.sfxVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));     // 기본 빗소리 (사라지지 않아야 함)
+                    StopPlaying(5);
+                    SFXTheme.InstrumentInfo inst = SFXTheme.CurrentSFXTheme.Instruments[5];
+                    Note note = new Note(inst.sfxPitchModulator(45), inst.sfxRhythm, 0, 0, 5);
+                    Score.PlayANoteForever(outDevice, note, (int)Math.Round(inst.sfxVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));     // 기본 빗소리 (사라지지 않아야 함)
                 }
                 if (tickNumber % ((int)TICK_PER_SECOND * 10) == (int)TICK_PER_SECOND * 5)
                 {
-                    StopPlaying(4);
-                    Score score = new Score();
-                    SFXTheme.InstrumentInfo inst = SFXTheme.CurrentSFXTheme.Instruments[4];
-                    Note note = new Note(inst.sfxPitchModulator(45), inst.sfxRhythm, 0, 0, 4);
-                    score.PlayANoteForever(outDevice, note, (int)Math.Round(inst.sfxVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));     // 기본 빗소리 (사라지지 않아야 함)
+                    StopPlaying(6);
+                    SFXTheme.InstrumentInfo inst = SFXTheme.CurrentSFXTheme.Instruments[6];
+                    Note note = new Note(inst.sfxPitchModulator(45), inst.sfxRhythm, 0, 0, 6);
+                    Score.PlayANoteForever(outDevice, note, (int)Math.Round(inst.sfxVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));     // 기본 빗소리 (사라지지 않아야 함)
                 }
+            }
+
+            if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(7) ||
+                SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(8))
+            {
+                if (accompanimentTickNumber >= Accompaniment.currentPattern.Value)
+                {
+                    Accompaniment.SetNewCurrentPattern();
+                    accompanimentTickNumber = 0;
+                }
+                Score accompaniment = Accompaniment.currentPattern.Key;
+
+                // 16분음표 단위로 음을 하나씩 재생
+                if (accompanimentTickNumber % 4 == 0)
+                {
+                    int measure = accompanimentTickNumber / 64;
+                    int position = (accompanimentTickNumber / 4) % 16;
+                    if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(7))
+                        accompaniment.Play(outDevice, measure, position, 7,
+                            (int)Math.Round(SFXTheme.CurrentSFXTheme.Instruments[7].accompanimentVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
+                    if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(8))
+                        accompaniment.Play(outDevice, measure, position, 8,
+                            (int)Math.Round(SFXTheme.CurrentSFXTheme.Instruments[8].accompanimentVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
+                }
+
+                accompanimentTickNumber++;
+            }
+            else
+            {
+                accompanimentTickNumber = 0;
             }
 
             // 동기화된 박자(최소 리듬 단위)에 맞춰 버퍼에 저장되어 있던 음표 재생
@@ -245,12 +277,11 @@ namespace ChordingCoding.SFX
         /// </summary>
         private static void FlushSyncPlayBuffer()
         {
-            Score score = new Score();
             List<KeyValuePair<Note, int>> tempSyncPlayBuffer = syncPlayBuffer;
             syncPlayBuffer = new List<KeyValuePair<Note, int>>();
             foreach (KeyValuePair<Note, int> p in tempSyncPlayBuffer)
             {
-                score.PlayANote(outDevice, p.Key, (int)Math.Round(p.Value * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
+                Score.PlayANote(outDevice, p.Key, (int)Math.Round(p.Value * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
             }
         }
     }

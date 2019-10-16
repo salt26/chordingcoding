@@ -136,7 +136,7 @@ namespace ChordingCoding.SFX
         }
 
         /// <summary>
-        /// 일반 문자 또는 공백 문자를 입력할 때 재생되고 반주로도 재생될, 채널(staff) 0, 1의 악기 정보입니다.
+        /// 일반 문자 또는 공백 문자를 입력할 때 재생되고 반주로도 재생될, 채널(staff) 0, 1, 2의 악기 정보입니다.
         /// </summary>
         public class CharacterInstrumentInfo : InstrumentInfo
         {
@@ -185,7 +185,7 @@ namespace ChordingCoding.SFX
         }
 
         /// <summary>
-        /// 공백 문자를 입력할 때 재생될, 채널(staff) 2의 악기 정보입니다.
+        /// 공백 문자를 입력할 때 재생될, 채널(staff) 3, 4의 악기 정보입니다.
         /// </summary>
         public class WhitespaceInstrumentInfo : InstrumentInfo
         {
@@ -217,7 +217,7 @@ namespace ChordingCoding.SFX
         }
 
         /// <summary>
-        /// 항상 재생될 효과음인, 채널(staff) 3, 4의 악기 정보입니다.
+        /// 항상 재생될 효과음인, 채널(staff) 5, 6의 악기 정보입니다.
         /// </summary>
         public class SFXInstrumentInfo : InstrumentInfo
         {
@@ -249,7 +249,7 @@ namespace ChordingCoding.SFX
         }
 
         /// <summary>
-        /// 반주로 재생될, 채널(staff) 5, 6의 악기 정보입니다.
+        /// 반주로 재생될, 채널(staff) 7, 8의 악기 정보입니다.
         /// </summary>
         public class AccompanimentInstrumentInfo : InstrumentInfo
         {
@@ -282,10 +282,10 @@ namespace ChordingCoding.SFX
         #endregion
 
         /* InstrumentSet
-         * 일반 문자 입력 시 사용하는 악기 채널은 항상 0, 1 (type == Type.character, CharacterInstrumentInfo)
-         * 공백 문자 입력 시 추가로 사용하는 악기 채널은 항상 2 (type == Type.whitespace, WhitespaceInstrumentInfo)
-         * 특정 테마일 때 항상 들리는 효과음의 악기 채널은 항상 3, 4 (type = Type.whitespace, SFXInstrumentInfo)
-         * 생성되는 반주의 악기 채널은 항상 5, 6 (type = Type.accompaniment, AccompanimentInstrumentInfo)
+         * 일반 문자 입력 시 사용하는 악기 채널은 항상 0, 1, 2 (type == Type.character, CharacterInstrumentInfo)
+         * 공백 문자 입력 시 추가로 사용하는 악기 채널은 항상 3, 4 (type == Type.whitespace, WhitespaceInstrumentInfo)
+         * 특정 테마일 때 항상 들리는 효과음의 악기 채널은 항상 5, 6 (type = Type.whitespace, SFXInstrumentInfo)
+         * 생성되는 반주의 악기 채널은 항상 7, 8 (type = Type.accompaniment, AccompanimentInstrumentInfo)
          */
         public struct InstrumentSet
         {
@@ -384,10 +384,10 @@ namespace ChordingCoding.SFX
             if (IsReady) return;
 
             /* [악기가 적용될 채널(staff)에 따른, 새 InsturmentInfo 만드는 법]
-             * 채널 0 또는 1 : CharacterInstrumentInfo
-             * 채널 2        : WhitespaceInstrumentInfo
-             * 채널 3 또는 4 : SFXInstrumentInfo
-             * 채널 5 또는 6 : AccompanimentInstrumentInfo
+             * 채널 0 또는 1 또는 2 : CharacterInstrumentInfo
+             * 채널 3 또는 4        : WhitespaceInstrumentInfo
+             * 채널 5 또는 6        : SFXInstrumentInfo
+             * 채널 7 또는 8        : AccompanimentInstrumentInfo
              *
              * [PitchModulator와 옥타브 범위와의 관계]
              * channel 1로 쓰일 악기는 항상 PitchModulator가 `(pitch) => pitch`이어야 합니다.
@@ -403,11 +403,11 @@ namespace ChordingCoding.SFX
             List<InstrumentInfo> availableInstruments = new List<InstrumentInfo>();
             availableInstruments.Add(new CharacterInstrumentInfo(32, (pitch) => pitch, 16, 127, (pitch) => pitch, 16, 64));                         // [0] Autumn channel 0, Acoustic bass
             availableInstruments.Add(new CharacterInstrumentInfo(24, (pitch) => pitch, 16, 127, (pitch) => pitch, 16, 127));                        // [1] Autumn channel 1, Acoustic guitar(nylon)
-            availableInstruments.Add(new WhitespaceInstrumentInfo(123, (pitch) => pitch % 12 + 54, 4, 54));                                         // [2] Autumn channel 2, Bird tweet
+            availableInstruments.Add(new WhitespaceInstrumentInfo(123, (pitch) => pitch % 12 + 54, 4, 54));                                         // [2] Autumn channel 3, Bird tweet
             availableInstruments.Add(new CharacterInstrumentInfo(101, (pitch) => pitch - 12, 14, 96, (pitch) => (pitch + 6) % 12 + 54, 14, 96));    // [3] Rain channel 0, SFX(goblin)
             availableInstruments.Add(new CharacterInstrumentInfo(12, (pitch) => pitch, 16, 127, (pitch) => pitch, 16, 127));                        // [4] Rain channel 1, Marimba
-            availableInstruments.Add(new WhitespaceInstrumentInfo(126, (pitch) => (pitch + 5) % 7 + 46, 64, 24));                                   // [5] Rain channel 2, Applause
-            availableInstruments.Add(new SFXInstrumentInfo(126, (pitch) => 45, 1, 24));                                                             // [6] Rain channel 3/4, Applause
+            availableInstruments.Add(new WhitespaceInstrumentInfo(126, (pitch) => (pitch + 5) % 7 + 46, 64, 24));                                   // [5] Rain channel 3, Applause
+            availableInstruments.Add(new SFXInstrumentInfo(126, (pitch) => 45, 1, 24));                                                             // [6] Rain channel 5/6, Applause
             availableInstruments.Add(new CharacterInstrumentInfo(49, (pitch) => pitch - 12, 16, 72, (pitch) => (pitch + 6) % 12 + 54, 16, 72));     // [7] Star channel 0, String ensemble 2
             availableInstruments.Add(new CharacterInstrumentInfo(11, (pitch) => pitch, 16, 127, (pitch) => pitch, 16, 127));                        // [8] Star channel 1, Vibraphone
             availableInstruments.Add(new CharacterInstrumentInfo(0, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12 , 32, 80, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12, 32, 80));       // [9] Pianoforte channel 0, Acoustic grand piano
@@ -415,8 +415,8 @@ namespace ChordingCoding.SFX
             availableInstruments.Add(new CharacterInstrumentInfo(46, (pitch) => pitch, 16, 127, (pitch) => pitch, 16, 127));                       // [11] Sky channel 1, Orchestral harp
             availableInstruments.Add(new CharacterInstrumentInfo(68, (pitch) => pitch, 16, 96, (pitch) => pitch, 16, 96));                       // [12] ??? channel 1, Oboe
             availableInstruments.Add(new CharacterInstrumentInfo(19, (pitch) => pitch, 12, 96, (pitch) => pitch, 12, 96));                       // [13] Medieval channel 1, Church organ
-            availableInstruments.Add(new WhitespaceInstrumentInfo(9, (pitch) => pitch % 12 + 72, 64, 127));                                        // [14] Medieval channel 2, Glockenspiel
-            availableInstruments.Add(new WhitespaceInstrumentInfo(9, (pitch) => (pitch + 7) % 12 + 48, 64, 127));                                  // [15] Medieval channel 2, Glockenspiel
+            availableInstruments.Add(new WhitespaceInstrumentInfo(9, (pitch) => pitch % 12 + 72, 64, 127));                                        // [14] Medieval channel 3, Glockenspiel
+            availableInstruments.Add(new WhitespaceInstrumentInfo(9, (pitch) => (pitch + 7) % 12 + 48, 64, 127));                                  // [15] Medieval channel 4, Glockenspiel
 
             Dictionary<int, InstrumentInfo> instruments;
 
@@ -467,26 +467,29 @@ namespace ChordingCoding.SFX
              * InstrumentSet.Type.whitespace
              */
             instruments = new Dictionary<int, InstrumentInfo>();
-            instruments.Add(2, availableInstruments[2]);
+            instruments.Add(3, availableInstruments[2]);
             availableInstrumentSets.Add(new InstrumentSet("Bird", "새", instruments, InstrumentSet.Type.whitespace));
 
             instruments = new Dictionary<int, InstrumentInfo>();
-            instruments.Add(2, availableInstruments[5]);
-            instruments.Add(3, availableInstruments[6]);
-            instruments.Add(4, availableInstruments[6]);
+            instruments.Add(3, availableInstruments[5]);
+            instruments.Add(5, availableInstruments[6]);
+            instruments.Add(6, availableInstruments[6]);
             availableInstrumentSets.Add(new InstrumentSet("Rain", "비", instruments, InstrumentSet.Type.whitespace));
 
             instruments = new Dictionary<int, InstrumentInfo>();
-            instruments.Add(2, availableInstruments[14]);
+            instruments.Add(3, availableInstruments[14]);
             availableInstrumentSets.Add(new InstrumentSet("Bell_high", "종 고음", instruments, InstrumentSet.Type.whitespace));
 
             instruments = new Dictionary<int, InstrumentInfo>();
-            instruments.Add(2, availableInstruments[15]);
+            instruments.Add(4, availableInstruments[15]);
             availableInstrumentSets.Add(new InstrumentSet("Bell_low", "종 저음", instruments, InstrumentSet.Type.whitespace));
 
             /* 
              * InstrumentSet.Type.accompaniment
              */
+            instruments = new Dictionary<int, InstrumentInfo>();
+            instruments.Add(7, availableInstruments[9]);
+            availableInstrumentSets.Add(new InstrumentSet("Piano", "피아노", instruments, InstrumentSet.Type.accompaniment));
 
             // TODO
             isInstrumentsReady = true;
@@ -499,11 +502,11 @@ namespace ChordingCoding.SFX
             availableSFXThemes.Add(new SFXTheme("Rain", "비 오는 날", ChordTransitionType.SomewhatBlue, "Forest", "Rain", null));
             availableSFXThemes.Add(new SFXTheme("Star", "별 헤는 밤", ChordTransitionType.SimilarOne, "Star", "Bell_high", null));
             availableSFXThemes.Add(new SFXTheme("Forest", "숲 속 아침", ChordTransitionType.SimilarOne, "Forest", "Bird", null));
-            availableSFXThemes.Add(new SFXTheme("Pianoforte", "피아노포르테", ChordTransitionType.SimilarOne, "Piano", null, null));
-            availableSFXThemes.Add(new SFXTheme("Pianoforte_low", "피아노포르테 저음", ChordTransitionType.SomewhatBlue, "Piano_low", null, null));
-            availableSFXThemes.Add(new SFXTheme("Pianoforte_high", "피아노포르테 고음", ChordTransitionType.SomewhatHappy, "Piano_high", null, null));
+            availableSFXThemes.Add(new SFXTheme("Pianoforte", "피아노포르테", ChordTransitionType.SimilarOne, "Piano", null, "Piano"));
+            availableSFXThemes.Add(new SFXTheme("Pianoforte_low", "피아노포르테 저음", ChordTransitionType.SomewhatBlue, "Piano_low", null, "Piano"));
+            availableSFXThemes.Add(new SFXTheme("Pianoforte_high", "피아노포르테 고음", ChordTransitionType.SomewhatHappy, "Piano_high", null, "Piano"));
             availableSFXThemes.Add(new SFXTheme("Sky", "구름 너머", ChordTransitionType.SomewhatHappy, "Sky", null, null));
-            availableSFXThemes.Add(new SFXTheme("Medieval", "중세 탐방", ChordTransitionType.SomewhatBlue, "Medieval", "Bell_low", null));
+            availableSFXThemes.Add(new SFXTheme("Medieval", "중세 탐방", ChordTransitionType.SomewhatBlue, "Medieval", "Bell_low", "Piano"));
 
             IsReady = true;
         }

@@ -15,19 +15,33 @@ namespace ChordingCoding.SFX
         /// 음 높이(1 ~ 127)를 반환하는 함수 대리자입니다.
         /// </summary>
         /// <returns></returns>
-        public delegate int Pitch();
+        public delegate int PitchGenerator();
         
         /// <summary>
         /// 음 높이(1 ~ 127)를 반환하는 함수.
         /// 예) 60: C4 / 64: E4 / 67: G4 / 72: C5
         /// </summary>
-        private Pitch pitch;
+        private PitchGenerator pitch;
+
+        /// <summary>
+        /// 음 높이(1 ~ 127). 고정된 값이 아니므로 읽을 때마다 값이 달라질 수도 있습니다.
+        /// 예) 60: C4 / 64: E4 / 67: G4 / 72: C5
+        /// </summary>
+        public int Pitch
+        {
+            get { return pitch(); }
+        }
+
+        private int rhythm;
 
         /// <summary>
         /// 음표의 길이(1 이상). 4/4박에서 한 마디를 16등분한 길이를 기준으로 합니다.
         /// 예) 16: 온음표 / 4: 4분음표 / 1: 16분음표
         /// </summary>
-        private int rhythm;
+        public int Rhythm
+        {
+            get { return rhythm; }
+        }
 
         private int measure;
 
@@ -94,7 +108,7 @@ namespace ChordingCoding.SFX
         /// <param name="measure">음표가 위치한 마디 번호(0부터 시작).</param>
         /// <param name="position">음표의 마디 내 위치(0 ~ 15). 4/4박에서 한 마디를 16등분한 길이를 기준으로 합니다.</param>
         /// <param name="staff">음표가 놓일 Staff 번호(0 ~ 15). 9번 Staff는 타악기 전용 Staff입니다.</param>
-        public Note(Pitch pitch, int rhythm, int measure, int position, int staff = 0)
+        public Note(PitchGenerator pitch, int rhythm, int measure, int position, int staff = 0)
         {
             this.pitch = pitch;
 

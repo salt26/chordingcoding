@@ -160,9 +160,16 @@ namespace ChordingCoding.VFX
         /// </summary>
         public void Draw(Graphics g)
         {
-            foreach (Particle p in particles)
+            try
             {
-                p.Draw(g);
+                foreach (Particle p in particles)
+                {
+                    p.Draw(g);
+                }
+            }
+            catch (InvalidOperationException)
+            {
+
             }
         }
         

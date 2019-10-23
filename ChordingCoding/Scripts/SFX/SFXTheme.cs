@@ -442,7 +442,7 @@ namespace ChordingCoding.SFX
             instruments = new Dictionary<int, InstrumentInfo>();
             instruments.Add(0, availableInstruments[9]);
             instruments.Add(1, availableInstruments[10]);
-            availableInstrumentSets.Add(new InstrumentSet("Piano", "피아노", instruments, InstrumentSet.Type.character, 3, 7));
+            availableInstrumentSets.Add(new InstrumentSet("Piano", "피아노", instruments, InstrumentSet.Type.character, 3, 8));
 
             instruments = new Dictionary<int, InstrumentInfo>();
             instruments.Add(0, availableInstruments[9]);

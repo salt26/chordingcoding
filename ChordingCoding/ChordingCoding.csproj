@@ -78,6 +78,7 @@
     <Compile Include="Scripts\InterceptKeys.cs" />
     <Compile Include="Scripts\SFX\Music.cs" />
     <Compile Include="Scripts\SFX\SFXTheme.cs" />
+    <Compile Include="Scripts\SFX\Timer.cs" />
     <Compile Include="Scripts\VFX\Particle.cs" />
     <Compile Include="Scripts\VFX\ParticleSystem.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

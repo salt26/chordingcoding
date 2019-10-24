@@ -18,10 +18,9 @@ namespace ChordingCoding.SFX
     /// </summary>
     class Music
     {
-        public delegate void TimerTickDelegate();
         public delegate void PlayEventDelegate(int pitch);
 
-        public const float TICK_PER_SECOND = 32f;   // 1초에 호출되는 tick 수
+        public const float TICK_PER_SECOND = 22f;   // 1초에 호출되는 tick 수
         public static int tickNumber = 0;           // 테마 변경 후 지금까지 지난 tick 수
         private static int accompanimentTickNumber = 0; // 반주 재생에 사용되는, 새 패턴을 재생하고 나서 지금까지 지난 tick 수
         private static int accompanimentPlayNumber = 0; // 같은 반주를 연속으로 재생한 횟수
@@ -63,10 +62,12 @@ namespace ChordingCoding.SFX
         /// </summary>
         public static event PlayEventDelegate OnChordTransition;
 
-        private static TimerTickDelegate tickDelegate;
+        private static Timer.TickDelegate tickDelegate;
+        private static Timer timer;
         private static List<KeyValuePair<Note, int>> syncPlayBuffer = new List<KeyValuePair<Note, int>>();
         private static bool syncTransitionBuffer = false;
         private static List<int> playPitchEventBuffer = new List<int>();                                    // PlayNoteInChord()에서 재생되는 메인 음을 저장
+        //private static long time = 0;
 
         /// <summary>
         /// 음악 출력 장치와 타이머를 초기화하고, 현재 음악 테마를 SFXThemeName으로 설정합니다.
@@ -74,7 +75,7 @@ namespace ChordingCoding.SFX
         /// <param name="SFXThemeName">설정할 음악 테마 이름</param>
         /// <param name="noteResolution">단위 리듬</param>
         /// <param name="timerTickDelegates">타이머의 틱마다 추가로 실행할 메서드의 대리자 목록</param>
-        public static void Initialize(string SFXThemeName, int noteResolution, TimerTickDelegate[] timerTickDelegates = null)
+        public static void Initialize(string SFXThemeName, int noteResolution, Timer.TickDelegate[] timerTickDelegates = null)
         {
             outDevice = new OutputDevice(0);
             SFXTheme.CurrentSFXTheme = SFXTheme.FindSFXTheme(SFXThemeName);
@@ -85,16 +86,13 @@ namespace ChordingCoding.SFX
             tickDelegate += Tick;
             if (timerTickDelegates != null)
             {
-                foreach (TimerTickDelegate t in timerTickDelegates)
+                foreach (Timer.TickDelegate t in timerTickDelegates)
                 {
                     tickDelegate += t;
                 }
             }
-            
-            System.Timers.Timer timer = new System.Timers.Timer();
-            timer.Interval = 1000f / TICK_PER_SECOND;
-            timer.Elapsed += new ElapsedEventHandler(Timer_Elapsed);
-            timer.Start();
+
+            timer = new Timer((int)(1000f / TICK_PER_SECOND), tickDelegate);
 
             syncPlayBuffer = new List<KeyValuePair<Note, int>>();
             syncTransitionBuffer = false;
@@ -108,15 +106,10 @@ namespace ChordingCoding.SFX
             if (IsReady)
             {
                 for (int i = 0; i <= 8; i++) StopPlaying(i);
+                timer.Stop();
                 outDevice.Close();
                 IsReady = false;
             }
-        }
-        
-        private static void Timer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            if (IsReady)
-                tickDelegate();
         }
 
         /// <summary>
@@ -261,6 +254,18 @@ namespace ChordingCoding.SFX
         /// </summary>
         public static void Tick()
         {
+            /*
+            if (tickNumber % 1 == 0)
+            {
+                long newTime = DateTime.Now.ToFileTime();
+                Console.WriteLine(newTime - time + ", " + tickNumber);
+                if (newTime - time > 10000000)
+                {
+                    time = newTime;
+                }
+            }
+            */
+
             // 지속 효과음이 멈추는 것을 대비하여 
             if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(5) &&
                 SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(6))

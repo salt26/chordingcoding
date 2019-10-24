@@ -73,6 +73,15 @@ namespace ChordingCoding.SFX
             Score score;
 
             score = new Score();
+            score.AddNote(() => Music.chord.NotesInChord()[0] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave + 1) * 12, 8, 0, 0, 7);
+            score.AddNote(() => Music.chord.NotesInChord()[2] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave) * 12, 8, 0, 0, 7);
+            score.AddNote(() => Music.chord.NotesInChord()[1] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave) * 12, 8, 0, 0, 7);
+            score.AddNote(() => Music.chord.NotesInChord()[0] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave) * 12, 8, 0, 0, 7);
+            score.AddNote(() => Music.chord.NotesInChord()[2] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave + 1) * 12, 8, 0, 8, 7);
+            score.AddNote(() => Music.chord.NotesInChord()[1] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave + 1) * 12, 8, 0, 8, 7);
+            availablePatterns.Add(new Pattern("2bits", "2비트", score, 16, 4)); // TODO 이름 바꾸기
+            
+            score = new Score();
             score.AddNote(() => Music.chord.NotesInChord()[0] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave + 1) * 12, 4, 0, 0, 7);
             score.AddNote(() => Music.chord.NotesInChord()[2] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave) * 12, 8, 0, 0, 7);
             score.AddNote(() => Music.chord.NotesInChord()[1] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave) * 12, 8, 0, 0, 7);
@@ -161,7 +170,7 @@ namespace ChordingCoding.SFX
             score.AddNote(() => Music.chord.NotesInChord()[0] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave + 1) * 12, 1, 0, 13, 7);
             score.AddNote(() => Music.chord.NotesInChord()[2] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave) * 12, 1, 0, 13, 7);
             availablePatterns.Add(new Pattern("Accent", "악센트", score, 16, 4)); // TODO 이름 바꾸기
-
+            
             SetNewCurrentPattern();
 
             IsReady = true;

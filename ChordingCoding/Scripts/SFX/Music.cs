@@ -20,7 +20,7 @@ namespace ChordingCoding.SFX
     {
         public delegate void PlayEventDelegate(int pitch);
 
-        public const float TICK_PER_SECOND = 22f;   // 1초에 호출되는 tick 수
+        private static float TICK_PER_SECOND = 22f;   // 1초에 호출되는 tick 수
         public static int tickNumber = 0;           // 테마 변경 후 지금까지 지난 tick 수
         private static int accompanimentTickNumber = 0; // 반주 재생에 사용되는, 새 패턴을 재생하고 나서 지금까지 지난 tick 수
         private static int accompanimentPlayNumber = 0; // 같은 반주를 연속으로 재생한 횟수
@@ -64,6 +64,7 @@ namespace ChordingCoding.SFX
 
         private static Timer.TickDelegate tickDelegate;
         private static Timer timer;
+        private static int timerNumber = 0;             // 1/1000초마다 1씩 증가, tick 간격마다 0으로 초기화
         private static List<KeyValuePair<Note, int>> syncPlayBuffer = new List<KeyValuePair<Note, int>>();
         private static bool syncTransitionBuffer = false;
         private static List<int> playPitchEventBuffer = new List<int>();                                    // PlayNoteInChord()에서 재생되는 메인 음을 저장
@@ -92,7 +93,8 @@ namespace ChordingCoding.SFX
                 }
             }
 
-            timer = new Timer((int)(1000f / TICK_PER_SECOND), tickDelegate);
+            timerNumber = 0;
+            timer = new Timer(1, TickTimer);
 
             syncPlayBuffer = new List<KeyValuePair<Note, int>>();
             syncTransitionBuffer = false;
@@ -249,10 +251,22 @@ namespace ChordingCoding.SFX
         }
 
         /// <summary>
+        /// 초당 Tick() 호출 횟수를 설정하여 음악의 빠르기를 바꿉니다.
+        /// </summary>
+        /// <param name="tickPerSecond">초당 tick 수 (16 이상 42 이하, 높을수록 빠름)</param>
+        public static void SetTickPerSecond(int tickPerSecond)
+        {
+            if (tickPerSecond < 16) tickPerSecond = 16;
+            if (tickPerSecond > 42) tickPerSecond = 42;
+            TICK_PER_SECOND = tickPerSecond;
+            timerNumber = 0;
+        }
+
+        /// <summary>
         /// 리듬에 맞게 음표를 재생합니다.
         /// tickDelegate에 의해 1초에 32번씩 자동으로 호출됩니다.
         /// </summary>
-        public static void Tick()
+        private static void Tick()
         {
             /*
             if (tickNumber % 1 == 0)
@@ -334,6 +348,22 @@ namespace ChordingCoding.SFX
             }
 
             tickNumber++;
+        }
+
+        /// <summary>
+        /// 1/1000초마다 호출되어, tick 간격마다 tickDelegate를 호출합니다.
+        /// </summary>
+        private static void TickTimer()
+        {
+            if (IsReady)
+            {
+                if (timerNumber >= (int)(1000f / TICK_PER_SECOND))
+                {
+                    timerNumber = 0;
+                    tickDelegate();
+                }
+                timerNumber++;
+            }
         }
 
         /// <summary>

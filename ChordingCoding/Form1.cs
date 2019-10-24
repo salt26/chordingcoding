@@ -116,7 +116,7 @@ namespace ChordingCoding.UI
 
             int resolution = (int)Properties.Settings.Default["NoteResolution"];
             Music.Initialize(Theme.CurrentTheme.SFX.Name, resolution,
-                new Music.TimerTickDelegate[] { MarshallingUpdateFrame });
+                new ChordingCoding.SFX.Timer.TickDelegate[] { MarshallingUpdateFrame });
             Music.OnPlayNotes += (pitch) => AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
             Music.OnChordTransition += (pitch) =>
             {
@@ -161,7 +161,7 @@ namespace ChordingCoding.UI
         {
             if (isReady)
             {
-                BeginInvoke(new Music.TimerTickDelegate(UpdateFrame));
+                BeginInvoke(new ChordingCoding.SFX.Timer.TickDelegate(UpdateFrame));
             }
         }
 

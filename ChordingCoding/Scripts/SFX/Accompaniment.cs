@@ -19,9 +19,9 @@ namespace ChordingCoding.SFX
         public static List<Pattern> availablePatterns = new List<Pattern>();
 
         /// <summary>
-        /// 현재 재생할 반주 패턴
+        /// 현재 재생할 반주 패턴 (Key는 staff 번호)
         /// </summary>
-        public static Pattern currentPattern;
+        public static Dictionary<int, Pattern> currentPatterns = new Dictionary<int, Pattern>();
 
         public static bool IsReady { get; private set; } = false;
 
@@ -70,6 +70,8 @@ namespace ChordingCoding.SFX
         /// </summary>
         public static void Initialize()
         {
+            availablePatterns = new List<Pattern>();
+            currentPatterns = new Dictionary<int, Pattern>();
             Score score;
 
             score = new Score();
@@ -171,18 +173,111 @@ namespace ChordingCoding.SFX
             score.AddNote(() => Music.chord.NotesInChord()[2] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave) * 12, 1, 0, 13, 7);
             availablePatterns.Add(new Pattern("Accent", "악센트", score, 16, 4)); // TODO 이름 바꾸기
             
-            SetNewCurrentPattern();
+            SetNewCurrentPattern(7);
+            SetNewCurrentPattern(8);
 
             IsReady = true;
         }
 
         /// <summary>
-        /// 현재 반주 패턴을 사용 가능한 반주 패턴들 중에서 랜덤으로 설정합니다.
+        /// 특정 staff의 현재 반주 패턴을 새로 설정합니다.
         /// </summary>
-        public static void SetNewCurrentPattern()
+        /// <param name="staff">반주 staff 번호 (7 또는 8)</param>
+        public static void SetNewCurrentPattern(int staff)
+        {
+            if (staff == 7)
+                SelectRandomAvailablePattern();
+            else if (staff == 8)
+                GenerateRhythmPattern();
+        }
+
+        /// <summary>
+        /// 7번 staff의 현재 반주 패턴을 사용 가능한 반주 패턴 중에서 랜덤으로 골라 설정합니다.
+        /// </summary>
+        private static void SelectRandomAvailablePattern()
         {
             Random r = new Random();
-            currentPattern = availablePatterns[r.Next(availablePatterns.Count)];
+            currentPatterns[7] = availablePatterns[r.Next(availablePatterns.Count)];
         }
+
+        /// <summary>
+        /// 무작위 리듬으로 한 마디의 리듬 패턴을 생성합니다.
+        /// 그리고 8번 staff의 현재 반주 패턴을 현재 화음에 맞는 이 리듬의 패턴으로 설정합니다.
+        /// </summary>
+        private static void GenerateRhythmPattern()
+        {
+            Random r = new Random();
+            List<int> rhythmsLength = new List<int>();
+            Score score = new Score();
+            bool[] notes = new bool[17];
+            int i;
+            notes[0] = notes[16] = true;
+            while (true)
+            {
+                for (i = 1; i < 16; i++) notes[i] = false;
+                for (i = 0; i < 7; i++)
+                {
+                    if (r.Next(0, 2) == 1)
+                    {
+                        notes[i * 2 + 2] = true;
+                    }
+                }
+                for (i = 0; i < 16; i += 2)
+                {
+                    if (notes[i] && notes[i + 2] && r.Next(0, 4) == 1)
+                    {
+                        notes[i + 1] = true;
+                    }
+                }
+                for (i = 0; i < 14; i += 2)
+                {
+                    if (notes[i] && !notes[i + 2] && notes[i + 4])
+                    {
+                        int t = r.Next(0, 8);
+                        switch (t)
+                        {
+                            case 1:
+                                notes[i + 1] = true;
+                                break;
+                            case 2:
+                                notes[i + 3] = true;
+                                break;
+                            case 3:
+                                notes[i + 1] = true;
+                                notes[i + 3] = true;
+                                break;
+                        }
+                    }
+                }
+                for (i = 0; i < 10; i += 2)
+                {
+                    if (notes[i] && !notes[i + 2] && !notes[i + 4] && notes[i + 6] && r.Next(0, 4) == 1)
+                    {
+                        notes[i + 3] = true;
+                    }
+                }
+                int count = 0;
+                rhythmsLength.Clear();
+                for (i = 1; i <= 16; i++)
+                {
+                    count++;
+                    if (notes[i])
+                    {
+                        if (count != 1 && count != 2 && count != 3 && count != 4 && count != 6 && count != 8 && count != 12 && count != 16) break;
+                        rhythmsLength.Add(count);
+                        count = 0;
+                    }
+                }
+                if (i > 16) break;
+            }
+            int count2 = 0;
+            foreach (int j in rhythmsLength)
+            {
+                score.AddNote(() => Music.chord.NextNote(), j, 0, count2, 8);
+                count2 += j;
+            }
+            currentPatterns[8] = new Pattern("Generated", "생성됨", score, 16, 1);
+        }
+
     }
 }

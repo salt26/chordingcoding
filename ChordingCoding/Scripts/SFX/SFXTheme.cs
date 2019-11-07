@@ -411,13 +411,16 @@ namespace ChordingCoding.SFX
             availableInstruments.Add(new CharacterInstrumentInfo(49, (pitch) => pitch - 12, 16, 72, (pitch) => (pitch + 6) % 12 + 54, 16, 72));     // [7] Star channel 0, String ensemble 2
             availableInstruments.Add(new CharacterInstrumentInfo(11, (pitch) => pitch, 16, 127, (pitch) => pitch, 16, 127));                        // [8] Star channel 1, Vibraphone
             availableInstruments.Add(new CharacterInstrumentInfo(0, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12 , 32, 80, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12, 32, 80));       // [9] Pianoforte channel 0, Acoustic grand piano
-            availableInstruments.Add(new CharacterInstrumentInfo(0, (pitch) => pitch, 32, 127, (pitch) => pitch, 32, 127));                        // [10] Pianoforte channel 1, Acoustic grand piano
-            availableInstruments.Add(new CharacterInstrumentInfo(46, (pitch) => pitch, 16, 127, (pitch) => pitch, 16, 127));                       // [11] Sky channel 1, Orchestral harp
-            availableInstruments.Add(new CharacterInstrumentInfo(68, (pitch) => pitch, 16, 96, (pitch) => pitch, 16, 96));                       // [12] ??? channel 1, Oboe
-            availableInstruments.Add(new CharacterInstrumentInfo(19, (pitch) => pitch, 12, 96, (pitch) => pitch, 12, 96));                       // [13] Medieval channel 1, Church organ
-            availableInstruments.Add(new WhitespaceInstrumentInfo(9, (pitch) => pitch % 12 + 72, 64, 80));                                        // [14] Medieval channel 3, Glockenspiel
-            availableInstruments.Add(new WhitespaceInstrumentInfo(9, (pitch) => (pitch + 7) % 12 + 48, 64, 80));                                  // [15] Medieval channel 4, Glockenspiel
-            availableInstruments.Add(new AccompanimentInstrumentInfo(0, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12, 32, 96));       // [16] Pianoforte channel 7, Acoustic grand piano
+            availableInstruments.Add(new CharacterInstrumentInfo(0, (pitch) => pitch, 32, 127, (pitch) => pitch, 32, 127));                         // [10] Pianoforte channel 1, Acoustic grand piano
+            availableInstruments.Add(new CharacterInstrumentInfo(46, (pitch) => pitch, 16, 127, (pitch) => pitch, 16, 127));                        // [11] Sky channel 1, Orchestral harp
+            availableInstruments.Add(new CharacterInstrumentInfo(68, (pitch) => pitch, 16, 96, (pitch) => pitch, 16, 96));                          // [12] ??? channel 1, Oboe
+            availableInstruments.Add(new CharacterInstrumentInfo(19, (pitch) => pitch, 12, 96, (pitch) => pitch, 12, 96));                          // [13] Medieval channel 1, Church organ
+            availableInstruments.Add(new WhitespaceInstrumentInfo(9, (pitch) => pitch % 12 + 72, 64, 80));                                          // [14] Medieval channel 3, Glockenspiel
+            availableInstruments.Add(new WhitespaceInstrumentInfo(9, (pitch) => (pitch + 7) % 12 + 48, 64, 80));                                    // [15] Medieval channel 4, Glockenspiel
+            availableInstruments.Add(new AccompanimentInstrumentInfo(0, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12, 32, 60));                // [16] Pianoforte channel 7, Acoustic grand piano
+            availableInstruments.Add(new AccompanimentInstrumentInfo(0, (pitch) => pitch, 32, 100));                                                 // [17] Pianoforte channel 8, Acoustic grand piano
+            availableInstruments.Add(new AccompanimentInstrumentInfo(11, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12, 32, 60));                // [18] Pianoforte channel 7, Vibraphone
+            availableInstruments.Add(new AccompanimentInstrumentInfo(12, (pitch) => pitch, 32, 100));                                                 // [19] Pianoforte channel 8, Marimba
 
             Dictionary<int, InstrumentInfo> instruments;
 
@@ -482,14 +485,18 @@ namespace ChordingCoding.SFX
             instruments.Add(4, availableInstruments[15]);
             availableInstrumentSets.Add(new InstrumentSet("Bell", "종", instruments, InstrumentSet.Type.whitespace));
 
-            instruments = new Dictionary<int, InstrumentInfo>();
-
             /* 
              * InstrumentSet.Type.accompaniment
              */
             instruments = new Dictionary<int, InstrumentInfo>();
             instruments.Add(7, availableInstruments[16]);
+            instruments.Add(8, availableInstruments[17]);
             availableInstrumentSets.Add(new InstrumentSet("Piano", "피아노", instruments, InstrumentSet.Type.accompaniment));
+            
+            instruments = new Dictionary<int, InstrumentInfo>();
+            instruments.Add(7, availableInstruments[18]);
+            instruments.Add(8, availableInstruments[19]);
+            availableInstrumentSets.Add(new InstrumentSet("Melody", "멜로디", instruments, InstrumentSet.Type.accompaniment));
 
             // TODO
             isInstrumentsReady = true;
@@ -505,7 +512,7 @@ namespace ChordingCoding.SFX
             availableSFXThemes.Add(new SFXTheme("Pianoforte", "피아노포르테", ChordTransitionType.SimilarOne, "Piano", null, "Piano"));
             availableSFXThemes.Add(new SFXTheme("Pianoforte_low", "피아노포르테 저음", ChordTransitionType.SomewhatBlue, "Piano_low", null, "Piano"));
             availableSFXThemes.Add(new SFXTheme("Pianoforte_high", "피아노포르테 고음", ChordTransitionType.SomewhatHappy, "Piano_high", null, "Piano"));
-            availableSFXThemes.Add(new SFXTheme("Sky", "구름 너머", ChordTransitionType.SomewhatHappy, "Sky", null, null));
+            availableSFXThemes.Add(new SFXTheme("Sky", "구름 너머", ChordTransitionType.SomewhatHappy, "Sky", null, "Melody"));
             availableSFXThemes.Add(new SFXTheme("Medieval", "중세 탐방", ChordTransitionType.SomewhatBlue, "Medieval", "Bell", "Piano"));
 
             IsReady = true;

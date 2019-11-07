@@ -22,8 +22,12 @@ namespace ChordingCoding.SFX
 
         private static float TICK_PER_SECOND = 22f;   // 1초에 호출되는 tick 수
         public static int tickNumber = 0;           // 테마 변경 후 지금까지 지난 tick 수
-        private static int accompanimentTickNumber = 0; // 반주 재생에 사용되는, 새 패턴을 재생하고 나서 지금까지 지난 tick 수
-        private static int accompanimentPlayNumber = 0; // 같은 반주를 연속으로 재생한 횟수
+
+        // 반주 재생에 사용되는, 새 패턴을 재생하고 나서 지금까지 지난 tick 수 (Key는 staff 번호)
+        private static Dictionary<int, int> accompanimentTickNumber = new Dictionary<int, int>();
+
+        // 같은 반주를 연속으로 재생한 횟수 (Key는 staff 번호)
+        private static Dictionary<int, int> accompanimentPlayNumber = new Dictionary<int, int>();
 
         /// <summary>
         /// 현재 화음
@@ -100,6 +104,13 @@ namespace ChordingCoding.SFX
             syncTransitionBuffer = false;
             playPitchEventBuffer = new List<int>();
 
+            accompanimentTickNumber = new Dictionary<int, int>();
+            accompanimentPlayNumber = new Dictionary<int, int>();
+            accompanimentTickNumber.Add(7, 0);
+            accompanimentTickNumber.Add(8, 0);
+            accompanimentPlayNumber.Add(7, 0);
+            accompanimentPlayNumber.Add(8, 0);
+
             IsReady = true;
         }
 
@@ -135,7 +146,13 @@ namespace ChordingCoding.SFX
             }
             chord = new Chord(SFXTheme.CurrentSFXTheme.ChordTransition);
             tickNumber = 0;
-            accompanimentTickNumber = 0;
+
+            Dictionary<int, int> tempTickNumber = new Dictionary<int, int>();
+            foreach (int i in accompanimentTickNumber.Keys)
+            {
+                tempTickNumber[i] = 0;
+            }
+            accompanimentTickNumber = tempTickNumber;
         }
 
         /// <summary>
@@ -300,42 +317,46 @@ namespace ChordingCoding.SFX
                 }
             }
 
-            if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(7) ||
-                SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(8))
+            for (int staff = 7; staff <= 8; staff++)
             {
-                if (accompanimentTickNumber >= Accompaniment.currentPattern.length * 4)
+                if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(staff))
                 {
-                    accompanimentPlayNumber++;
-                    if (accompanimentPlayNumber >= Accompaniment.currentPattern.iteration)
+                    if (accompanimentTickNumber[staff] >= Accompaniment.currentPatterns[staff].length * 4)
                     {
-                        Accompaniment.SetNewCurrentPattern();
-                        accompanimentPlayNumber = 0;
+                        accompanimentPlayNumber[staff]++;
+                        if (accompanimentPlayNumber[staff] >= Accompaniment.currentPatterns[staff].iteration)
+                        {
+                            Accompaniment.SetNewCurrentPattern(staff);
+                            accompanimentPlayNumber[staff] = 0;
+                        }
+                        accompanimentTickNumber[staff] = 0;
                     }
-                    accompanimentTickNumber = 0;
-                }
-                Score accompaniment = Accompaniment.currentPattern.score;
+                    Score accompaniment = Accompaniment.currentPatterns[staff].score;
 
-                // 16분음표 단위로 음을 하나씩 재생
-                if (accompanimentTickNumber % 4 == 0)
+                    // 16분음표 단위로 음을 하나씩 재생
+                    if (accompanimentTickNumber[staff] % 4 == 0)
+                    {
+                        int measure = accompanimentTickNumber[staff] / 64;
+                        int position = (accompanimentTickNumber[staff] / 4) % 16;
+                        if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(staff))
+                            accompaniment.Play(outDevice, measure, position, staff,
+                                (int)Math.Round(SFXTheme.CurrentSFXTheme.Instruments[staff].accompanimentVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
+                    }
+
+                    accompanimentTickNumber[staff]++;
+                }
+                else
                 {
-                    int measure = accompanimentTickNumber / 64;
-                    int position = (accompanimentTickNumber / 4) % 16;
-                    if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(7))
-                        accompaniment.Play(outDevice, measure, position, 7,
-                            (int)Math.Round(SFXTheme.CurrentSFXTheme.Instruments[7].accompanimentVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
-                    if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(8))
-                        accompaniment.Play(outDevice, measure, position, 8,
-                            (int)Math.Round(SFXTheme.CurrentSFXTheme.Instruments[8].accompanimentVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
+                    accompanimentTickNumber[staff] = 0;
                 }
-
-                accompanimentTickNumber++;
             }
-            else
+
+            if (tickNumber % 64 == 0 && (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(7) || SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(8)))
             {
-                accompanimentTickNumber = 0;
+                syncTransitionBuffer = false;
+                PlayChordTransition();
             }
-
-            if (syncTransitionBuffer && tickNumber % 32 == 0)
+            else if (syncTransitionBuffer && tickNumber % 32 == 0)
             {
                 syncTransitionBuffer = false;
                 PlayChordTransition();

@@ -173,21 +173,29 @@ namespace ChordingCoding.UI
             List<ParticleSystem> deadParticleSystem = new List<ParticleSystem>();
 
             // 각 파티클 시스템 객체의 Update 함수 호출
-            foreach (ParticleSystem ps in particleSystems)
+            try
             {
-                // 수명이 다한 파티클 시스템 처리
-                if (ps.CanDestroy())
+                foreach (ParticleSystem ps in particleSystems)
                 {
-                    deadParticleSystem.Add(ps);
+                    // 수명이 다한 파티클 시스템 처리
+                    if (ps.CanDestroy())
+                    {
+                        deadParticleSystem.Add(ps);
+                    }
+                    else
+                    {
+                        ps.Update();
+                    }
                 }
-                else
+
+                foreach (ParticleSystem dead in deadParticleSystem)
                 {
-                    ps.Update();
+                    particleSystems.Remove(dead);
                 }
             }
-            foreach (ParticleSystem dead in deadParticleSystem)
+            catch (InvalidOperationException)
             {
-                particleSystems.Remove(dead);
+
             }
 
             if (basicParticleSystem != null)

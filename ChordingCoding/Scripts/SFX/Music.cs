@@ -211,7 +211,7 @@ namespace ChordingCoding.SFX
                 playPitchEventBuffer = new List<int>();
                 foreach (int p in tempPlayPitchEventBuffer)
                 {
-                    OnPlayNotes(p);
+                    OnPlayNotes?.Invoke(p);
                 }
             }
             else
@@ -281,7 +281,7 @@ namespace ChordingCoding.SFX
                         pair.Value.whitespaceRhythm, pair.Key, pair.Value.whitespaceVolume);
                 }
             }
-            OnChordTransition(pitch);
+            OnChordTransition?.Invoke(pitch);
         }
 
         /// <summary>
@@ -430,16 +430,23 @@ namespace ChordingCoding.SFX
         {
             List<KeyValuePair<Note, int>> tempSyncPlayBuffer = syncPlayBuffer;
             syncPlayBuffer = new List<KeyValuePair<Note, int>>();
-            foreach (KeyValuePair<Note, int> p in tempSyncPlayBuffer)
+            try
             {
-                Score.PlayANote(outDevice, p.Key, (int)Math.Round(p.Value * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
-            }
+                foreach (KeyValuePair<Note, int> p in tempSyncPlayBuffer)
+                {
+                    Score.PlayANote(outDevice, p.Key, (int)Math.Round(p.Value * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
+                }
 
-            List<int> tempPlayPitchEventBuffer = playPitchEventBuffer;
-            playPitchEventBuffer = new List<int>();
-            foreach (int pitch in tempPlayPitchEventBuffer)
+                List<int> tempPlayPitchEventBuffer = playPitchEventBuffer;
+                playPitchEventBuffer = new List<int>();
+                foreach (int pitch in tempPlayPitchEventBuffer)
+                {
+                    OnPlayNotes?.Invoke(pitch);
+                }
+            }
+            catch (InvalidOperationException)
             {
-                OnPlayNotes(pitch);
+
             }
         }
     }

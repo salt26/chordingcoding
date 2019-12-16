@@ -18,6 +18,11 @@ namespace ChordingCoding.UI
 {
     public partial class Form1 : Form
     {
+        /// <summary>
+        /// 시각 효과를 표시할지 결정합니다.
+        /// </summary>
+        const bool ENABLE_VFX = false;
+
         static bool _isReady = false;
         static Dictionary<string, int> _opacity = new Dictionary<string, int>();
         static List<ParticleSystem> particleSystems = new List<ParticleSystem>();
@@ -117,22 +122,38 @@ namespace ChordingCoding.UI
             int resolution = (int)Properties.Settings.Default["NoteResolution"];
             Music.Initialize(Theme.CurrentTheme.SFX.Name, resolution,
                 new ChordingCoding.SFX.Timer.TickDelegate[] { MarshallingUpdateFrame });
-            Music.OnPlayNotes += (pitch) => AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
-            Music.OnChordTransition += (pitch) =>
+
+            if (ENABLE_VFX)
             {
-                if (Theme.CurrentTheme.ParticleSystemForWhitespace != null)
+                Music.OnPlayNotes += (pitch) => AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
+                Music.OnChordTransition += (pitch) =>
                 {
-                    AddParticleSystem(Theme.CurrentTheme.ParticleSystemForWhitespace);
-                }
-                else
+                    if (Theme.CurrentTheme.ParticleSystemForWhitespace != null)
+                    {
+                        AddParticleSystem(Theme.CurrentTheme.ParticleSystemForWhitespace);
+                    }
+                    else
+                    {
+                        AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
+                    }
+                };
+            }
+            else
+            {
+                List<TrackBarMenuItem> l = new List<TrackBarMenuItem>();
+                foreach (TrackBarMenuItem i in 불투명도ToolStripMenuItem.DropDownItems)
                 {
-                    AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
+                    l.Add(i);
                 }
-            };
+                foreach (TrackBarMenuItem i in l)
+                {
+                    i.TrackBar.Dispose();
+                    i.Dispose();
+                }
+                불투명도ToolStripMenuItem.Dispose();
+            }
 
             SetNoteResolution(resolution);
-
-            //bitmap = new Bitmap(Width, Height);
 
             notifyIcon1.ShowBalloonTip(8);
 
@@ -352,9 +373,12 @@ namespace ChordingCoding.UI
 
         private void trackBarMenuItem1_ValueChanged(object sender, EventArgs e)
         {
-            opacity = trackBarMenuItem1.Value * 5;
-            Opacity = opacity / 100D;
-            불투명도ToolStripMenuItem.Text = "불투명도 (" + opacity + "%)";
+            if (ENABLE_VFX)
+            {
+                opacity = trackBarMenuItem1.Value * 5;
+                Opacity = opacity / 100D;
+                불투명도ToolStripMenuItem.Text = "불투명도 (" + opacity + "%)";
+            }
         }
 
 
@@ -390,14 +414,20 @@ namespace ChordingCoding.UI
                 }
             }
             테마ToolStripMenuItem.Text = "테마 (" + theme.DisplayName + ")";
-            basicParticleSystem = theme.BasicParticleSystem;
-            basicParticleSystem.particles = new List<Particle>();
-            particleSystems = new List<ParticleSystem>();
 
             Opacity = opacity / 100D;
-            trackBarMenuItem1.Value = opacity / 5;
+
+            if (ENABLE_VFX)
+            {
+                basicParticleSystem = theme.BasicParticleSystem;
+                basicParticleSystem.particles = new List<Particle>();
+                particleSystems = new List<ParticleSystem>();
+
+                trackBarMenuItem1.Value = opacity / 5;
+                불투명도ToolStripMenuItem.Text = "불투명도 (" + opacity + "%)";
+            }
+
             trackBarMenuItem2.Value = SFXTheme.CurrentSFXTheme.Volume / 5;
-            불투명도ToolStripMenuItem.Text = "불투명도 (" + opacity + "%)";
             음량ToolStripMenuItem.Text = "음량 (" + SFXTheme.CurrentSFXTheme.Volume + "%)";
         }
 

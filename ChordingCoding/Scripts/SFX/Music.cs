@@ -74,6 +74,8 @@ namespace ChordingCoding.SFX
         private static List<int> playPitchEventBuffer = new List<int>();                                    // PlayNoteInChord()에서 재생되는 메인 음을 저장
         //private static long time = 0;
 
+        private static PowerManagement mgmt;
+
         /// <summary>
         /// 음악 출력 장치와 타이머를 초기화하고, 현재 음악 테마를 SFXThemeName으로 설정합니다.
         /// </summary>
@@ -100,6 +102,11 @@ namespace ChordingCoding.SFX
             timerNumber = 0;
             timer = new Timer(1, TickTimer);
 
+            mgmt = new PowerManagement();
+            mgmt.InitPowerEvents();
+            mgmt.OnPowerSuspend += Suspend;
+            mgmt.OnPowerResume += Resume;
+
             syncPlayBuffer = new List<KeyValuePair<Note, int>>();
             syncTransitionBuffer = false;
             playPitchEventBuffer = new List<int>();
@@ -114,6 +121,34 @@ namespace ChordingCoding.SFX
             IsReady = true;
         }
 
+        /// <summary>
+        /// 타이머를 멈추고 일시적으로 음악이 재생되지 않게 합니다.
+        /// </summary>
+        public static void Suspend()
+        {
+            if (IsReady)
+            {
+                for (int i = 0; i <= 8; i++) StopPlaying(i);
+                timer.Stop();
+                IsReady = false;
+            }
+        }
+
+        /// <summary>
+        /// 타이머를 설정하고 음악이 다시 재생되도록 합니다.
+        /// </summary>
+        public static void Resume()
+        {
+            if (!IsReady)
+            {
+                timer = new Timer(1, TickTimer);
+                IsReady = true;
+            }
+        }
+
+        /// <summary>
+        /// 음악 출력 장치를 끄고 타이머를 멈춥니다.
+        /// </summary>
         public static void Dispose()
         {
             if (IsReady)
@@ -121,6 +156,7 @@ namespace ChordingCoding.SFX
                 for (int i = 0; i <= 8; i++) StopPlaying(i);
                 timer.Stop();
                 outDevice.Close();
+                mgmt.Stop();
                 IsReady = false;
             }
         }

@@ -175,7 +175,24 @@ namespace ChordingCoding.SFX
             {
                 try
                 {
-                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, p.Key, p.Value.instrumentCode));
+                    if (p.Key == 7 || p.Key == 8)
+                    {
+                        if (p.Value.instrumentCode == -1)
+                        {
+                            if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(1))
+                                outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, p.Key, SFXTheme.CurrentSFXTheme.Instruments[1].instrumentCode));
+                            else
+                                outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, p.Key, p.Value.instrumentCode));
+                        }
+                        else
+                        {
+                            outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, p.Key, p.Value.instrumentCode));
+                        }
+                    }
+                    else
+                    {
+                        outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, p.Key, p.Value.instrumentCode));
+                    }
                 }
                 catch (ObjectDisposedException) { }
                 catch (OutputDeviceException) { }
@@ -273,16 +290,14 @@ namespace ChordingCoding.SFX
                         ii.whitespaceRhythm, 0, ii.whitespaceVolume);
                 }
             }
-            /*
             foreach (KeyValuePair<int, SFXTheme.InstrumentInfo> pair in SFXTheme.CurrentSFXTheme.Instruments)
             {
-                if (pair.Value.whitespaceVolume > 0)
+                if (pair.Value.whitespaceVolume > 0 && pair.Key != 1)
                 {
                     PlayANoteSync(pair.Value.whitespacePitchModulator(pitch),
                         pair.Value.whitespaceRhythm, pair.Key, pair.Value.whitespaceVolume);
                 }
             }
-            */
             OnChordTransition?.Invoke(pitch);
         }
 
@@ -377,8 +392,10 @@ namespace ChordingCoding.SFX
                         int measure = accompanimentTickNumber[staff] / 64;
                         int position = (accompanimentTickNumber[staff] / 4) % 16;
                         if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(staff))
+                        {
                             accompaniment.Play(outDevice, measure, position, staff,
                                 (int)Math.Round(SFXTheme.CurrentSFXTheme.Instruments[staff].accompanimentVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
+                        }
                     }
 
                     accompanimentTickNumber[staff]++;

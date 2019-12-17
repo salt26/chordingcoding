@@ -1013,7 +1013,16 @@ namespace ChordingCoding.SFX
             int newOctave = SFXTheme.CurrentSFXTheme.MinOctave + octaveAddedToMin;
             if (type != Type.M7 && type != Type.m7)
             {
-                if (order < 0 || order > 2) order = 0;
+                if (order < 0)
+                {
+                    order = 0;
+                }
+                else if (order > 2)
+                {
+                    order = 0;
+                    newOctave++;
+                }
+
                 r = new int[3] {  newOctave * 12 + (int)root + TypeToNote(0),
                                   newOctave * 12 + (int)root + TypeToNote(1),
                                   newOctave * 12 + (int)root + TypeToNote(2) };

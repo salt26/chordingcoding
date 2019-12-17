@@ -74,6 +74,7 @@ namespace ChordingCoding.SFX
             currentPatterns = new Dictionary<int, Pattern>();
             Score score;
 
+            /*
             score = new Score();
             score.AddNote(() => Music.chord.NotesInChord()[0] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave + 1) * 12, 8, 0, 0, 7);
             score.AddNote(() => Music.chord.NotesInChord()[2] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave) * 12, 8, 0, 0, 7);
@@ -172,7 +173,43 @@ namespace ChordingCoding.SFX
             score.AddNote(() => Music.chord.NotesInChord()[0] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave + 1) * 12, 1, 0, 13, 7);
             score.AddNote(() => Music.chord.NotesInChord()[2] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave) * 12, 1, 0, 13, 7);
             availablePatterns.Add(new Pattern("Accent", "악센트", score, 16, 4)); // TODO 이름 바꾸기
-            
+            */
+
+            score = new Score();
+            score.AddNote(() => Music.chord.GetNote(0, 0), 1, 0, 0, 7);
+            score.AddNote(() => Music.chord.GetNote(1, 0), 1, 0, 1, 7);
+            score.AddNote(() => Music.chord.GetNote(2, 0), 1, 0, 2, 7);
+            score.AddNote(() => Music.chord.GetNote(1, 1), 1, 0, 3, 7);
+            score.AddNote(() => Music.chord.GetNote(0, 1), 1, 0, 4, 7);
+            score.AddNote(() => Music.chord.GetNote(1, 1), 1, 0, 5, 7);
+            score.AddNote(() => Music.chord.GetNote(2, 1), 1, 0, 6, 7);
+            score.AddNote(() => Music.chord.GetNote(1, 2), 1, 0, 7, 7);
+            score.AddNote(() => Music.chord.GetNote(0, 2), 1, 0, 8, 7);
+            score.AddNote(() => Music.chord.GetNote(1, 2), 1, 0, 9, 7);
+            score.AddNote(() => Music.chord.GetNote(2, 2), 1, 0, 10, 7);
+            score.AddNote(() => Music.chord.GetNote(1, 3), 1, 0, 11, 7);
+            score.AddNote(() => Music.chord.GetNote(0, 3), 1, 0, 12, 7);
+            score.AddNote(() => Music.chord.GetNote(1, 3), 1, 0, 13, 7);
+            score.AddNote(() => Music.chord.GetNote(2, 3), 1, 0, 14, 7);
+            score.AddNote(() => Music.chord.GetNote(1, 4), 1, 0, 15, 7);
+            score.AddNote(() => Music.chord.GetNote(2, 4), 1, 1, 0, 7);
+            score.AddNote(() => Music.chord.GetNote(1, 4), 1, 1, 1, 7);
+            score.AddNote(() => Music.chord.GetNote(0, 4), 1, 1, 2, 7);
+            score.AddNote(() => Music.chord.GetNote(1, 3), 1, 1, 3, 7);
+            score.AddNote(() => Music.chord.GetNote(2, 3), 1, 1, 4, 7);
+            score.AddNote(() => Music.chord.GetNote(1, 3), 1, 1, 5, 7);
+            score.AddNote(() => Music.chord.GetNote(0, 3), 1, 1, 6, 7);
+            score.AddNote(() => Music.chord.GetNote(1, 2), 1, 1, 7, 7);
+            score.AddNote(() => Music.chord.GetNote(2, 2), 1, 1, 8, 7);
+            score.AddNote(() => Music.chord.GetNote(1, 2), 1, 1, 9, 7);
+            score.AddNote(() => Music.chord.GetNote(0, 2), 1, 1, 10, 7);
+            score.AddNote(() => Music.chord.GetNote(1, 1), 1, 1, 11, 7);
+            score.AddNote(() => Music.chord.GetNote(2, 1), 1, 1, 12, 7);
+            score.AddNote(() => Music.chord.GetNote(1, 1), 1, 1, 13, 7);
+            score.AddNote(() => Music.chord.GetNote(0, 1), 1, 1, 14, 7);
+            score.AddNote(() => Music.chord.GetNote(1, 0), 1, 1, 15, 7);
+            availablePatterns.Add(new Pattern("Mountain1", "산1", score, 32, 1)); // TODO 이름 바꾸기
+
             SetNewCurrentPattern(7);
             SetNewCurrentPattern(8);
 

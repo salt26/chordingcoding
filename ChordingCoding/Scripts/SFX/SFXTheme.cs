@@ -490,12 +490,12 @@ namespace ChordingCoding.SFX
              */
             instruments = new Dictionary<int, InstrumentInfo>();
             instruments.Add(7, availableInstruments[16]);
-            instruments.Add(8, availableInstruments[17]);
+            //instruments.Add(8, availableInstruments[17]);
             availableInstrumentSets.Add(new InstrumentSet("Piano", "피아노", instruments, InstrumentSet.Type.accompaniment));
             
             instruments = new Dictionary<int, InstrumentInfo>();
             instruments.Add(7, availableInstruments[18]);
-            instruments.Add(8, availableInstruments[19]);
+            //instruments.Add(8, availableInstruments[19]);
             availableInstrumentSets.Add(new InstrumentSet("Melody", "멜로디", instruments, InstrumentSet.Type.accompaniment));
 
             // TODO

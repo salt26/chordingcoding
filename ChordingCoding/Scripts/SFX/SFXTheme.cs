@@ -398,6 +398,11 @@ namespace ChordingCoding.SFX
              * Type이 character인 InstrumentSet에서 지정한 minOctave와 maxOctave 사이의 임의의 음입니다.
              * 즉, channel 1로 함께 쓰인 악기의 옥타브 범위에 영향을 받습니다.
              * 이들의 음 옥타브 범위를 따로 지정하려면 PitchModulator를 활용해야 합니다.
+             * 
+             * [악기 번호(code)]
+             * -1인 경우 현재 테마의 channel 1에서 사용 중인 악기의 종류를 참조하여 그대로 따른다는 뜻입니다.
+             * 하지만 악기 번호가 -1이어도 음량(volume)은 channel 1을 따르지 않으므로 자유롭게 설정 가능합니다.
+             * 악기 번호 -1은 channel 7과 channel 8에서만 유효합니다. 다른 채널에서는 사용하지 마십시오.
              */
             // availableInstruments에 새 악기 정보를 추가할 때에는 맨 뒤에 추가바람. (순서가 중요!)
             List<InstrumentInfo> availableInstruments = new List<InstrumentInfo>();
@@ -421,6 +426,8 @@ namespace ChordingCoding.SFX
             availableInstruments.Add(new AccompanimentInstrumentInfo(0, (pitch) => pitch, 32, 100));                                                 // [17] Pianoforte channel 8, Acoustic grand piano
             availableInstruments.Add(new AccompanimentInstrumentInfo(11, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12, 32, 60));                // [18] Pianoforte channel 7, Vibraphone
             availableInstruments.Add(new AccompanimentInstrumentInfo(12, (pitch) => pitch, 32, 100));                                                 // [19] Pianoforte channel 8, Marimba
+            availableInstruments.Add(new AccompanimentInstrumentInfo(-1, (pitch) => pitch, 0, 48));                                                // [20] channel 7 또는 8에서 1번 악기를 참조하여 재생할 때 사용
+            availableInstruments.Add(new AccompanimentInstrumentInfo(-1, (pitch) => pitch, 0, 84));                                                 // [21] channel 7 또는 8에서 1번 악기를 참조하여 재생할 때 사용
 
             Dictionary<int, InstrumentInfo> instruments;
 
@@ -494,8 +501,8 @@ namespace ChordingCoding.SFX
             availableInstrumentSets.Add(new InstrumentSet("Piano", "피아노", instruments, InstrumentSet.Type.accompaniment));
             
             instruments = new Dictionary<int, InstrumentInfo>();
-            instruments.Add(7, availableInstruments[18]);
-            instruments.Add(8, availableInstruments[19]);
+            instruments.Add(7, availableInstruments[20]);
+            instruments.Add(8, availableInstruments[21]);
             availableInstrumentSets.Add(new InstrumentSet("Melody", "멜로디", instruments, InstrumentSet.Type.accompaniment));
 
             // TODO
@@ -508,7 +515,7 @@ namespace ChordingCoding.SFX
             availableSFXThemes.Add(new SFXTheme("Autumn", "가을 산책", ChordTransitionType.SomewhatHappy, "Guitar", "Bird", null));
             availableSFXThemes.Add(new SFXTheme("Rain", "비 오는 날", ChordTransitionType.SomewhatBlue, "Forest", "Rain", null));
             availableSFXThemes.Add(new SFXTheme("Star", "별 헤는 밤", ChordTransitionType.SimilarOne, "Star", "Bell", null));
-            availableSFXThemes.Add(new SFXTheme("Forest", "숲 속 아침", ChordTransitionType.SimilarOne, "Forest", "Bird", null));
+            availableSFXThemes.Add(new SFXTheme("Forest", "숲 속 아침", ChordTransitionType.SimilarOne, "Forest", "Bird", "Melody"));
             availableSFXThemes.Add(new SFXTheme("Pianoforte", "피아노포르테", ChordTransitionType.SimilarOne, "Piano", null, "Piano"));
             availableSFXThemes.Add(new SFXTheme("Pianoforte_low", "피아노포르테 저음", ChordTransitionType.SomewhatBlue, "Piano_low", null, "Piano"));
             availableSFXThemes.Add(new SFXTheme("Pianoforte_high", "피아노포르테 고음", ChordTransitionType.SomewhatHappy, "Piano_high", null, "Piano"));

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Management;
+using Microsoft.Win32;
 
 namespace ChordingCoding.SFX
 {
@@ -38,6 +39,7 @@ namespace ChordingCoding.SFX
 
         /// <summary>
         /// 전원 상태 감지 시스템을 초기화하고 시작합니다.
+        /// 처음 한 번만 호출하거나, Stop()을 먼저 호출한 후에 호출해야 합니다.
         /// </summary>
         public void InitPowerEvents()
         {
@@ -63,6 +65,8 @@ namespace ChordingCoding.SFX
             }
 
             managementEventWatcher.Start();
+
+            //SystemEvents.PowerModeChanged += OnPowerChange;
         }
 
         private void PowerEventArrive(object sender, EventArrivedEventArgs e)
@@ -89,11 +93,29 @@ namespace ChordingCoding.SFX
 
         /// <summary>
         /// 전원 상태 감지 시스템을 멈춥니다.
+        /// 이것을 호출하지 않으면 메모리 누수가 발생할 수 있습니다.
         /// </summary>
         public void Stop()
         {
             managementEventWatcher.Stop();
             Console.WriteLine("Power Management stopped");
+
+            //SystemEvents.PowerModeChanged -= OnPowerChange;
         }
+
+        /*
+        private void OnPowerChange(object s, PowerModeChangedEventArgs e)
+        {
+            switch (e.Mode)
+            {
+                case PowerModes.Resume:
+                    Console.WriteLine("OnPowerChange:Resume");
+                    break;
+                case PowerModes.Suspend:
+                    Console.WriteLine("OnPowerChange:Suspend");
+                    break;
+            }
+        }
+        */
     }
 }

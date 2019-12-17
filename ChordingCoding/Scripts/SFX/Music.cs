@@ -20,7 +20,7 @@ namespace ChordingCoding.SFX
     {
         public delegate void PlayEventDelegate(int pitch);
 
-        private static float TICK_PER_SECOND = 22f;   // 1초에 호출되는 tick 수
+        private static float TICK_PER_SECOND = 29f;   // 1초에 호출되는 tick 수
         public static int tickNumber = 0;           // 테마 변경 후 지금까지 지난 tick 수
 
         // 반주 재생에 사용되는, 새 패턴을 재생하고 나서 지금까지 지난 tick 수 (Key는 staff 번호)
@@ -273,6 +273,7 @@ namespace ChordingCoding.SFX
                         ii.whitespaceRhythm, 0, ii.whitespaceVolume);
                 }
             }
+            /*
             foreach (KeyValuePair<int, SFXTheme.InstrumentInfo> pair in SFXTheme.CurrentSFXTheme.Instruments)
             {
                 if (pair.Value.whitespaceVolume > 0)
@@ -281,6 +282,7 @@ namespace ChordingCoding.SFX
                         pair.Value.whitespaceRhythm, pair.Key, pair.Value.whitespaceVolume);
                 }
             }
+            */
             OnChordTransition?.Invoke(pitch);
         }
 

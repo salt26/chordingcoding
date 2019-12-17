@@ -180,7 +180,7 @@ namespace ChordingCoding.UI
         /// </summary>
         private void MarshallingUpdateFrame()
         {
-            if (isReady)
+            if (ENABLE_VFX && isReady)
             {
                 BeginInvoke(new ChordingCoding.SFX.Timer.TickDelegate(UpdateFrame));
             }

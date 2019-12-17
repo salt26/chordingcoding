@@ -269,6 +269,7 @@ namespace ChordingCoding.SFX
 
         /// <summary>
         /// 화음 전이를 일으키면서 새 화음의 음들을 재생합니다.
+        /// 확률적으로 연주 속도가 변할 수 있습니다.
         /// </summary>
         /// <returns></returns>
         private static void PlayChordTransition()
@@ -298,6 +299,11 @@ namespace ChordingCoding.SFX
                         pair.Value.whitespaceRhythm, pair.Key, pair.Value.whitespaceVolume);
                 }
             }
+
+            // 빠르기 변경
+            Random r = new Random();
+            SetTickPerSecond((int)TICK_PER_SECOND + (int)(1.2f * Math.Round(Util.GaussianRandom(r), MidpointRounding.AwayFromZero)));
+
             OnChordTransition?.Invoke(pitch);
         }
 
@@ -329,6 +335,7 @@ namespace ChordingCoding.SFX
             if (tickPerSecond < 16) tickPerSecond = 16;
             if (tickPerSecond > 42) tickPerSecond = 42;
             TICK_PER_SECOND = tickPerSecond;
+            Console.WriteLine(TICK_PER_SECOND);
             timerNumber = 0;
         }
 

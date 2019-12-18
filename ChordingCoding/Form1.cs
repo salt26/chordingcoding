@@ -21,12 +21,13 @@ namespace ChordingCoding.UI
         /// <summary>
         /// 시각 효과를 표시할지 결정합니다.
         /// </summary>
-        const bool ENABLE_VFX = false;
+        const bool ENABLE_VFX = true;
 
         static bool _isReady = false;
         static Dictionary<string, int> _opacity = new Dictionary<string, int>();
         static List<ParticleSystem> particleSystems = new List<ParticleSystem>();
         static ParticleSystem basicParticleSystem = null;
+        static bool isModifyingParticleSystems = false;
         //Bitmap bitmap;
         public static Form1 form1;
         
@@ -191,6 +192,7 @@ namespace ChordingCoding.UI
         /// </summary>
         private void UpdateFrame()
         {
+            /*
             List<ParticleSystem> deadParticleSystem = new List<ParticleSystem>();
 
             // 각 파티클 시스템 객체의 Update 함수 호출
@@ -208,16 +210,32 @@ namespace ChordingCoding.UI
                         ps.Update();
                     }
                 }
-
-                foreach (ParticleSystem dead in deadParticleSystem)
-                {
-                    particleSystems.Remove(dead);
-                }
+                
+                particleSystems.RemoveAll(x => deadParticleSystem.Contains(x));
             }
             catch (InvalidOperationException)
             {
 
             }
+            */
+
+            // TODO
+            isModifyingParticleSystems = true;
+            List<ParticleSystem> deadParticleSystems = new List<ParticleSystem>();
+            for (int i = particleSystems.Count - 1; i >= 0; i--)
+            {
+                // 수명이 다한 파티클 시스템 처리
+                if (particleSystems[i].CanDestroy())
+                {
+                    deadParticleSystems.Add(particleSystems[i]);
+                }
+                else
+                {
+                    particleSystems[i].Update();
+                }
+            }
+            particleSystems.RemoveAll(x => deadParticleSystems.Contains(x));
+            isModifyingParticleSystems = false;
 
             if (basicParticleSystem != null)
             {
@@ -230,10 +248,10 @@ namespace ChordingCoding.UI
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
+            // TODO
             // 각 파티클 시스템 객체의 Draw 함수 호출
-            foreach (ParticleSystem ps in particleSystems)
-            {
-                ps.Draw(e.Graphics);
+            for (int i = particleSystems.Count - 1; i >= 0; i--) { 
+                particleSystems[i].Draw(e.Graphics);
             }
             if (basicParticleSystem != null)
                 basicParticleSystem.Draw(e.Graphics);

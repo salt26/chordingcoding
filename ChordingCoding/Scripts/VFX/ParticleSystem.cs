@@ -98,26 +98,51 @@ namespace ChordingCoding.VFX
         /// </summary>
         public void Update()
         {
-            List<Particle> deadParticles = new List<Particle>();
-            foreach (Particle p in particles)
+            void particlesUpdateOrRemove(object[] args)
             {
-                if (p.lifetime <= 0)
+                List<Particle> particles_ = args[0] as List<Particle>;
+                
+                List<Particle> deadParticles = new List<Particle>();
+                for (int i = particles_.Count - 1; i >= 0; i--)
                 {
-                    // 수명이 다한 파티클 처리
-                    deadParticles.Add(p);
-                    continue;
+                    Particle p = particles_[i];
+                    if (p.lifetime <= 0)
+                    {
+                        // 수명이 다한 파티클 처리
+                        deadParticles.Add(p);
+                        continue;
+                    }
+                    else
+                    {
+                        // 수명이 남아 있는 파티클 업데이트
+                        p.Update();
+                    }
                 }
-                else
-                {
-                    // 수명이 남아 있는 파티클 업데이트
-                    p.Update();
-                }
-            }
-            foreach (Particle dead in deadParticles)
-            {
                 // 수명이 다한 파티클의 레퍼런스를 파티클 목록에서 삭제
-                particles.Remove(dead);
+                particles_.RemoveAll(x => deadParticles.Contains(x));
             }
+            Util.Lock.Task task0 = particlesUpdateOrRemove;
+
+            void particlesRemoveAtZero(object[] args)
+            {
+                List<Particle> particles_ = args[0] as List<Particle>;
+                if (particles_.Count >= 200)
+                {
+                    particles_.RemoveAt(0);
+                }
+            }
+            Util.Lock.Task task1 = particlesRemoveAtZero;
+
+            void particlesAdd(object[] args)
+            {
+                List<Particle> particles_ = args[0] as List<Particle>;
+                Particle particle_ = args[1] as Particle;
+                particles_.Add(particle_);
+            }
+            Util.Lock.Task task2 = particlesAdd;
+
+
+            Util.Lock.AddTask("particles", task0, particles);
 
             if (lifetime > 0 && !isBasicParticleSystem)
             {
@@ -125,12 +150,10 @@ namespace ChordingCoding.VFX
                 for (int i = 0; i < createNumber; i++)
                 {
                     // 한 파티클 시스템 당 최대 파티클 개수 200개로 제한
-                    if (particles.Count >= 200)
-                    {
-                        particles.RemoveAt(0);
-                    }
+                    Util.Lock.AddTask("particles", task1, particles);
                     ParticlePosition(out float posX, out float posY);
-                    particles.Add(new Particle(particleType, posX, posY, particleLifetime, particleColor(), particleSize));
+                    Particle p = new Particle(particleType, posX, posY, particleLifetime, particleColor(), particleSize);
+                    Util.Lock.AddTask("particles", task2, particles, p);
                 }
 
                 // 위치 이동
@@ -145,12 +168,10 @@ namespace ChordingCoding.VFX
                 for (int i = 0; i < createNumber; i++)
                 {
                     // 한 파티클 시스템 당 최대 파티클 개수 200개로 제한
-                    if (particles.Count >= 200)
-                    {
-                        particles.RemoveAt(0);
-                    }
+                    Util.Lock.AddTask("particles", task1, particles);
                     ParticlePosition(out float posX, out float posY);
-                    particles.Add(new Particle(particleType, posX, posY, particleLifetime, particleColor(), particleSize));
+                    Particle p = new Particle(particleType, posX, posY, particleLifetime, particleColor(), particleSize);
+                    Util.Lock.AddTask("particles", task2, particles, p);
                 }
             }
         }
@@ -174,11 +195,21 @@ namespace ChordingCoding.VFX
             }
             */
 
-            // TODO
-            for (int i = particles.Count - 1; i >= 0; i--)
+            void particlesDraw(object[] args)
             {
-                particles[i].Draw(g);
+                List<Particle> particles_ = args[0] as List<Particle>;
+                Graphics g_ = args[1] as Graphics;
+
+                for (int i = particles_.Count - 1; i >= 0; i--)
+                {
+                    particles_[i].Draw(g_);
+                }
             }
+
+            Util.Lock.Task task = particlesDraw;
+
+            Util.Lock.AddTask("particles", task, particles, g);
+
         }
         
         /// <summary>
@@ -198,16 +229,32 @@ namespace ChordingCoding.VFX
             if (!isBasicParticleSystem) return;
             //Console.WriteLine(particleType.ToString() + " " + particleLifetime);
 
+            void particlesRemoveAtZero(object[] args)
+            {
+                List<Particle> particles_ = args[0] as List<Particle>;
+                if (particles_.Count >= 200)
+                {
+                    particles_.RemoveAt(0);
+                }
+            }
+            Util.Lock.Task task1 = particlesRemoveAtZero;
+
+            void particlesAdd(object[] args)
+            {
+                List<Particle> particles_ = args[0] as List<Particle>;
+                Particle particle_ = args[1] as Particle;
+                particles_.Add(particle_);
+            }
+            Util.Lock.Task task2 = particlesAdd;
+
             // 새 파티클 생성
             for (int i = 0; i < createNumber; i++)
             {
                 // 한 파티클 시스템 당 최대 파티클 개수 200개로 제한
-                if (particles.Count >= 200)
-                {
-                    particles.RemoveAt(0);
-                }
+                Util.Lock.AddTask("particles", task1, particles);
                 ParticlePosition(out float posX, out float posY);
-                particles.Add(new Particle(particleType, posX, posY, particleLifetime, particleColor, particleSize));
+                Particle p = new Particle(particleType, posX, posY, particleLifetime, particleColor, particleSize);
+                Util.Lock.AddTask("particles", task2, particles, p);
             }
         }
 

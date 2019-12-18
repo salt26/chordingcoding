@@ -221,7 +221,17 @@ namespace ChordingCoding.SFX
             Thread t1 = new Thread(new ThreadStart(() => NoteOff(outDevice, note)));
             t1.Start();
             */
-            noteOffBuffer.Add(note);
+
+            void noteOffBufferAdd(object[] args)
+            {
+                List<Note> noteOffBuffer_ = args[0] as List<Note>;
+                Note note_ = args[1] as Note;
+                noteOffBuffer_.Add(note_);
+            }
+            Util.Lock.Task task = noteOffBufferAdd;
+
+
+            Util.Lock.AddTask("noteOffBuffer", task, noteOffBuffer, note);
             Console.WriteLine("PlayANote");
             //Console.WriteLine("End of note.");
         }
@@ -291,44 +301,64 @@ namespace ChordingCoding.SFX
         {
             if (noteOffBuffer.Count <= 0) return;
             long measure = Music.Measure;
-            float position = Music.Position;
+            int position = Music.Position;
 
             Console.WriteLine("Before: " + noteOffBuffer.Count);
             Console.WriteLine("curr: " + (measure * 64f + position));
-
-            // TODO
-            List<Note> tempBuffer = noteOffBuffer;
-            List<Note> removingBuffer = new List<Note>();
-            for (int i = tempBuffer.Count - 1; i >= 0; i--) {
-                Note note = tempBuffer[i];
-
-                // 악보에 있는 모든 음표를 재생합니다.
-                KeyValuePair<float, int> p = note.ToMidi()[1];
-                Console.WriteLine("note: " + p.Key);
-
-                if (p.Value <= 0 && p.Key <= measure * 64f + position)
+            
+            void noteOffBufferStop(object[] args)
+            {
+                List<Note> noteOffBuffer_ = args[0] as List<Note>;
+                long measure_ = (long)args[1];
+                int position_ = (int)args[2];
+                OutputDevice outDevice_ = args[3] as OutputDevice;
+                
+                List<Note> deadBuffer = new List<Note>();
+                for (int i = noteOffBuffer_.Count - 1; i >= 0; i--)
                 {
-                    // 음표의 재생을 멈춥니다.
-                    // (Midi message pair를 번역하여 Midi message를 생성합니다.)
-                    try
+                    Note note = noteOffBuffer_[i];
+
+                    // 악보에 있는 모든 음표를 재생합니다.
+                    KeyValuePair<float, int> p = note.ToMidi()[1];
+                    Console.WriteLine("note: " + p.Key);
+
+                    if (p.Value <= 0 && p.Key <= measure_ * 64f + position_)
                     {
-                        outDevice.Send(new ChannelMessage(ChannelCommand.NoteOff, -p.Value >> 16, -p.Value & 65535, 10));
-                    }
-                    catch (ObjectDisposedException) { }
-                    catch (OutputDeviceException) { }
-                    finally
-                    {
-                        removingBuffer.Add(tempBuffer[i]);
+                        // 음표의 재생을 멈춥니다.
+                        // (Midi message pair를 번역하여 Midi message를 생성합니다.)
+                        try
+                        {
+                            outDevice_.Send(new ChannelMessage(ChannelCommand.NoteOff, -p.Value >> 16, -p.Value & 65535, 10));
+                        }
+                        catch (ObjectDisposedException) { }
+                        catch (OutputDeviceException) { }
+                        finally
+                        {
+                            deadBuffer.Add(noteOffBuffer_[i]);
+                        }
                     }
                 }
+                noteOffBuffer_.RemoveAll(x => deadBuffer.Contains(x));
+                Console.WriteLine("After:  " + noteOffBuffer_.Count);
             }
-            noteOffBuffer.RemoveAll(x => removingBuffer.Contains(x));
-            Console.WriteLine("After:  " + noteOffBuffer.Count);
+            Util.Lock.Task task = noteOffBufferStop;
+
+
+            Util.Lock.AddTask("noteOffBuffer", task, noteOffBuffer, measure, position, outDevice);
+            
         }
 
         public static void ClearNoteOffBuffer()
         {
-            noteOffBuffer.Clear();
+            void noteOffBufferClear(object[] args)
+            {
+                List<Note> noteOffBuffer_ = args[0] as List<Note>;
+                noteOffBuffer_.Clear();
+            }
+            Util.Lock.Task task = noteOffBufferClear;
+
+
+            Util.Lock.AddTask("noteOffBuffer", task, noteOffBuffer);
         }
 
         /// <summary>

@@ -24,13 +24,13 @@ namespace ChordingCoding
         /// <summary>
         /// 한 번에 하나씩만 수행되어야 하는 작업들을 관리합니다.
         /// </summary>
-        class Lock
+        public class Lock
         {
             public delegate void Task(params object[] arguments);
 
             private static Dictionary<string, Queue<KeyValuePair<Task, object[]>>> lockedTaskQueue =
                 new Dictionary<string, Queue<KeyValuePair<Task, object[]>>>();                          // 작업 대기열
-            private static Dictionary<string, bool> isLocked = new Dictionary<string, bool>();          // 작업이 진행 중이면 true, 놀고 있으면 false
+            private static List<string> isLocked = new List<string>();          // 진행 중인 작업 그룹의 이름들을 담는 목록
 
             // 작업을 넣기만 하는 함수와 작업을 빼서 처리하기만 하는 함수가 분리되어야 한다.
             // 같은 작업임을 구분하는 변수가 꼭 bool일 필요는 없다. string이어도 된다. 작업이 처리 중인지는 이 안에서만 관리한다.
@@ -42,12 +42,8 @@ namespace ChordingCoding
             /// <param name="lockName">동시에 실행되면 안 되는 작업들의 그룹 이름</param>
             /// <param name="task">추가할 작업 delegate</param>
             /// <param name="args">추가할 작업에 필요한 인자들</param>
-            public static void AddTask(string lockName, Task task, object[] args)
+            public static void AddTask(string lockName, Task task, params object[] args)
             {
-                if (!isLocked.ContainsKey(lockName))
-                {
-                    isLocked.Add(lockName, false);
-                }
                 if (!lockedTaskQueue.ContainsKey(lockName))
                 {
                     lockedTaskQueue.Add(lockName, new Queue<KeyValuePair<Task, object[]>>());
@@ -55,24 +51,59 @@ namespace ChordingCoding
 
                 lockedTaskQueue[lockName].Enqueue(new KeyValuePair<Task, object[]>(task, args));
 
-                if (!isLocked[lockName])
+                // lock이 안 잡혀있는 경우 (처리 중인 Task가 없는 경우)
+                if (isLocked.IndexOf(lockName) == -1)
                 {
+                    // lock 잡고 Task 수행
+                    isLocked.Add(lockName);
                     DoTask(lockName);
                 }
             }
 
             private static void DoTask(string lockName)
             {
-                if (!isLocked.ContainsKey(lockName)) return;
-                if (!lockedTaskQueue.ContainsKey(lockName)) return;
+                if (!lockedTaskQueue.ContainsKey(lockName))
+                {
+                    if (isLocked.IndexOf(lockName) != -1)
+                    {
+                        // lock이 잡혀있는 경우 lock 놓음
+                        isLocked.Remove(lockName);
+                    }
+                    return;
+                }
+                if (lockedTaskQueue[lockName].Count <= 0)
+                {
+                    // 수행할 Task가 없음
 
-                // TODO
+                    if (isLocked.IndexOf(lockName) != -1)
+                    {
+                        // lock이 잡혀있는 경우 lock 놓음
+                        isLocked.Remove(lockName);
+                    }
+                    lockedTaskQueue.Remove(lockName);
+                    return;
+                }
+                if (isLocked.IndexOf(lockName) == -1)
+                {
+                    // lock 잡음
+                    isLocked.Add(lockName);
+                }
+                
+                KeyValuePair<Task, object[]> p = lockedTaskQueue[lockName].Dequeue();
+                p.Key(p.Value);     // Task 수행
+
+                DoTask(lockName);   // 잡은 lock을 놓지 않고 연쇄적으로 다음 Task 수행
             }
 
+            /// <summary>
+            /// 인자로 주어진 lockName을 공유하는 작업이 처리 중이면 true, 아니면 false를 반환합니다.
+            /// </summary>
+            /// <param name="lockName">동시에 실행되면 안 되는 작업들의 그룹 이름</param>
+            /// <returns></returns>
             public static bool GetTaskLocked(string lockName)
             {
-                if (!isLocked.ContainsKey(lockName)) return false;
-                return isLocked[lockName];
+                if (isLocked.IndexOf(lockName) == -1) return false;
+                return true;
             }
         }
         #endregion

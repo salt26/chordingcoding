@@ -21,7 +21,32 @@ namespace ChordingCoding.SFX
         public delegate void PlayEventDelegate(int pitch);
 
         private static float TICK_PER_SECOND = 29f;   // 1초에 호출되는 tick 수
-        public static int tickNumber = 0;           // 테마 변경 후 지금까지 지난 tick 수
+        private static long tickNumber = 0;           // 테마 변경 후 지금까지 지난 tick 수
+
+        /// <summary>
+        /// 현재 마디 수를 나타냅니다.
+        /// 테마를 바꾸면 초기화됩니다.
+        /// </summary>
+        public static long Measure
+        {
+            get
+            {
+                return tickNumber / 64;
+            }
+        }
+
+        /// <summary>
+        /// 현재 마디 내 위치를 나타냅니다.
+        /// 0 이상 64 미만의 값을 가지며, 값이 1씩 올라갈 때마다 64분음표 하나만큼의 시간이 흐른 위치를 나타냅니다.
+        /// 4/4박자를 가정합니다.
+        /// </summary>
+        public static int Position
+        {
+            get
+            {
+                return (int)(tickNumber % 64);
+            }
+        }
 
         // 반주 재생에 사용되는, 새 패턴을 재생하고 나서 지금까지 지난 tick 수 (Key는 staff 번호)
         private static Dictionary<int, int> accompanimentTickNumber = new Dictionary<int, int>();
@@ -170,6 +195,7 @@ namespace ChordingCoding.SFX
             if (SFXTheme.CurrentSFXTheme == null) return;
 
             for (int i = 0; i <= 8; i++) StopPlaying(i);
+            Score.ClearNoteOffBuffer();
 
             foreach (KeyValuePair<int, SFXTheme.InstrumentInfo> p in SFXTheme.CurrentSFXTheme.Instruments)
             {
@@ -218,10 +244,11 @@ namespace ChordingCoding.SFX
         public static void PlayANoteSync(int pitch, int rhythm, int staff, int velocity)
         {
             if (!IsReady) return;
-            Note note = new Note(pitch, rhythm, 0, 0, staff);
+            Note note = new Note(pitch, rhythm, Measure, Position, staff);
 
             if (NoteResolution == 0)
             {
+                Console.WriteLine("PlayANoteSync");
                 Score.PlayANote(outDevice, note, (int)Math.Round(velocity * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
 
                 List<int> tempPlayPitchEventBuffer = playPitchEventBuffer;
@@ -335,7 +362,7 @@ namespace ChordingCoding.SFX
             if (tickPerSecond < 16) tickPerSecond = 16;
             if (tickPerSecond > 42) tickPerSecond = 42;
             TICK_PER_SECOND = tickPerSecond;
-            Console.WriteLine(TICK_PER_SECOND);
+            //Console.WriteLine(TICK_PER_SECOND);
             timerNumber = 0;
         }
 
@@ -356,6 +383,7 @@ namespace ChordingCoding.SFX
                 }
             }
             */
+            Score.NoteOff(outDevice);
 
             // 지속 효과음이 멈추는 것을 대비하여 
             if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(5) &&
@@ -365,14 +393,14 @@ namespace ChordingCoding.SFX
                 {
                     StopPlaying(5);
                     SFXTheme.InstrumentInfo inst = SFXTheme.CurrentSFXTheme.Instruments[5];
-                    Note note = new Note(inst.sfxPitchModulator(45), inst.sfxRhythm, 0, 0, 5);
+                    Note note = new Note(inst.sfxPitchModulator(45), inst.sfxRhythm, Measure, Position, 5);
                     Score.PlayANoteForever(outDevice, note, (int)Math.Round(inst.sfxVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));     // 기본 빗소리 (사라지지 않아야 함)
                 }
                 if (tickNumber % ((int)TICK_PER_SECOND * 10) == (int)TICK_PER_SECOND * 5)
                 {
                     StopPlaying(6);
                     SFXTheme.InstrumentInfo inst = SFXTheme.CurrentSFXTheme.Instruments[6];
-                    Note note = new Note(inst.sfxPitchModulator(45), inst.sfxRhythm, 0, 0, 6);
+                    Note note = new Note(inst.sfxPitchModulator(45), inst.sfxRhythm, Measure, Position, 6);
                     Score.PlayANoteForever(outDevice, note, (int)Math.Round(inst.sfxVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));     // 기본 빗소리 (사라지지 않아야 함)
                 }
             }
@@ -381,7 +409,7 @@ namespace ChordingCoding.SFX
             {
                 if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(staff))
                 {
-                    if (accompanimentTickNumber[staff] >= Accompaniment.currentPatterns[staff].length * 4)
+                    if (accompanimentTickNumber[staff] >= Accompaniment.currentPatterns[staff].length)
                     {
                         accompanimentPlayNumber[staff]++;
                         if (accompanimentPlayNumber[staff] >= Accompaniment.currentPatterns[staff].iteration)
@@ -393,16 +421,13 @@ namespace ChordingCoding.SFX
                     }
                     Score accompaniment = Accompaniment.currentPatterns[staff].score;
 
-                    // 16분음표 단위로 음을 하나씩 재생
-                    if (accompanimentTickNumber[staff] % 4 == 0)
+                    // 64분음표 단위로 음을 하나씩 재생
+                    long measure = accompanimentTickNumber[staff] / 64;
+                    int position = accompanimentTickNumber[staff] % 64;
+                    if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(staff))
                     {
-                        int measure = accompanimentTickNumber[staff] / 64;
-                        int position = (accompanimentTickNumber[staff] / 4) % 16;
-                        if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(staff))
-                        {
-                            accompaniment.Play(outDevice, measure, position, staff,
-                                (int)Math.Round(SFXTheme.CurrentSFXTheme.Instruments[staff].accompanimentVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
-                        }
+                        accompaniment.Play(outDevice, measure, position, staff,
+                            (int)Math.Round(SFXTheme.CurrentSFXTheme.Instruments[staff].accompanimentVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
                     }
 
                     accompanimentTickNumber[staff]++;
@@ -454,6 +479,7 @@ namespace ChordingCoding.SFX
         /// </summary>
         private static void FlushSyncPlayBuffer()
         {
+            /*
             List<KeyValuePair<Note, int>> tempSyncPlayBuffer = syncPlayBuffer;
             syncPlayBuffer = new List<KeyValuePair<Note, int>>();
             try
@@ -473,6 +499,22 @@ namespace ChordingCoding.SFX
             catch (InvalidOperationException)
             {
 
+            }
+            */
+            List<KeyValuePair<Note, int>> tempSyncPlayBuffer = syncPlayBuffer;
+            syncPlayBuffer = new List<KeyValuePair<Note, int>>();
+            for (int i = tempSyncPlayBuffer.Count - 1; i >= 0; i--)
+            {
+                Console.WriteLine("FlushSyncPlayBuffer");
+                KeyValuePair<Note, int> p = tempSyncPlayBuffer[i];
+                Score.PlayANote(outDevice, p.Key, (int)Math.Round(p.Value * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
+            }
+            
+            List<int> tempPlayPitchEventBuffer = playPitchEventBuffer;
+            playPitchEventBuffer = new List<int>();
+            for (int i = tempPlayPitchEventBuffer.Count - 1; i >= 0; i--)
+            {
+                OnPlayNotes?.Invoke(tempPlayPitchEventBuffer[i]);
             }
         }
     }

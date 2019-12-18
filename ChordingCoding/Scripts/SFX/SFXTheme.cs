@@ -142,13 +142,13 @@ namespace ChordingCoding.SFX
         {
             /// <param name="code">MIDI 악기 번호</param>
             /// <param name="cPitchModulator">일반 문자 음 높이 변경 함수</param>
-            /// <param name="cRhythm">일반 문자 음 길이 (16분음표: 1, 온음표: 16)</param>
+            /// <param name="cRhythm">일반 문자 음 길이 (64분음표: 1, 온음표: 64)</param>
             /// <param name="cVolume">일반 문자 음량 (0 ~ 127)</param>
             /// <param name="wPitchModulator">공백 문자 음 높이 변경 함수</param>
-            /// <param name="wRhythm">공백 문자 음 길이 (16분음표: 1, 온음표: 16)</param>
+            /// <param name="wRhythm">공백 문자 음 길이 (64분음표: 1, 온음표: 64)</param>
             /// <param name="wVolume">공백 문자 음량 (0 ~ 127)</param>
             /// <param name="aPitchModulator">반주 음 높이 변경 함수</param>
-            /// <param name="aRhythm">반주 음 길이 (16분음표: 1, 온음표: 16)</param>
+            /// <param name="aRhythm">반주 음 길이 (64분음표: 1, 온음표: 64)</param>
             /// <param name="aVolume">반주 음량 (0 ~ 127)</param>
             public CharacterInstrumentInfo(int code,
                 PitchModulator cPitchModulator, int cRhythm, int cVolume,
@@ -191,7 +191,7 @@ namespace ChordingCoding.SFX
         {
             /// <param name="code">MIDI 악기 번호</param>
             /// <param name="wPitchModulator">공백 문자 음 높이 변경 함수</param>
-            /// <param name="wRhythm">공백 문자 음 길이 (16분음표: 1, 온음표: 16)</param>
+            /// <param name="wRhythm">공백 문자 음 길이 (64분음표: 1, 온음표: 64)</param>
             /// <param name="wVolume">공백 문자 음량 (0 ~ 127)</param>
             public WhitespaceInstrumentInfo(int code, PitchModulator wPitchModulator, int wRhythm, int wVolume)
             {
@@ -223,7 +223,7 @@ namespace ChordingCoding.SFX
         {
             /// <param name="code">MIDI 악기 번호</param>
             /// <param name="sPitchModulator">효과음 높이 변경 함수</param>
-            /// <param name="sRhythm">효과음 길이 (16분음표: 1, 온음표: 16)</param>
+            /// <param name="sRhythm">효과음 길이 (64분음표: 1, 온음표: 64)</param>
             /// <param name="sVolume">효과음 음량 (0 ~ 127)</param>
             public SFXInstrumentInfo(int code, PitchModulator sPitchModulator, int sRhythm, int sVolume)
             {
@@ -255,7 +255,7 @@ namespace ChordingCoding.SFX
         {
             /// <param name="code">MIDI 악기 번호</param>
             /// <param name="aPitchModulator">반주 음 높이 변경 함수</param>
-            /// <param name="aRhythm">반주 음 길이 (16분음표: 1, 온음표: 16)</param>
+            /// <param name="aRhythm">반주 음 길이 (64분음표: 1, 온음표: 64)</param>
             /// <param name="aVolume">반주 음량 (0 ~ 127)</param>
             public AccompanimentInstrumentInfo(int code, PitchModulator aPitchModulator, int aRhythm, int aVolume)
             {
@@ -406,26 +406,26 @@ namespace ChordingCoding.SFX
              */
             // availableInstruments에 새 악기 정보를 추가할 때에는 맨 뒤에 추가바람. (순서가 중요!)
             List<InstrumentInfo> availableInstruments = new List<InstrumentInfo>();
-            availableInstruments.Add(new CharacterInstrumentInfo(32, (pitch) => pitch, 16, 127, (pitch) => pitch, 16, 64));                         // [0] Autumn channel 0, Acoustic bass
-            availableInstruments.Add(new CharacterInstrumentInfo(24, (pitch) => pitch, 16, 127, (pitch) => pitch, 16, 127));                        // [1] Autumn channel 1, Acoustic guitar(nylon)
-            availableInstruments.Add(new WhitespaceInstrumentInfo(123, (pitch) => pitch % 12 + 54, 4, 54));                                         // [2] Autumn channel 3, Bird tweet
-            availableInstruments.Add(new CharacterInstrumentInfo(101, (pitch) => pitch - 12, 14, 96, (pitch) => (pitch + 6) % 12 + 54, 14, 96));    // [3] Rain channel 0, SFX(goblin)
-            availableInstruments.Add(new CharacterInstrumentInfo(12, (pitch) => pitch, 16, 127, (pitch) => pitch, 16, 127));                        // [4] Rain channel 1, Marimba
-            availableInstruments.Add(new WhitespaceInstrumentInfo(126, (pitch) => (pitch + 5) % 7 + 46, 64, 24));                                   // [5] Rain channel 3, Applause
-            availableInstruments.Add(new SFXInstrumentInfo(126, (pitch) => 45, 1, 24));                                                             // [6] Rain channel 5/6, Applause
-            availableInstruments.Add(new CharacterInstrumentInfo(49, (pitch) => pitch - 12, 16, 72, (pitch) => (pitch + 6) % 12 + 54, 16, 72));     // [7] Star channel 0, String ensemble 2
-            availableInstruments.Add(new CharacterInstrumentInfo(11, (pitch) => pitch, 16, 127, (pitch) => pitch, 16, 127));                        // [8] Star channel 1, Vibraphone
-            availableInstruments.Add(new CharacterInstrumentInfo(0, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12 , 32, 80, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12, 32, 80));       // [9] Pianoforte channel 0, Acoustic grand piano
-            availableInstruments.Add(new CharacterInstrumentInfo(0, (pitch) => pitch, 32, 127, (pitch) => pitch, 32, 127));                         // [10] Pianoforte channel 1, Acoustic grand piano
-            availableInstruments.Add(new CharacterInstrumentInfo(46, (pitch) => pitch, 16, 127, (pitch) => pitch, 16, 127));                        // [11] Sky channel 1, Orchestral harp
-            availableInstruments.Add(new CharacterInstrumentInfo(68, (pitch) => pitch, 16, 96, (pitch) => pitch, 16, 96));                          // [12] ??? channel 1, Oboe
-            availableInstruments.Add(new CharacterInstrumentInfo(19, (pitch) => pitch, 12, 96, (pitch) => pitch, 12, 96));                          // [13] Medieval channel 1, Church organ
-            availableInstruments.Add(new WhitespaceInstrumentInfo(9, (pitch) => pitch % 12 + 72, 64, 80));                                          // [14] Medieval channel 3, Glockenspiel
-            availableInstruments.Add(new WhitespaceInstrumentInfo(9, (pitch) => (pitch + 7) % 12 + 48, 64, 80));                                    // [15] Medieval channel 4, Glockenspiel
-            availableInstruments.Add(new AccompanimentInstrumentInfo(0, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12, 32, 60));                // [16] Pianoforte channel 7, Acoustic grand piano
-            availableInstruments.Add(new AccompanimentInstrumentInfo(0, (pitch) => pitch, 32, 100));                                                 // [17] Pianoforte channel 8, Acoustic grand piano
-            availableInstruments.Add(new AccompanimentInstrumentInfo(11, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12, 32, 60));                // [18] Pianoforte channel 7, Vibraphone
-            availableInstruments.Add(new AccompanimentInstrumentInfo(12, (pitch) => pitch, 32, 100));                                                 // [19] Pianoforte channel 8, Marimba
+            availableInstruments.Add(new CharacterInstrumentInfo(32, (pitch) => pitch, 64, 127, (pitch) => pitch, 64, 64));                         // [0] Autumn channel 0, Acoustic bass
+            availableInstruments.Add(new CharacterInstrumentInfo(24, (pitch) => pitch, 64, 127, (pitch) => pitch, 64, 127));                        // [1] Autumn channel 1, Acoustic guitar(nylon)
+            availableInstruments.Add(new WhitespaceInstrumentInfo(123, (pitch) => pitch % 12 + 54, 16, 54));                                         // [2] Autumn channel 3, Bird tweet
+            availableInstruments.Add(new CharacterInstrumentInfo(101, (pitch) => pitch - 12, 56, 96, (pitch) => (pitch + 6) % 12 + 54, 56, 96));    // [3] Rain channel 0, SFX(goblin)
+            availableInstruments.Add(new CharacterInstrumentInfo(12, (pitch) => pitch, 64, 127, (pitch) => pitch, 64, 127));                        // [4] Rain channel 1, Marimba
+            availableInstruments.Add(new WhitespaceInstrumentInfo(126, (pitch) => (pitch + 5) % 7 + 46, 256, 24));                                   // [5] Rain channel 3, Applause
+            availableInstruments.Add(new SFXInstrumentInfo(126, (pitch) => 45, 4, 24));                                                             // [6] Rain channel 5/6, Applause
+            availableInstruments.Add(new CharacterInstrumentInfo(49, (pitch) => pitch - 12, 64, 72, (pitch) => (pitch + 6) % 12 + 54, 64, 72));     // [7] Star channel 0, String ensemble 2
+            availableInstruments.Add(new CharacterInstrumentInfo(11, (pitch) => pitch, 64, 127, (pitch) => pitch, 64, 127));                        // [8] Star channel 1, Vibraphone
+            availableInstruments.Add(new CharacterInstrumentInfo(0, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12 , 128, 80, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12, 128, 80));       // [9] Pianoforte channel 0, Acoustic grand piano
+            availableInstruments.Add(new CharacterInstrumentInfo(0, (pitch) => pitch, 128, 127, (pitch) => pitch, 128, 127));                         // [10] Pianoforte channel 1, Acoustic grand piano
+            availableInstruments.Add(new CharacterInstrumentInfo(46, (pitch) => pitch, 64, 127, (pitch) => pitch, 64, 127));                        // [11] Sky channel 1, Orchestral harp
+            availableInstruments.Add(new CharacterInstrumentInfo(68, (pitch) => pitch, 64, 96, (pitch) => pitch, 64, 96));                          // [12] ??? channel 1, Oboe
+            availableInstruments.Add(new CharacterInstrumentInfo(19, (pitch) => pitch, 48, 96, (pitch) => pitch, 48, 96));                          // [13] Medieval channel 1, Church organ
+            availableInstruments.Add(new WhitespaceInstrumentInfo(9, (pitch) => pitch % 12 + 72, 256, 80));                                          // [14] Medieval channel 3, Glockenspiel
+            availableInstruments.Add(new WhitespaceInstrumentInfo(9, (pitch) => (pitch + 7) % 12 + 48, 256, 80));                                    // [15] Medieval channel 4, Glockenspiel
+            availableInstruments.Add(new AccompanimentInstrumentInfo(0, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12, 128, 60));                // [16] Pianoforte channel 7, Acoustic grand piano
+            availableInstruments.Add(new AccompanimentInstrumentInfo(0, (pitch) => pitch, 128, 100));                                                 // [17] Pianoforte channel 8, Acoustic grand piano
+            availableInstruments.Add(new AccompanimentInstrumentInfo(11, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12, 128, 60));                // [18] Pianoforte channel 7, Vibraphone
+            availableInstruments.Add(new AccompanimentInstrumentInfo(12, (pitch) => pitch, 128, 100));                                                 // [19] Pianoforte channel 8, Marimba
             availableInstruments.Add(new AccompanimentInstrumentInfo(-1, (pitch) => pitch, 0, 48));                                                // [20] channel 7 또는 8에서 1번 악기를 참조하여 재생할 때 사용
             availableInstruments.Add(new AccompanimentInstrumentInfo(-1, (pitch) => pitch, 0, 84));                                                 // [21] channel 7 또는 8에서 1번 악기를 참조하여 재생할 때 사용
 

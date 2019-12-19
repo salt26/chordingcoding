@@ -125,6 +125,7 @@ namespace ChordingCoding.UI
 
             if (ENABLE_VFX)
             {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
                 Music.OnPlayNotes += (pitch) => AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
                 Music.OnChordTransition += (pitch) =>
                 {
@@ -137,9 +138,11 @@ namespace ChordingCoding.UI
                         AddParticleToBasicParticleSystem((Chord.Root)(pitch % 12));
                     }
                 };
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
             else
             {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
                 List<TrackBarMenuItem> l = new List<TrackBarMenuItem>();
                 foreach (TrackBarMenuItem i in 불투명도ToolStripMenuItem.DropDownItems)
                 {
@@ -151,6 +154,7 @@ namespace ChordingCoding.UI
                     i.Dispose();
                 }
                 불투명도ToolStripMenuItem.Dispose();
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
 
             SetNoteResolution(resolution);
@@ -445,9 +449,11 @@ namespace ChordingCoding.UI
         {
             if (ENABLE_VFX)
             {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
                 opacity = trackBarMenuItem1.Value * 5;
                 Opacity = opacity / 100D;
                 불투명도ToolStripMenuItem.Text = "불투명도 (" + opacity + "%)";
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
         }
 
@@ -489,12 +495,14 @@ namespace ChordingCoding.UI
 
             if (ENABLE_VFX)
             {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
                 basicParticleSystem = theme.BasicParticleSystem;
                 basicParticleSystem.particles = new List<Particle>();
                 particleSystems = new List<ParticleSystem>();
 
                 trackBarMenuItem1.Value = opacity / 5;
                 불투명도ToolStripMenuItem.Text = "불투명도 (" + opacity + "%)";
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
 
             trackBarMenuItem2.Value = SFXTheme.CurrentSFXTheme.Volume / 5;

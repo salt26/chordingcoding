@@ -176,7 +176,8 @@ namespace ChordingCoding.SFX
                 if (note.Measure == measure && note.Position == position && (staff == -1 || note.Staff == staff))
                 {
                     Console.WriteLine("Play");
-                    PlayANote(outDevice, note, velocity);
+                    Note noteInCurrentTime = new Note(note.Pitch, note.Rhythm, Music.Measure, Music.Position, note.Staff);
+                    PlayANote(outDevice, noteInCurrentTime, velocity);
                     /*
                     Thread t1 = new Thread(new ThreadStart(() => PlayANote(outDevice, note, velocity)));
                     t1.Start();

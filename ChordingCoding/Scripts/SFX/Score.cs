@@ -175,7 +175,6 @@ namespace ChordingCoding.SFX
             {
                 if (note.Measure == measure && note.Position == position && (staff == -1 || note.Staff == staff))
                 {
-                    Console.WriteLine("Play");
                     Note noteInCurrentTime = new Note(note.Pitch, note.Rhythm, Music.Measure, Music.Position, note.Staff);
                     PlayANote(outDevice, noteInCurrentTime, velocity);
                     /*
@@ -233,7 +232,6 @@ namespace ChordingCoding.SFX
 
 
             Util.Lock.AddTask("noteOffBuffer", task, noteOffBuffer, note);
-            Console.WriteLine("PlayANote");
             //Console.WriteLine("End of note.");
         }
 
@@ -304,8 +302,8 @@ namespace ChordingCoding.SFX
             long measure = Music.Measure;
             int position = Music.Position;
 
-            Console.WriteLine("Before: " + noteOffBuffer.Count);
-            Console.WriteLine("curr: " + (measure * 64f + position));
+            //Console.WriteLine("Before: " + noteOffBuffer.Count);
+            //Console.WriteLine("curr: " + (measure * 64f + position));
             
             void noteOffBufferStop(object[] args)
             {
@@ -321,7 +319,7 @@ namespace ChordingCoding.SFX
 
                     // 악보에 있는 모든 음표를 재생합니다.
                     KeyValuePair<float, int> p = note.ToMidi()[1];
-                    Console.WriteLine("note: " + p.Key);
+                    //Console.WriteLine("note: " + p.Key);
 
                     if (p.Value <= 0 && p.Key <= measure_ * 64f + position_)
                     {
@@ -340,7 +338,7 @@ namespace ChordingCoding.SFX
                     }
                 }
                 noteOffBuffer_.RemoveAll(x => deadBuffer.Contains(x));
-                Console.WriteLine("After:  " + noteOffBuffer_.Count);
+                //Console.WriteLine("After:  " + noteOffBuffer_.Count);
             }
             Util.Lock.Task task = noteOffBufferStop;
 

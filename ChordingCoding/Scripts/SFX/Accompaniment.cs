@@ -74,7 +74,7 @@ namespace ChordingCoding.SFX
             currentPatterns = new Dictionary<int, Pattern>();
             Score score;
 
-            
+            /*
             score = new Score();
             score.AddNote(() => Music.chord.NotesInChord()[0] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave + 1) * 12, 32, 0, 0, 7);
             score.AddNote(() => Music.chord.NotesInChord()[2] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave) * 12, 32, 0, 0, 7);
@@ -173,9 +173,9 @@ namespace ChordingCoding.SFX
             score.AddNote(() => Music.chord.NotesInChord()[0] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave + 1) * 12, 4, 0, 52, 7);
             score.AddNote(() => Music.chord.NotesInChord()[2] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave) * 12, 4, 0, 52, 7);
             availablePatterns.Add(new Pattern("Accent", "악센트", score, 64, 2)); // TODO 이름 바꾸기
+            */
             
-            
-            /*
+
             score = new Score();
             score.AddNote(() => Music.chord.GetNote(0, 0), 4, 0, 0, 7);
             score.AddNote(() => Music.chord.GetNote(1, 0), 4, 0, 4, 7);
@@ -420,7 +420,7 @@ namespace ChordingCoding.SFX
             score.AddNote(() => Music.chord.GetNote(3, 0), 4, 1, 56, 7);
             score.AddNote(() => Music.chord.GetNote(1, 1), 4, 1, 60, 7);
             availablePatterns.Add(new Pattern("Mountain0202-2131", "산0202-2131", score, 128, 1));
-            */
+            
 
             SetNewCurrentPattern(7);
             SetNewCurrentPattern(8);

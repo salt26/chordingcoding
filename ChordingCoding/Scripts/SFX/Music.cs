@@ -248,7 +248,6 @@ namespace ChordingCoding.SFX
 
             if (NoteResolution == 0)
             {
-                Console.WriteLine("PlayANoteSync");
                 Score.PlayANote(outDevice, note, (int)Math.Round(velocity * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
 
                 List<int> tempPlayPitchEventBuffer = playPitchEventBuffer;
@@ -505,7 +504,6 @@ namespace ChordingCoding.SFX
             syncPlayBuffer = new List<KeyValuePair<Note, int>>();
             for (int i = tempSyncPlayBuffer.Count - 1; i >= 0; i--)
             {
-                Console.WriteLine("FlushSyncPlayBuffer");
                 KeyValuePair<Note, int> p = tempSyncPlayBuffer[i];
                 Score.PlayANote(outDevice, p.Key, (int)Math.Round(p.Value * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
             }

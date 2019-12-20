@@ -228,10 +228,8 @@ namespace ChordingCoding.SFX
                 Note note_ = args[1] as Note;
                 noteOffBuffer_.Add(note_);
             }
-            Util.Lock.Task task = noteOffBufferAdd;
 
-
-            Util.Lock.AddTask("noteOffBuffer", task, noteOffBuffer, note);
+            Util.TaskQueue.Add("noteOffBuffer", noteOffBufferAdd, noteOffBuffer, note);
             //Console.WriteLine("End of note.");
         }
 
@@ -340,10 +338,8 @@ namespace ChordingCoding.SFX
                 noteOffBuffer_.RemoveAll(x => deadBuffer.Contains(x));
                 //Console.WriteLine("After:  " + noteOffBuffer_.Count);
             }
-            Util.Lock.Task task = noteOffBufferStop;
 
-
-            Util.Lock.AddTask("noteOffBuffer", task, noteOffBuffer, measure, position, outDevice);
+            Util.TaskQueue.Add("noteOffBuffer", noteOffBufferStop, noteOffBuffer, measure, position, outDevice);
             
         }
 
@@ -354,10 +350,8 @@ namespace ChordingCoding.SFX
                 List<Note> noteOffBuffer_ = args[0] as List<Note>;
                 noteOffBuffer_.Clear();
             }
-            Util.Lock.Task task = noteOffBufferClear;
 
-
-            Util.Lock.AddTask("noteOffBuffer", task, noteOffBuffer);
+            Util.TaskQueue.Add("noteOffBuffer", noteOffBufferClear, noteOffBuffer);
         }
 
         /// <summary>

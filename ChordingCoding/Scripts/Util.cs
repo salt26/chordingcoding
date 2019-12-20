@@ -21,13 +21,16 @@ namespace ChordingCoding
             float randStdNormal = (float)(Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2)); // random normal(0,1)
             return randStdNormal;
         }
-
-        #region Lock: 한 번에 하나씩만 수행되어야 하는 작업을 관리하는 클래스
+        
         /// <summary>
         /// 한 번에 하나씩만 수행되어야 하는 작업들을 관리합니다.
         /// </summary>
-        public class Lock
+        public class TaskQueue
         {
+            /// <summary>
+            /// TaskQueue에 넣을 수 있는, 임의의 인자들을 받고 값을 반환하지 않는 작업 delegate입니다.
+            /// </summary>
+            /// <param name="arguments"></param>
             public delegate void Task(params object[] arguments);
 
             /// <summary>
@@ -48,7 +51,7 @@ namespace ChordingCoding
             /// <param name="lockName">동시에 실행되면 안 되는 작업들의 그룹 이름</param>
             /// <param name="task">추가할 작업 delegate</param>
             /// <param name="args">추가할 작업에 필요한 인자들</param>
-            public static void AddTask(string lockName, 
+            public static void Add(string lockName, 
                 Task task, params object[] args)
             {
                 if (!lockedTaskQueues.ContainsKey(lockName))
@@ -88,7 +91,6 @@ namespace ChordingCoding
                 System.Threading.Tasks.Task.Run(() => DoTask(lockName));   // 연쇄적으로 다음 Task 수행
             }
         }
-        #endregion
         
     }
 }

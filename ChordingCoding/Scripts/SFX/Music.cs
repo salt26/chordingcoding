@@ -154,6 +154,7 @@ namespace ChordingCoding.SFX
             if (IsReady)
             {
                 for (int i = 0; i <= 8; i++) StopPlaying(i);
+                Score.ClearNoteOffBuffer();
                 timer.Stop();
                 IsReady = false;
             }
@@ -179,6 +180,7 @@ namespace ChordingCoding.SFX
             if (IsReady)
             {
                 for (int i = 0; i <= 8; i++) StopPlaying(i);
+                Score.ClearNoteOffBuffer();
                 timer.Stop();
                 outDevice.Close();
                 mgmt.Stop();

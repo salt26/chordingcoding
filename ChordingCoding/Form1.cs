@@ -242,10 +242,8 @@ namespace ChordingCoding.UI
                 }
                 particleSystems_.RemoveAll(x => deadParticleSystems.Contains(x));
             }
-            Util.Lock.Task task = particleSystemsUpdateOrRemove;
 
-
-            Util.Lock.AddTask("particleSystems", task, particleSystems);
+            Util.TaskQueue.Add("particleSystems", particleSystemsUpdateOrRemove, particleSystems);
             if (basicParticleSystem != null)
             {
                 basicParticleSystem.Update();
@@ -269,10 +267,8 @@ namespace ChordingCoding.UI
                     particleSystems_[i].Draw(graphics_);
                 }
             }
-            Util.Lock.Task task = particleSystemsDraw;
-
-
-            Util.Lock.AddTask("particleSystems", task, particleSystems, e.Graphics);
+            
+            Util.TaskQueue.Add("particleSystems", particleSystemsDraw, particleSystems, e.Graphics);
             if (basicParticleSystem != null)
                 basicParticleSystem.Draw(e.Graphics);
         }
@@ -298,7 +294,6 @@ namespace ChordingCoding.UI
                     particleSystems_.RemoveAt(0);
                 }
             }
-            Util.Lock.Task task1 = particleSystemsRemoveAtZero;
 
             void particleSystemsAdd(object[] args)
             {
@@ -307,15 +302,13 @@ namespace ChordingCoding.UI
 
                 particleSystems_.Add(particleSystem_);
             }
-            Util.Lock.Task task2 = particleSystemsAdd;
-
 
             // 한 번에 활성화되는 파티클 시스템 수를 10개로 제한
-            Util.Lock.AddTask("particleSystems", task1, particleSystems);
+            Util.TaskQueue.Add("particleSystems", particleSystemsRemoveAtZero, particleSystems);
             ParticleSystem ps = new ParticleSystem(startPosX, startPosY, velocityX, velocityY, lifetime,
                                                        createNumber, createRange, createFunction,
                                                        particleType, particleColor, particleSize, particleLifetime);
-            Util.Lock.AddTask("particleSystems", task2, particleSystems, ps);
+            Util.TaskQueue.Add("particleSystems", particleSystemsAdd, particleSystems, ps);
         }
         
         /// <summary>
@@ -333,7 +326,6 @@ namespace ChordingCoding.UI
                     particleSystems_.RemoveAt(0);
                 }
             }
-            Util.Lock.Task task1 = particleSystemsRemoveAtZero;
 
             void particleSystemsAdd(object[] args)
             {
@@ -342,17 +334,15 @@ namespace ChordingCoding.UI
 
                 particleSystems_.Add(particleSystem_);
             }
-            Util.Lock.Task task2 = particleSystemsAdd;
-
 
             // 한 번에 활성화되는 파티클 시스템 수를 10개로 제한
-            Util.Lock.AddTask("particleSystems", task1, particleSystems);
+            Util.TaskQueue.Add("particleSystems", particleSystemsRemoveAtZero, particleSystems);
             ParticleSystem ps = new ParticleSystem(particleSystem.startPositionX, particleSystem.startPositionY,
                 particleSystem.velocityX, particleSystem.velocityY, particleSystem.lifetime,
                 particleSystem.createNumber, particleSystem.createRange, particleSystem.createFunction,
                 particleSystem.particleType, particleSystem.particleColor, particleSystem.particleSize, particleSystem.particleLifetime);
 
-            Util.Lock.AddTask("particleSystems", task2, particleSystems, ps);
+            Util.TaskQueue.Add("particleSystems", particleSystemsAdd, particleSystems, ps);
         }
 
         /// <summary>

@@ -171,6 +171,7 @@ namespace ChordingCoding.SFX
                 }
             }
             */
+
             foreach (Note note in score)
             {
                 if (note.Measure == measure && note.Position == position && (staff == -1 || note.Staff == staff))

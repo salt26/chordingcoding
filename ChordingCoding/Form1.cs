@@ -21,7 +21,7 @@ namespace ChordingCoding.UI
         /// <summary>
         /// 시각 효과를 표시할지 결정합니다.
         /// </summary>
-        const bool ENABLE_VFX = true;
+        const bool ENABLE_VFX = false;
 
         static bool _isReady = false;
         static Dictionary<string, int> _opacity = new Dictionary<string, int>();

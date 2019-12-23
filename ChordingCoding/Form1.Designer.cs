@@ -41,11 +41,11 @@
             this._없음ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.불투명도ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.trackBarMenuItem1 = new ChordingCoding.UI.TrackBarMenuItem();
             this.음량ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.trackBarMenuItem2 = new ChordingCoding.UI.TrackBarMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.종료ToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.trackBarMenuItem1 = new ChordingCoding.UI.TrackBarMenuItem();
+            this.trackBarMenuItem2 = new ChordingCoding.UI.TrackBarMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -73,12 +73,12 @@
             this.종료ToolStripMenuItem});
             this.contextMenuStrip1.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Table;
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(181, 148);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(167, 126);
             // 
             // 테마ToolStripMenuItem
             // 
             this.테마ToolStripMenuItem.Name = "테마ToolStripMenuItem";
-            this.테마ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.테마ToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.테마ToolStripMenuItem.Text = "테마";
             // 
             // 단위리듬ToolStripMenuItem
@@ -90,7 +90,7 @@
             this._32분음표ToolStripMenuItem,
             this._없음ToolStripMenuItem});
             this.단위리듬ToolStripMenuItem.Name = "단위리듬ToolStripMenuItem";
-            this.단위리듬ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.단위리듬ToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.단위리듬ToolStripMenuItem.Text = "단위 리듬";
             // 
             // _4분음표ToolStripMenuItem
@@ -131,7 +131,7 @@
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(177, 6);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(163, 6);
             // 
             // 불투명도ToolStripMenuItem
             // 
@@ -139,8 +139,30 @@
             this.불투명도ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.trackBarMenuItem1});
             this.불투명도ToolStripMenuItem.Name = "불투명도ToolStripMenuItem";
-            this.불투명도ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.불투명도ToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
             this.불투명도ToolStripMenuItem.Text = "불투명도";
+            // 
+            // 음량ToolStripMenuItem
+            // 
+            this.음량ToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.음량ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.trackBarMenuItem2});
+            this.음량ToolStripMenuItem.Name = "음량ToolStripMenuItem";
+            this.음량ToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.음량ToolStripMenuItem.Text = "음량";
+            // 
+            // toolStripSeparator1
+            // 
+            this.toolStripSeparator1.Name = "toolStripSeparator1";
+            this.toolStripSeparator1.Size = new System.Drawing.Size(163, 6);
+            // 
+            // 종료ToolStripMenuItem
+            // 
+            this.종료ToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.종료ToolStripMenuItem.Name = "종료ToolStripMenuItem";
+            this.종료ToolStripMenuItem.Size = new System.Drawing.Size(166, 22);
+            this.종료ToolStripMenuItem.Text = "종료                 ";
+            this.종료ToolStripMenuItem.Click += new System.EventHandler(this.종료ToolStripMenuItem_Click);
             // 
             // trackBarMenuItem1
             // 
@@ -151,15 +173,6 @@
             this.trackBarMenuItem1.Value = 0;
             this.trackBarMenuItem1.ValueChanged += new System.EventHandler(this.trackBarMenuItem1_ValueChanged);
             // 
-            // 음량ToolStripMenuItem
-            // 
-            this.음량ToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.음량ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.trackBarMenuItem2});
-            this.음량ToolStripMenuItem.Name = "음량ToolStripMenuItem";
-            this.음량ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.음량ToolStripMenuItem.Text = "음량";
-            // 
             // trackBarMenuItem2
             // 
             this.trackBarMenuItem2.BackColor = System.Drawing.Color.White;
@@ -168,19 +181,6 @@
             this.trackBarMenuItem2.Text = "trackBarMenuItem2";
             this.trackBarMenuItem2.Value = 10;
             this.trackBarMenuItem2.ValueChanged += new System.EventHandler(this.trackBarMenuItem2_ValueChanged);
-            // 
-            // toolStripSeparator1
-            // 
-            this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(177, 6);
-            // 
-            // 종료ToolStripMenuItem
-            // 
-            this.종료ToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.종료ToolStripMenuItem.Name = "종료ToolStripMenuItem";
-            this.종료ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.종료ToolStripMenuItem.Text = "종료                 ";
-            this.종료ToolStripMenuItem.Click += new System.EventHandler(this.종료ToolStripMenuItem_Click);
             // 
             // Form1
             // 

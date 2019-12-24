@@ -9,7 +9,9 @@ using System.Runtime.InteropServices;
 using System.ComponentModel;
 using System.Data;
 using System.Threading;
+using System.IO;
 using Sanford.Multimedia.Midi;
+using NAudio.Wave;
 
 namespace ChordingCoding.SFX
 {
@@ -144,6 +146,18 @@ namespace ChordingCoding.SFX
             accompanimentPlayNumber.Add(8, 0);
 
             IsReady = true;
+
+            Task.Run(() =>
+            {
+                var capture = new WasapiLoopbackCapture();
+                RecordSound(capture);
+                capture.StartRecording();
+                while (capture.CaptureState != NAudio.CoreAudioApi.CaptureState.Stopped)
+                {
+                    Thread.Sleep(500);
+                }
+                Console.WriteLine("Recording stopped");
+            });
         }
 
         /// <summary>
@@ -546,6 +560,35 @@ namespace ChordingCoding.SFX
             }
 
             Util.TaskQueue.Add("play", FlushPlay);
+        }
+
+        /// <summary>
+        /// Windows에서 나는 모든 소리를 20초 동안 녹음합니다.
+        /// 녹음 파일은 "Desktop\NAudio" 폴더에 저장됩니다.
+        /// </summary>
+        /// <param name="capture"></param>
+        public static void RecordSound(WasapiLoopbackCapture capture)
+        {
+            var outputFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "NAudio");
+            Directory.CreateDirectory(outputFolder);
+            var outputFilePath = Path.Combine(outputFolder, "recorded.wav");
+            var writer = new WaveFileWriter(outputFilePath, capture.WaveFormat);
+
+            capture.DataAvailable += (s, a) =>
+            {
+                writer.Write(a.Buffer, 0, a.BytesRecorded);
+                if (writer.Position > capture.WaveFormat.AverageBytesPerSecond * 20)
+                {
+                    capture.StopRecording();
+                }
+            };
+
+            capture.RecordingStopped += (s, a) =>
+            {
+                writer.Dispose();
+                writer = null;
+                capture.Dispose();
+            };
         }
     }
 }

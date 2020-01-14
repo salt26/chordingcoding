@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using System.Windows.Forms.Design;
-using Sanford.Multimedia.Midi;
+//using Sanford.Multimedia.Midi;
 using System.Runtime.InteropServices;
 using System.Reflection;
 using System.Configuration;

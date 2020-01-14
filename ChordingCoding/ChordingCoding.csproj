@@ -36,6 +36,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -49,17 +50,66 @@
   <PropertyGroup>
     <ApplicationIcon>Resources\NoteWord.ico</ApplicationIcon>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>ChordingCoding.Program</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\x86\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>true</Prefer32Bit>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="NAudio, Version=1.9.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NAudio.1.9.0\lib\net35\NAudio.dll</HintPath>
-    </Reference>
-    <Reference Include="Sanford.Multimedia.Midi">
-      <HintPath>.\Sanford.Multimedia.Midi.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Management" />
+    <Reference Include="System.ValueTuple, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.ValueTuple.4.5.0\lib\netstandard1.0\System.ValueTuple.dll</HintPath>
+    </Reference>
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -71,33 +121,59 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Scripts\SFX\PowerManagement.cs" />
-    <Compile Include="Scripts\SFX\Accompaniment.cs" />
-    <Compile Include="Scripts\SFX\Chord.cs" />
+    <Compile Include="NFluidsynth\AudioDriver.cs" />
+    <Compile Include="NFluidsynth\ConfigurationKeys.cs" />
+    <Compile Include="NFluidsynth\Enums.cs" />
+    <Compile Include="NFluidsynth\FileRenderer.cs" />
+    <Compile Include="NFluidsynth\FluidSynthInteropException.cs" />
+    <Compile Include="NFluidsynth\FluidsynthObject.cs" />
+    <Compile Include="NFluidsynth\Logger.cs" />
+    <Compile Include="NFluidsynth\MidiDriver.cs" />
+    <Compile Include="NFluidsynth\MidiEvent.cs" />
+    <Compile Include="NFluidsynth\MidiEventHandler.cs" />
+    <Compile Include="NFluidsynth\MidiRouter.cs" />
+    <Compile Include="NFluidsynth\MidiRouterRule.cs" />
+    <Compile Include="NFluidsynth\Native\LibFluidsynth.Audio.cs" />
+    <Compile Include="NFluidsynth\Native\LibFluidsynth.cs" />
+    <Compile Include="NFluidsynth\Native\LibFluidsynth.Midi.cs" />
+    <Compile Include="NFluidsynth\Native\LibFluidsynth.Misc.cs" />
+    <Compile Include="NFluidsynth\Native\LibFluidsynth.Settings.cs" />
+    <Compile Include="NFluidsynth\Native\LibFluidsynth.SfLoader.cs" />
+    <Compile Include="NFluidsynth\Native\LibFluidsynth.Synth.cs" />
+    <Compile Include="NFluidsynth\Player.cs" />
+    <Compile Include="NFluidsynth\Settings.cs" />
+    <Compile Include="NFluidsynth\SoundFont.cs" />
+    <Compile Include="NFluidsynth\SoundFontLoader.cs" />
+    <Compile Include="NFluidsynth\Synth.cs" />
+    <Compile Include="NFluidsynth\Utility.cs" />
+    <Compile Include="NFluidsynth\Voice.cs" />
+    <Compile Include="SFX\PowerManagement.cs" />
+    <Compile Include="SFX\Accompaniment.cs" />
+    <Compile Include="SFX\Chord.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Form1.Designer.cs">
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
-    <Compile Include="Scripts\InterceptKeys.cs" />
-    <Compile Include="Scripts\SFX\Music.cs" />
-    <Compile Include="Scripts\SFX\SFXTheme.cs" />
-    <Compile Include="Scripts\SFX\Timer.cs" />
-    <Compile Include="Scripts\Util.cs" />
-    <Compile Include="Scripts\VFX\Particle.cs" />
-    <Compile Include="Scripts\VFX\ParticleSystem.cs" />
+    <Compile Include="InterceptKeys.cs" />
+    <Compile Include="SFX\Music.cs" />
+    <Compile Include="SFX\SFXTheme.cs" />
+    <Compile Include="SFX\Timer.cs" />
+    <Compile Include="Util.cs" />
+    <Compile Include="VFX\Particle.cs" />
+    <Compile Include="VFX\ParticleSystem.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Scripts\Theme.cs" />
-    <Compile Include="Scripts\Interfaces\TrackBarMenuItem.cs" />
-    <Compile Include="Scripts\SFX\Note.cs" />
-    <Compile Include="Scripts\Program.cs" />
+    <Compile Include="Theme.cs" />
+    <Compile Include="Interfaces\TrackBarMenuItem.cs" />
+    <Compile Include="SFX\Note.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Scripts\SFX\Score.cs" />
+    <Compile Include="SFX\Score.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -160,6 +236,9 @@
       <ProductName>.NET Framework 3.5 SP1</ProductName>
       <Install>false</Install>
     </BootstrapperPackage>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Scripts\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Sanford.Multimedia.Midi;
+//using Sanford.Multimedia.Midi;
 
 namespace ChordingCoding.SFX
 {
@@ -424,8 +424,8 @@ namespace ChordingCoding.SFX
             availableInstruments.Add(new WhitespaceInstrumentInfo(9, (pitch) => (pitch + 7) % 12 + 48, 256, 80));                                    // [15] Medieval channel 4, Glockenspiel
             availableInstruments.Add(new AccompanimentInstrumentInfo(0, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12, 128, 60));                // [16] Pianoforte channel 7, Acoustic grand piano
             availableInstruments.Add(new AccompanimentInstrumentInfo(0, (pitch) => pitch, 128, 100));                                                 // [17] Pianoforte channel 8, Acoustic grand piano
-            availableInstruments.Add(new AccompanimentInstrumentInfo(11, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12, 128, 60));                // [18] Pianoforte channel 7, Vibraphone
-            availableInstruments.Add(new AccompanimentInstrumentInfo(12, (pitch) => pitch, 128, 100));                                                 // [19] Pianoforte channel 8, Marimba
+            availableInstruments.Add(new AccompanimentInstrumentInfo(11, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12, 128, 60));                // [18] ??? channel 7, Vibraphone
+            availableInstruments.Add(new AccompanimentInstrumentInfo(12, (pitch) => pitch, 128, 100));                                                 // [19] ??? channel 8, Marimba
             availableInstruments.Add(new AccompanimentInstrumentInfo(-1, (pitch) => pitch, 0, 48));                                                // [20] channel 7 또는 8에서 1번 악기를 참조하여 재생할 때 사용
             availableInstruments.Add(new AccompanimentInstrumentInfo(-1, (pitch) => pitch, 0, 84));                                                 // [21] channel 7 또는 8에서 1번 악기를 참조하여 재생할 때 사용
 

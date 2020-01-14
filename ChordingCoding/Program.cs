@@ -62,10 +62,10 @@ namespace ChordingCoding
                         hasHandle = true;
                     }
 
-                    /* 
-                     * 아래 코드는 프로그램이 단독으로 실행할 때 수행할 명령들입니다.
-                     * Form1을 실행합니다.
-                     */
+                    
+                    // 아래 코드는 프로그램이 단독으로 실행할 때 수행할 명령들입니다.
+                    // Form1을 실행합니다.
+                    
 
                     // 키보드 입력 이벤트를 감지하여 콜백을 호출하도록 합니다.
                     InterceptKeys._hookID = InterceptKeys.SetHook(InterceptKeys._proc);

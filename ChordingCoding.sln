@@ -1,22 +1,25 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.26430.14
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChordingCoding", "ChordingCoding\ChordingCoding.csproj", "{685E8886-DC26-4DAA-AE4E-AC8A17095D85}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{685E8886-DC26-4DAA-AE4E-AC8A17095D85}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{685E8886-DC26-4DAA-AE4E-AC8A17095D85}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{685E8886-DC26-4DAA-AE4E-AC8A17095D85}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{685E8886-DC26-4DAA-AE4E-AC8A17095D85}.Release|Any CPU.Build.0 = Release|Any CPU
+		{685E8886-DC26-4DAA-AE4E-AC8A17095D85}.Debug|x64.ActiveCfg = Debug|x64
+		{685E8886-DC26-4DAA-AE4E-AC8A17095D85}.Debug|x64.Build.0 = Debug|x64
+		{685E8886-DC26-4DAA-AE4E-AC8A17095D85}.Release|x64.ActiveCfg = Release|x64
+		{685E8886-DC26-4DAA-AE4E-AC8A17095D85}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {0C620E36-EC64-41D9-8E71-D5B8B2D07462}
 	EndGlobalSection
 EndGlobal

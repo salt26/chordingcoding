@@ -139,21 +139,23 @@ namespace ChordingCoding
                 null, new Theme.ParticleInfo(Particle.Type.leaf, (Form1.form1.Size.Height + 150) / 4, (pitch) => Color.White, 1f),
                 "Autumn"));
 
+            /*
             _availableThemes.Add(new Theme(
                 "Rain", "비 오는 날",
-                new ParticleSystem(/*cNum*/ 1, /*cRange*/ 0,
+                new ParticleSystem(1, 0,
                                    ParticleSystem.CreateFunction.TopRandom,
                                    Particle.Type.rain, () => Color.White,
-                                   /*pSize*/ 0.1f, /*pLife*/ (Form1.form1.Size.Height + 150) / 30),
-                new ParticleSystem(/*posX*/ () => 0,
-                                   /*posY*/ () => 0,
-                                   /*velX*/ 0, /*velY*/ 0, /*life*/ 160,
-                                   /*cNum*/ 1, /*cRange*/ 0,
+                                   0.1f, (Form1.form1.Size.Height + 150) / 30),
+                new ParticleSystem(() => 0,
+                                   () => 0,
+                                   0, 0, 160,
+                                   1, 0,
                                    ParticleSystem.CreateFunction.TopRandom,
                                    Particle.Type.rain, () => Color.White,
-                                   /*pSize*/ 0.1f, /*pLife*/ (Form1.form1.Size.Height + 150) / 30),
+                                   0.1f, (Form1.form1.Size.Height + 150) / 30),
                 new Theme.ParticleInfo(Particle.Type.note, (Form1.form1.Size.Height + 150) / 15, (pitch) => Chord.PitchColor(pitch), 0.1f),
                 "Rain"));
+            */
 
             _availableThemes.Add(new Theme(
                 "Star", "별 헤는 밤",
@@ -171,21 +173,23 @@ namespace ChordingCoding
                 new Theme.ParticleInfo(Particle.Type.star, 32, (pitch) => Chord.PitchColor(pitch), 1f),
                 "Star"));
 
+            /*
             _availableThemes.Add(new Theme(
                 "Forest", "숲 속 아침",
-                new ParticleSystem(/*cNum*/ 4, /*cRange*/ 0,
+                new ParticleSystem(4, 0,
                                    ParticleSystem.CreateFunction.TopRandom,
                                    Particle.Type.leaf, () => Color.White,
-                                   /*pSize*/ 0.1f, /*pLife*/ 128),
-                new ParticleSystem(/*posX*/ () => (float)(new Random().NextDouble() * Form1.form1.Size.Width),
-                                   /*posY*/ () => (float)(new Random().NextDouble() * Form1.form1.Size.Height * 5 / 6 - Form1.form1.Size.Height / 12),
-                                   /*velX*/ 0, /*velY*/ 16, /*life*/ 38,
-                                   /*cNum*/ 2, /*cRange*/ 200,
+                                   0.1f, 128),
+                new ParticleSystem(() => (float)(new Random().NextDouble() * Form1.form1.Size.Width),
+                                   () => (float)(new Random().NextDouble() * Form1.form1.Size.Height * 5 / 6 - Form1.form1.Size.Height / 12),
+                                   0, 16, 38,
+                                   2, 200,
                                    ParticleSystem.CreateFunction.Gaussian,
                                    Particle.Type.leaf, () => Music.chord.ChordColor(),
-                                   /*pSize*/ 0.7f, /*pLife*/ 40),
+                                   0.7f, 40),
                 new Theme.ParticleInfo(Particle.Type.rain, (Form1.form1.Size.Height + 150) / 4, (pitch) => Color.White, 0.2f),
                 "Forest"));
+            */
             
             _availableThemes.Add(new Theme(
                 "Pianoforte", "피아노포르테",

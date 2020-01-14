@@ -137,7 +137,7 @@
             // 
             this.불투명도ToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.불투명도ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.trackBarMenuItem1});
+                this.trackBarMenuItem1});
             this.불투명도ToolStripMenuItem.Name = "불투명도ToolStripMenuItem";
             this.불투명도ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.불투명도ToolStripMenuItem.Text = "불투명도";
@@ -155,7 +155,7 @@
             // 
             this.음량ToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
             this.음량ToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.trackBarMenuItem2});
+                this.trackBarMenuItem2});
             this.음량ToolStripMenuItem.Name = "음량ToolStripMenuItem";
             this.음량ToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.음량ToolStripMenuItem.Text = "음량";

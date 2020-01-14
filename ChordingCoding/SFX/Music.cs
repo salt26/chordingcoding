@@ -10,8 +10,13 @@ using System.ComponentModel;
 using System.Data;
 using System.Threading;
 using System.IO;
-using Sanford.Multimedia.Midi;
+//using Sanford.Multimedia.Midi;
 using NAudio.Wave;
+using NAudio.MediaFoundation;
+using NAudio.CoreAudioApi;
+using NAudio.Dmo.Effect;
+using NAudio.Dmo;
+using NFluidsynth;
 
 namespace ChordingCoding.SFX
 {
@@ -79,8 +84,12 @@ namespace ChordingCoding.SFX
                 }
             }
         }
-        public static OutputDevice outDevice;
-        
+        //public static OutputDevice outDevice;
+        public static Settings settings;
+        public static Synth syn;
+        public static AudioDriver adriver;
+
+
         public static bool IsReady { get; private set; } = false;
 
         /// <summary>
@@ -111,7 +120,26 @@ namespace ChordingCoding.SFX
         /// <param name="timerTickDelegates">타이머의 틱마다 추가로 실행할 메서드의 대리자 목록</param>
         public static void Initialize(string SFXThemeName, int noteResolution, Timer.TickDelegate[] timerTickDelegates = null)
         {
-            outDevice = new OutputDevice(0);
+            //outDevice = new OutputDevice(0);
+            settings = new Settings();
+            settings[ConfigurationKeys.SynthAudioChannels].IntValue = 2;
+
+            syn = new Synth(settings);
+            try
+            {
+                syn.LoadSoundFont("FluidR3_GM.sf2", true);
+            }
+            catch (FileNotFoundException e)
+            {
+                Console.WriteLine(e.StackTrace);
+            }
+            for (int i = 0; i < 16; i++)
+            {
+                syn.SoundFontSelect(i, 0);
+            }
+
+            adriver = new AudioDriver(syn.Settings, syn);
+
             SFXTheme.CurrentSFXTheme = SFXTheme.FindSFXTheme(SFXThemeName);
             ThemeChanged();
             NoteResolution = noteResolution;
@@ -147,17 +175,28 @@ namespace ChordingCoding.SFX
 
             IsReady = true;
 
+            /*
             Task.Run(() =>
             {
                 var capture = new WasapiLoopbackCapture();
-                RecordSound(capture);
-                capture.StartRecording();
-                while (capture.CaptureState != NAudio.CoreAudioApi.CaptureState.Stopped)
+                var effectProvider = new DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params>(new WaveInProvider(capture));
+
+                PlayEffectorSound(capture, effectProvider);
+                using (var outputDevice = new WasapiOut())
                 {
-                    Thread.Sleep(500);
+                    outputDevice.Init(effectProvider);
+                    capture.StartRecording();
+                    outputDevice.Play();
+                    while (capture.CaptureState != NAudio.CoreAudioApi.CaptureState.Stopped)
+                    {
+                        Thread.Sleep(500);
+                        if (!IsReady) capture.StopRecording();
+                    }
+                    Console.WriteLine("Effector stopped");
                 }
-                Console.WriteLine("Recording stopped");
+
             });
+            */
         }
 
         /// <summary>
@@ -196,7 +235,10 @@ namespace ChordingCoding.SFX
                 for (int i = 0; i <= 8; i++) StopPlaying(i);
                 Score.ClearNoteOffBuffer();
                 timer.Stop();
-                outDevice.Close();
+                //outDevice.Close();
+                adriver.Dispose();
+                syn.Dispose();
+                settings.Dispose();
                 mgmt.Stop();
                 IsReady = false;
             }
@@ -224,22 +266,26 @@ namespace ChordingCoding.SFX
                             if (p.Value.instrumentCode == -1)
                             {
                                 if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(1))
-                                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, p.Key, SFXTheme.CurrentSFXTheme.Instruments[1].instrumentCode));
+                                    //outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, p.Key, SFXTheme.CurrentSFXTheme.Instruments[1].instrumentCode));
+                                    syn.ProgramChange(p.Key, SFXTheme.CurrentSFXTheme.Instruments[1].instrumentCode);
                                 else
-                                    outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, p.Key, p.Value.instrumentCode));
+                                    //outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, p.Key, p.Value.instrumentCode));
+                                    syn.ProgramChange(p.Key, p.Value.instrumentCode);
                             }
                             else
                             {
-                                outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, p.Key, p.Value.instrumentCode));
+                                //outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, p.Key, p.Value.instrumentCode));
+                                syn.ProgramChange(p.Key, p.Value.instrumentCode);
                             }
                         }
                         else
                         {
-                            outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, p.Key, p.Value.instrumentCode));
+                            //outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, p.Key, p.Value.instrumentCode));
+                            syn.ProgramChange(p.Key, p.Value.instrumentCode);
                         }
                     }
                     catch (ObjectDisposedException) { }
-                    catch (OutputDeviceException) { }
+                    //catch (OutputDeviceException) { }
                 }
                 chord = new Chord(SFXTheme.CurrentSFXTheme.ChordTransition);
                 tickNumber = 0;
@@ -277,7 +323,8 @@ namespace ChordingCoding.SFX
 
                 if (NoteResolution == 0)
                 {
-                    Score.PlayANote(outDevice, note, (int)Math.Round(velocity * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
+                    //Score.PlayANote(outDevice, note, (int)Math.Round(velocity * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
+                    Score.PlayANote(syn, note, (int)Math.Round(velocity * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
 
                     List<int> tempPlayPitchEventBuffer = playPitchEventBuffer;
                     playPitchEventBuffer = new List<int>();
@@ -302,7 +349,8 @@ namespace ChordingCoding.SFX
         public static void StopPlaying(int staff)
         {
             if (!IsReady) return;
-            Score.Stop(outDevice, staff);
+            //Score.Stop(outDevice, staff);
+            Score.Stop(syn, staff);
         }
 
         /// <summary>
@@ -403,18 +451,8 @@ namespace ChordingCoding.SFX
         /// </summary>
         private static void Tick()
         {
-            /*
-            if (tickNumber % 1 == 0)
-            {
-                long newTime = DateTime.Now.ToFileTime();
-                Console.WriteLine(newTime - time + ", " + tickNumber);
-                if (newTime - time > 10000000)
-                {
-                    time = newTime;
-                }
-            }
-            */
-            Score.NoteOff(outDevice);
+            //Score.NoteOff(outDevice);
+            Score.NoteOff(syn);
 
             void TickPlay(object[] args)
             {
@@ -427,14 +465,16 @@ namespace ChordingCoding.SFX
                         StopPlaying(5);
                         SFXTheme.InstrumentInfo inst = SFXTheme.CurrentSFXTheme.Instruments[5];
                         Note note = new Note(inst.sfxPitchModulator(45), inst.sfxRhythm, Measure, Position, 5);
-                        Score.PlayANoteForever(outDevice, note, (int)Math.Round(inst.sfxVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));     // 기본 빗소리 (사라지지 않아야 함)
+                        //Score.PlayANoteForever(outDevice, note, (int)Math.Round(inst.sfxVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));     // 기본 빗소리 (사라지지 않아야 함)
+                        Score.PlayANoteForever(syn, note, (int)Math.Round(inst.sfxVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
                     }
                     if (tickNumber % ((int)TICK_PER_SECOND * 10) == (int)TICK_PER_SECOND * 5)
                     {
                         StopPlaying(6);
                         SFXTheme.InstrumentInfo inst = SFXTheme.CurrentSFXTheme.Instruments[6];
                         Note note = new Note(inst.sfxPitchModulator(45), inst.sfxRhythm, Measure, Position, 6);
-                        Score.PlayANoteForever(outDevice, note, (int)Math.Round(inst.sfxVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));     // 기본 빗소리 (사라지지 않아야 함)
+                        //Score.PlayANoteForever(outDevice, note, (int)Math.Round(inst.sfxVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));     // 기본 빗소리 (사라지지 않아야 함)
+                        Score.PlayANoteForever(syn, note, (int)Math.Round(inst.sfxVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
                     }
                 }
 
@@ -459,8 +499,13 @@ namespace ChordingCoding.SFX
                         int position = accompanimentTickNumber[staff] % 64;
                         if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(staff))
                         {
+                            /*
                             accompaniment.Play(outDevice, measure, position, staff,
                                 (int)Math.Round(SFXTheme.CurrentSFXTheme.Instruments[staff].accompanimentVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
+                            */
+                            accompaniment.Play(syn, measure, position, staff,
+                                (int)Math.Round(SFXTheme.CurrentSFXTheme.Instruments[staff].accompanimentVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
+
                         }
 
                         accompanimentTickNumber[staff]++;
@@ -548,7 +593,8 @@ namespace ChordingCoding.SFX
                 for (int i = tempSyncPlayBuffer.Count - 1; i >= 0; i--)
                 {
                     KeyValuePair<Note, int> p = tempSyncPlayBuffer[i];
-                    Score.PlayANote(outDevice, p.Key, (int)Math.Round(p.Value * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
+                    //Score.PlayANote(outDevice, p.Key, (int)Math.Round(p.Value * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
+                    Score.PlayANote(syn, p.Key, (int)Math.Round(p.Value * (SFXTheme.CurrentSFXTheme.Volume / 100D)));
                 }
 
                 List<int> tempPlayPitchEventBuffer = playPitchEventBuffer;
@@ -567,15 +613,20 @@ namespace ChordingCoding.SFX
         /// 녹음 파일은 "Desktop\NAudio" 폴더에 저장됩니다.
         /// </summary>
         /// <param name="capture"></param>
-        public static void RecordSound(WasapiLoopbackCapture capture)
+        public static void RecordSound(WasapiLoopbackCapture capture, DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params> reverb = null)
         {
             var outputFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Desktop), "NAudio");
             Directory.CreateDirectory(outputFolder);
             var outputFilePath = Path.Combine(outputFolder, "recorded.wav");
             var writer = new WaveFileWriter(outputFilePath, capture.WaveFormat);
+            var mp3FilePath = Path.Combine(outputFolder, $"recorded_{ DateTime.Now:yyMMdd-HH-mm-ss-fffff}.mp3");
 
             capture.DataAvailable += (s, a) =>
             {
+                if (reverb != null)
+                {
+                    reverb.Read(a.Buffer, 0, a.BytesRecorded);
+                }
                 writer.Write(a.Buffer, 0, a.BytesRecorded);
                 if (writer.Position > capture.WaveFormat.AverageBytesPerSecond * 20)
                 {
@@ -585,10 +636,61 @@ namespace ChordingCoding.SFX
 
             capture.RecordingStopped += (s, a) =>
             {
+                MediaFoundationApi.Startup();
                 writer.Dispose();
                 writer = null;
+                using (var reader = new WaveFileReader(outputFilePath))
+                {
+                    try
+                    {
+                        MediaFoundationEncoder.EncodeToMp3(reader, mp3FilePath);
+                    }
+                    catch (InvalidOperationException ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+                }
                 capture.Dispose();
+                if (reverb != null)
+                {
+                    reverb.Dispose();
+                }
             };
+        }
+
+        /// <summary>
+        /// Windows에서 나는 모든 소리를 받아 reverb 효과를 주고 재생합니다.
+        /// </summary>
+        /// <param name="capture"></param>
+        public static void PlayEffectorSound(WasapiLoopbackCapture capture, DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params> reverb)
+        {
+            if (reverb is null) return;
+            capture.DataAvailable += (s, a) =>
+            {
+                reverb.Read(a.Buffer, 0, a.BytesRecorded);
+            };
+
+            capture.RecordingStopped += (s, a) =>
+            {
+                capture.Dispose();
+                reverb.Dispose();
+            };
+        }
+
+        public static void SynthesizeSound()
+        {
+            using (Settings settings = new Settings())
+            {
+                settings[ConfigurationKeys.SynthAudioChannels].IntValue = 2;
+                using (Synth syn = new Synth(settings))
+                {
+                    syn.LoadSoundFont("FluidR3_GM.sf2", true);
+                    for (int i = 0; i < 16; i++)
+                    {
+                        syn.SoundFontSelect(i, 0);
+                    }
+                }
+            }
         }
     }
 }

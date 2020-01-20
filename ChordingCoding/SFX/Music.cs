@@ -89,6 +89,14 @@ namespace ChordingCoding.SFX
         public static Synth syn;
         public static AudioDriver adriver;
 
+        public static BufferedWaveProvider sound;
+        public static RawSourceWaveStream soundStream;
+        //public static WaveOutEvent playback;
+        public static DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params> reverb;
+        public static WasapiOut outputDevice;
+        public static byte[] buffer;
+        public static MemoryStream stream;
+
 
         public static bool IsReady { get; private set; } = false;
 
@@ -139,7 +147,35 @@ namespace ChordingCoding.SFX
             }
 
             adriver = new AudioDriver(syn.Settings, syn);
+            /*
+            WaveInEvent recorder = new WaveInEvent
+            {
+                WaveFormat = new WaveFormat(44100, 2)
+            };
+            BufferedWaveProvider sound = new BufferedWaveProvider(recorder.WaveFormat);
+            recorder.DataAvailable += (object sender, WaveInEventArgs e) =>
+            {
+                sound.AddSamples(e.Buffer, 0, e.BytesRecorded);
+            };
+            recorder.StartRecording();
+            //sound.Read();
+            */
+            //playback = new WaveOutEvent();
+            //playback.Init(sound);
+            //playback.Play();
+            /*
+            sound = new BufferedWaveProvider(new WaveFormat(44100, 2));
+            buffer = new byte[44100 * 4];
+            stream = new MemoryStream();
+            Task.Run(() => {
+                soundStream = new RawSourceWaveStream(stream, new WaveFormat(44100, 2));
+                reverb = new DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params>(soundStream);
+                outputDevice = new WasapiOut();
 
+                outputDevice.Init(reverb);
+                outputDevice.Play();
+            });
+            */
             SFXTheme.CurrentSFXTheme = SFXTheme.FindSFXTheme(SFXThemeName);
             ThemeChanged();
             NoteResolution = noteResolution;
@@ -174,7 +210,6 @@ namespace ChordingCoding.SFX
             accompanimentPlayNumber.Add(8, 0);
 
             IsReady = true;
-
             /*
             Task.Run(() =>
             {
@@ -237,6 +272,10 @@ namespace ChordingCoding.SFX
                 timer.Stop();
                 //outDevice.Close();
                 adriver.Dispose();
+                //playback.Stop();
+                //outputDevice.Stop();
+                //outputDevice.Dispose();
+                //reverb.Dispose();
                 syn.Dispose();
                 settings.Dispose();
                 mgmt.Stop();
@@ -534,6 +573,7 @@ namespace ChordingCoding.SFX
             {
                 FlushSyncPlayBuffer();
             }
+            //SoundPipeline(buffer);
 
             void IncreaseTick(object[] args)
             {
@@ -691,6 +731,31 @@ namespace ChordingCoding.SFX
                     }
                 }
             }
+        }
+
+        public static void SoundPipeline(byte[] tempLeftBuffer)
+        {
+            #region TODO 곧 없어질, 음악을 1초 단위로 합성하는 로직
+            float second_per_tick = 1f / TICK_PER_SECOND;
+            int frameNum = (int)(second_per_tick * 44100 * 2);
+            GCHandle pinnedLeftArray = GCHandle.Alloc(tempLeftBuffer, GCHandleType.Pinned);
+            IntPtr leftPointer = pinnedLeftArray.AddrOfPinnedObject();
+            syn.WriteSample16(frameNum, leftPointer, 0, frameNum * 2, 2, leftPointer, 1, frameNum * 2, 2);
+            /*
+            for (int i = 0; i < frame * 4; i++)
+            {
+                Console.Write(tempLeftBuffer[i] + " ");
+            }
+            */
+            stream.Write(tempLeftBuffer, 0, frameNum);
+            //soundStream.Read(tempLeftBuffer, 0, frameNum);
+            //sound.AddSamples(tempLeftBuffer, 0, frameNum);
+
+            reverb.Read(tempLeftBuffer, 0, frameNum);
+            Console.WriteLine();
+
+            pinnedLeftArray.Free();
+            #endregion
         }
     }
 }

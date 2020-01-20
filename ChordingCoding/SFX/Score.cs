@@ -248,6 +248,7 @@ namespace ChordingCoding.SFX
                     syn.NoteOn(p.Value >> 16, p.Value & 65535, velocity);
                 }
                 catch (ObjectDisposedException) { }
+                catch (FluidSynthInteropException) { }
             }
 
             void noteOffBufferAdd(object[] args)
@@ -320,6 +321,7 @@ namespace ChordingCoding.SFX
                     syn.NoteOn(p.Value >> 16, p.Value & 65535, velocity);
                 }
                 catch (ObjectDisposedException) { }
+                catch (FluidSynthInteropException) { }
             }
             //Console.WriteLine("End of note.");
         }

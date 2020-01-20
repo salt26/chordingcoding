@@ -413,9 +413,9 @@ namespace ChordingCoding.SFX
             availableInstruments.Add(new CharacterInstrumentInfo(12, (pitch) => pitch, 64, 127, (pitch) => pitch, 64, 127));                        // [4] Rain channel 1, Marimba
             availableInstruments.Add(new WhitespaceInstrumentInfo(126, (pitch) => (pitch + 5) % 7 + 46, 256, 24));                                   // [5] Rain channel 3, Applause
             availableInstruments.Add(new SFXInstrumentInfo(126, (pitch) => 45, 4, 24));                                                             // [6] Rain channel 5/6, Applause
-            availableInstruments.Add(new CharacterInstrumentInfo(49, (pitch) => pitch - 12, 64, 60, (pitch) => (pitch + 6) % 12 + 54, 64, 60));     // [7] Star channel 0, String ensemble 2
+            availableInstruments.Add(new CharacterInstrumentInfo(49, (pitch) => pitch - 12, 64, 60, (pitch) => (pitch + 6) % 12 + 54, 64, 48));     // [7] Star channel 0, String ensemble 2
             availableInstruments.Add(new CharacterInstrumentInfo(11, (pitch) => pitch, 64, 127, (pitch) => pitch, 64, 127));                        // [8] Star channel 1, Vibraphone
-            availableInstruments.Add(new CharacterInstrumentInfo(0, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12 , 128, 80, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12, 128, 80));       // [9] Pianoforte channel 0, Acoustic grand piano
+            availableInstruments.Add(new CharacterInstrumentInfo(0, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12, 128, 80, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12, 128, 60));       // [9] Pianoforte channel 0, Acoustic grand piano
             availableInstruments.Add(new CharacterInstrumentInfo(0, (pitch) => pitch, 128, 127, (pitch) => pitch, 128, 127));                         // [10] Pianoforte channel 1, Acoustic grand piano
             availableInstruments.Add(new CharacterInstrumentInfo(46, (pitch) => pitch, 64, 127, (pitch) => pitch, 64, 127));                        // [11] Sky channel 1, Orchestral harp
             availableInstruments.Add(new CharacterInstrumentInfo(68, (pitch) => pitch, 64, 96, (pitch) => pitch, 64, 96));                          // [12] ??? channel 1, Oboe

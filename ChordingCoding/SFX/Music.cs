@@ -177,9 +177,9 @@ namespace ChordingCoding.SFX
             });
             */
             SFXTheme.CurrentSFXTheme = SFXTheme.FindSFXTheme(SFXThemeName);
-            ThemeChanged();
             NoteResolution = noteResolution;
             Accompaniment.Initialize();
+            ThemeChanged();
 
             tickDelegate += Tick;
             if (timerTickDelegates != null)
@@ -293,6 +293,7 @@ namespace ChordingCoding.SFX
 
             void ChangeTheme(object[] args)
             {
+                Score.InitializePlaylist();
                 for (int i = 0; i <= 8; i++) StopPlaying(i);
                 Score.ClearNoteOffBuffer();
 
@@ -329,12 +330,18 @@ namespace ChordingCoding.SFX
                 chord = new Chord(SFXTheme.CurrentSFXTheme.ChordTransition);
                 tickNumber = 0;
 
-                Dictionary<int, int> tempTickNumber = new Dictionary<int, int>();
-                foreach (int i in accompanimentTickNumber.Keys)
+                if (SFXTheme.IsReady)
                 {
-                    tempTickNumber[i] = 0;
+                    for (int staff = 7; staff <= 8; staff++)
+                    {
+                        if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(staff))
+                        {
+                            Accompaniment.SetNewCurrentPattern(staff);
+                            accompanimentPlayNumber[staff] = 0;
+                            accompanimentTickNumber[staff] = 0;
+                        }
+                    }
                 }
-                accompanimentTickNumber = tempTickNumber;
             }
 
             Util.TaskQueue.Add("play", ChangeTheme);

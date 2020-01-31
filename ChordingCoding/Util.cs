@@ -20,6 +20,21 @@ namespace ChordingCoding
             float randStdNormal = (float)(Math.Sqrt(-2.0 * Math.Log(u1)) * Math.Sin(2.0 * Math.PI * u2)); // random normal(0,1)
             return randStdNormal;
         }
+
+        /// <summary>
+        /// value를 반올림한 값을 min(포함)과 max(포함) 사이의 값으로 변환하여 반환합니다.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
+        /// <returns></returns>
+        public static int RoundAndClamp(float value, int min, int max)
+        {
+            int r = (int)Math.Round(value);
+            if (r < min) return min;
+            else if (r > max) return max;
+            else return r;
+        }
         
         /// <summary>
         /// 한 번에 하나씩만 수행되어야 하는 작업들을 관리합니다.

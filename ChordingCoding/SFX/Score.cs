@@ -93,7 +93,7 @@ namespace ChordingCoding.SFX
         /// <param name="staff">음표가 놓일 Staff 번호(0 ~ 15). 9번 Staff는 타악기 전용 Staff입니다.</param>
         public void AddNote(Note.PitchGenerator pitch, int velocity, int rhythm, long measure, int position, int staff = 0)
         {
-            Note note = new Note(pitch, SFXTheme.CurrentSFXTheme.Instruments[staff].accompanimentVolume, rhythm, measure, position, staff);
+            Note note = new Note(pitch, velocity, rhythm, measure, position, staff);
             score.Add(note);
 
             if (length < rhythm + measure * 64 + position)
@@ -255,6 +255,56 @@ namespace ChordingCoding.SFX
 
             isPlaying = false;
             //Console.WriteLine("End of score.");
+        }
+
+        /// <summary>
+        /// 음표들을 연주하기 위해 Midi message pair 리스트로 변환합니다.
+        /// (이 Pair들은 재생하거나 저장할 때 Message로 번역됩니다.)
+        /// </summary>
+        /// <returns></returns>
+        List<KeyValuePair<float, int>> ToMidi()
+        {
+            List<KeyValuePair<float, int>> list = new List<KeyValuePair<float, int>>();
+
+            // 모든 음표의 Midi message pair들을 모아서 list에 추가합니다.
+            foreach (Note n in score)
+            {
+                list.Add(n.ToMidi()[0]);
+                list.Add(n.ToMidi()[1]);
+            }
+
+            // Midi message pair들을 타이밍이 빠른 것부터 순서대로 정렬합니다.
+            list.Sort(delegate (KeyValuePair<float, int> p1, KeyValuePair<float, int> p2)
+            {
+                return p1.Key < p2.Key ? -1 : p1.Key > p2.Key ? 1 : p1.Value < p2.Value ? -1 : p1.Value > p2.Value ? 1 : 0;
+            });
+
+            return list;
+        }
+
+        /// <summary>
+        /// 악보에 들어있는 음표들의 정보를 출력합니다.
+        /// </summary>
+        void Print()
+        {
+            Console.WriteLine("Print score - length: " + Length);
+            foreach (Note n in score)
+            {
+                Console.WriteLine("position: " + (n.Measure * 64 + n.Position) + " / rhythm: " + n.Rhythm + " / pitch: " + n.Pitch + " / velocity: " + n.Velocity);
+            }
+        }
+
+        /// <summary>
+        /// Play()로 재생하기 시작한 악보들의 재생을 모두 멈춥니다.
+        /// </summary>
+        public static void InitializePlaylist()
+        {
+            void playingScoresReset(object[] args)
+            {
+                playingScores = new List<ScoreWithPosition>();
+            }
+
+            Util.TaskQueue.Add("playingScores", playingScoresReset);
         }
 
         /// <summary>
@@ -623,40 +673,6 @@ namespace ChordingCoding.SFX
             }
 
             Util.TaskQueue.Add("noteOffBuffer", noteOffBufferClear, noteOffBuffer);
-        }
-
-        /// <summary>
-        /// 음표들을 연주하기 위해 Midi message pair 리스트로 변환합니다.
-        /// (이 Pair들은 재생하거나 저장할 때 Message로 번역됩니다.)
-        /// </summary>
-        /// <returns></returns>
-        List<KeyValuePair<float, int>> ToMidi()
-        {
-            List<KeyValuePair<float, int>> list = new List<KeyValuePair<float, int>>();
-
-            // 모든 음표의 Midi message pair들을 모아서 list에 추가합니다.
-            foreach (Note n in score)
-            {
-                list.Add(n.ToMidi()[0]);
-                list.Add(n.ToMidi()[1]);
-            }
-
-            // Midi message pair들을 타이밍이 빠른 것부터 순서대로 정렬합니다.
-            list.Sort(delegate (KeyValuePair<float, int> p1, KeyValuePair<float, int> p2)
-            {
-                return p1.Key < p2.Key ? -1 : p1.Key > p2.Key ? 1 : p1.Value < p2.Value ? -1 : p1.Value > p2.Value ? 1 : 0;
-            });
-
-            return list;
-        }
-
-        void Print()
-        {
-            Console.WriteLine("Print score - length: " + Length);
-            foreach (Note n in score)
-            {
-                Console.WriteLine("position: " + (n.Measure * 64 + n.Position) + " / rhythm: " + n.Rhythm + " / pitch: " + n.Pitch);
-            }
         }
     }
 

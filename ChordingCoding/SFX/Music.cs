@@ -27,7 +27,7 @@ namespace ChordingCoding.SFX
     {
         public delegate void PlayEventDelegate(int pitch);
 
-        private static float TICK_PER_SECOND = 29f;   // 1초에 호출되는 tick 수
+        private static float TICK_PER_SECOND = 25f;   // 1초에 호출되는 tick 수
         private static long tickNumber = 0;           // 테마 변경 후 지금까지 지난 tick 수
 
         /// <summary>
@@ -89,6 +89,7 @@ namespace ChordingCoding.SFX
         public static Synth syn;
         public static AudioDriver adriver;
 
+        /*
         public static BufferedWaveProvider sound;
         public static RawSourceWaveStream soundStream;
         //public static WaveOutEvent playback;
@@ -96,7 +97,7 @@ namespace ChordingCoding.SFX
         public static WasapiOut outputDevice;
         public static byte[] buffer;
         public static MemoryStream stream;
-
+        */
 
         public static bool IsReady { get; private set; } = false;
 
@@ -177,6 +178,7 @@ namespace ChordingCoding.SFX
             });
             */
             SFXTheme.CurrentSFXTheme = SFXTheme.FindSFXTheme(SFXThemeName);
+            Console.WriteLine(SFXThemeName + " " + SFXTheme.CurrentSFXTheme.Name);
             NoteResolution = noteResolution;
             Accompaniment.Initialize();
             ThemeChanged();
@@ -481,11 +483,20 @@ namespace ChordingCoding.SFX
         /// <summary>
         /// 초당 Tick() 호출 횟수를 설정하여 음악의 빠르기를 바꿉니다.
         /// </summary>
-        /// <param name="tickPerSecond">초당 tick 수 (16 이상 42 이하, 높을수록 빠름)</param>
+        /// <param name="tickPerSecond">초당 tick 수 (16 이상 35 이하, 높을수록 빠름)</param>
         public static void SetTickPerSecond(int tickPerSecond)
         {
+            // TPS = 16: 분당 4분음표 60개
+            // TPS = 20: 분당 4분음표 75개, Adagio
+            // TPS = 22: 분당 4분음표 83개, Andante
+            // TPS = 25: 분당 4분음표 94개, Andantino
+            // TPS = 29: 분당 4분음표 110개, Moderato
+            // TPS = 32: 분당 4분음표 121개
+            // TPS = 35: 분당 4분음표 134개, Allegro
+            // TPS = 42: 분당 4분음표 163개, Vivace
+
             if (tickPerSecond < 16) tickPerSecond = 16;
-            if (tickPerSecond > 42) tickPerSecond = 42;
+            if (tickPerSecond > 35) tickPerSecond = 35;
             TICK_PER_SECOND = tickPerSecond;
             //Console.WriteLine(TICK_PER_SECOND);
             timerNumber = 0;
@@ -560,7 +571,7 @@ namespace ChordingCoding.SFX
                     }
                 }
 
-                Score.PlayPerTick(syn, SFXTheme.CurrentSFXTheme.Volume / 100f);
+                Score.PlayPerTick(syn, (SFXTheme.CurrentSFXTheme.Volume / 100f));
             }
             Util.TaskQueue.Add("play", TickPlay);
 
@@ -655,6 +666,7 @@ namespace ChordingCoding.SFX
             Util.TaskQueue.Add("play", FlushPlay);
         }
 
+        /*
         /// <summary>
         /// Windows에서 나는 모든 소리를 20초 동안 녹음합니다.
         /// 녹음 파일은 "Desktop\NAudio" 폴더에 저장됩니다.
@@ -704,7 +716,9 @@ namespace ChordingCoding.SFX
                 }
             };
         }
+        */
 
+        /*
         /// <summary>
         /// Windows에서 나는 모든 소리를 받아 reverb 효과를 주고 재생합니다.
         /// </summary>
@@ -723,7 +737,9 @@ namespace ChordingCoding.SFX
                 reverb.Dispose();
             };
         }
+        */
 
+        /*
         public static void SynthesizeSound()
         {
             using (Settings settings = new Settings())
@@ -739,7 +755,9 @@ namespace ChordingCoding.SFX
                 }
             }
         }
+        */
 
+        /*
         public static void SoundPipeline(byte[] tempLeftBuffer)
         {
             #region TODO 곧 없어질, 음악을 1초 단위로 합성하는 로직
@@ -748,12 +766,6 @@ namespace ChordingCoding.SFX
             GCHandle pinnedLeftArray = GCHandle.Alloc(tempLeftBuffer, GCHandleType.Pinned);
             IntPtr leftPointer = pinnedLeftArray.AddrOfPinnedObject();
             syn.WriteSample16(frameNum, leftPointer, 0, frameNum * 2, 2, leftPointer, 1, frameNum * 2, 2);
-            /*
-            for (int i = 0; i < frame * 4; i++)
-            {
-                Console.Write(tempLeftBuffer[i] + " ");
-            }
-            */
             stream.Write(tempLeftBuffer, 0, frameNum);
             //soundStream.Read(tempLeftBuffer, 0, frameNum);
             //sound.AddSamples(tempLeftBuffer, 0, frameNum);
@@ -764,5 +776,6 @@ namespace ChordingCoding.SFX
             pinnedLeftArray.Free();
             #endregion
         }
+        */
     }
 }

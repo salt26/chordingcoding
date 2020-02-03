@@ -223,21 +223,39 @@ namespace ChordingCoding
                 new Theme.ParticleInfo(Particle.Type.star, 32, (pitch) => Chord.PitchColor(pitch), 1f),
                 "Sky"));
             
+            /*
             _availableThemes.Add(new Theme(
                 "Medieval", "중세 탐방",
-                new ParticleSystem(/*cNum*/ 1, /*cRange*/ 0,
+                new ParticleSystem(1, 0,
                                    ParticleSystem.CreateFunction.TopRandom,
                                    Particle.Type.rain, () => Color.White,
-                                   /*pSize*/ 0.1f, /*pLife*/ (Form1.form1.Size.Height + 150) / 30),
-                new ParticleSystem(/*posX*/ () => 0,
-                                   /*posY*/ () => 0,
-                                   /*velX*/ 0, /*velY*/ 0, /*life*/ 160,
-                                   /*cNum*/ 1, /*cRange*/ 0,
+                                   0.1f, (Form1.form1.Size.Height + 150) / 30),
+                new ParticleSystem(() => 0,
+                                   () => 0,
+                                   0, 0, 160,
+                                   1, 0,
                                    ParticleSystem.CreateFunction.TopRandom,
                                    Particle.Type.rain, () => Color.White,
-                                   /*pSize*/ 0.1f, /*pLife*/ (Form1.form1.Size.Height + 150) / 30),
+                                   0.1f, (Form1.form1.Size.Height + 150) / 30),
                 new Theme.ParticleInfo(Particle.Type.note, (Form1.form1.Size.Height + 150) / 15, (pitch) => Chord.PitchColor(pitch), 0.1f),
                 "Medieval"));
+            */
+
+            _availableThemes.Add(new Theme(
+                "Ruins", "고대 유적",
+                new ParticleSystem(1, 0,
+                                   ParticleSystem.CreateFunction.TopRandom,
+                                   Particle.Type.rain, () => Color.White,
+                                   0.1f, (Form1.form1.Size.Height + 150) / 30),
+                new ParticleSystem(() => 0,
+                                   () => 0,
+                                   0, 0, 160,
+                                   1, 0,
+                                   ParticleSystem.CreateFunction.TopRandom,
+                                   Particle.Type.rain, () => Color.White,
+                                   0.1f, (Form1.form1.Size.Height + 150) / 30),
+                new Theme.ParticleInfo(Particle.Type.note, (Form1.form1.Size.Height + 150) / 15, (pitch) => Chord.PitchColor(pitch), 0.1f),
+                "Ruins"));
 
             IsReady = true;
         }

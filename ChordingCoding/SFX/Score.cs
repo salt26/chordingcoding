@@ -128,7 +128,8 @@ namespace ChordingCoding.SFX
         /// <param name="staff">음표가 놓일 Staff 번호(0 ~ 15). 9번 Staff는 타악기 전용 Staff입니다.</param>
         public void AddNoteInAccompaniment(Note.PitchGenerator pitch, int rhythm, long measure, int position, int staff)
         {
-            Note note = new Note(pitch, SFXTheme.CurrentSFXTheme.Instruments[staff].accompanimentVolume, rhythm, measure, position, staff);
+            // Note note = new Note(pitch, SFXTheme.CurrentSFXTheme.Instruments[staff].accompanimentVolume, rhythm, measure, position, staff);
+            Note note = new Note(pitch, 127, rhythm, measure, position, staff);
             score.Add(note);
 
             if (length < rhythm + measure * 64 + position)
@@ -334,8 +335,38 @@ namespace ChordingCoding.SFX
         }
 
         /// <summary>
+        /// 악보를 재생합니다.
+        /// 이미 재생 중인 악보는 중복하여 재생할 수 없습니다.
+        /// 한 번 호출하면 자동으로 악보의 끝까지 재생합니다.
+        /// </summary>
+        /// <param name="score">재생할 악보</param>
+        /// <param name="velocityChange">연주 세기를 변화시키기 위해 악보 전체의 음 세기에 곱해질 값</param>
+        /// <param name="startMeasure">재생을 시작할 마디 번호 (기본값은 0)</param>
+        /// <param name="startPosition">재생을 시작할 마디 내 위치(0 ~ 63, 기본값은 0). 4/4박에서 한 마디를 64등분한 길이를 기준으로 합니다.</param>
+        public static void Play(Score score, float velocityChange, long startMeasure = 0, int startPosition = 0)
+        {
+            if (startMeasure < 0) startMeasure = 0;
+            if (startPosition < 0 || startPosition > 63) startPosition = 0;
+            long start = startMeasure * 64 + startPosition;
+
+            void playingScoresAddWithVelocity(object[] args)
+            {
+                List<ScoreWithPosition> playingScores_ = args[0] as List<ScoreWithPosition>;
+                Score score_ = args[1] as Score;
+                float velocityChange_ = (float)args[2];
+                long start_ = (long)args[3];
+                Console.WriteLine("playingScoresAdd");
+                playingScores_.Add(new ScoreWithPosition(score_, start_, velocityChange_));
+            }
+
+            Util.TaskQueue.Add("playingScores", playingScoresAddWithVelocity, playingScores, score, velocityChange, start);
+        }
+
+        /// <summary>
         /// 매 tick마다 호출되어 playingScores에 들어있는 악보들을 재생해주는 helper 메서드입니다.
         /// </summary>
+        /// <param name="syn">신디사이저</param>
+        /// <param name="velocityChange">연주 세기를 변화시키기 위해 음 세기에 곱해질 값</param>
         public static void PlayPerTick(Synth syn, float velocityChange = 1f)
         {
             void playingScoresPlay(object[] args)
@@ -350,7 +381,7 @@ namespace ChordingCoding.SFX
                     int position = (int)(p.position % 64);
                     Console.WriteLine("Current position: " + p.position);
                     p.score.Print();
-                    p.score.PlayEnumerable(syn, measure, position, -1, velocityChange_);
+                    p.score.PlayEnumerable(syn, measure, position, -1, velocityChange_ * p.velocityChange);
 
                     if (p.position + 1 <= p.score.length)
                     {
@@ -678,13 +709,46 @@ namespace ChordingCoding.SFX
 
     class ScoreWithPosition
     {
-        public Score score;
-        public long position;
-
-        public ScoreWithPosition(Score score, long startPosition)
+        private Score _score;
+        public Score score
         {
-            this.score = score;
+            get
+            {
+                return _score;
+            }
+        }
+        private long _position;
+        public long position
+        {
+            get
+            {
+                return _position;
+            }
+            set
+            {
+                if (value < 0) _position = 0;
+                else _position = value;
+            }
+        }
+        private float _velocityChange;
+        public float velocityChange
+        {
+            get
+            {
+                return _velocityChange;
+            }
+            set
+            {
+                if (value < 0) _velocityChange = 1f;
+                else _velocityChange = value;
+            }
+        }
+
+        public ScoreWithPosition(Score score, long startPosition, float velocityChange = 1f)
+        {
+            this._score = score;
             this.position = startPosition;
+            this.velocityChange = velocityChange;
         }
     }
 }

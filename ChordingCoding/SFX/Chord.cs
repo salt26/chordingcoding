@@ -1006,11 +1006,11 @@ namespace ChordingCoding.SFX
         /// <param name="order">몇 번째 음인지 (0: 근음, 3화음은 2 이하, 7화음은 3 이하)</param>
         /// <param name="octaveAddedToMin">최소 옥타브에 더해질 옥타브 수</param>
         /// <returns></returns>
-        public int GetNote(int order, int octaveAddedToMin)
+        public int GetNoteInAccompaniment(int order, int octaveAddedToMin)
         {
             int[] r;
             if (octaveAddedToMin < 0) octaveAddedToMin = 0;
-            int newOctave = SFXTheme.CurrentSFXTheme.MinOctave + octaveAddedToMin;
+            int newOctave = SFXTheme.CurrentSFXTheme.MinOctaveInAccompaniment + octaveAddedToMin;
             if (type != Type.M7 && type != Type.m7)
             {
                 if (order < 0)
@@ -1036,7 +1036,7 @@ namespace ChordingCoding.SFX
                                   newOctave * 12 + (int)root + TypeToNote(3) };
             }
             int result = r[order];
-            while (result >= SFXTheme.CurrentSFXTheme.MaxOctave * 12 + 12) result -= 12;
+            while (result >= SFXTheme.CurrentSFXTheme.MaxOctaveInAccompaniment * 12 + 12) result -= 12;
             return result;
         }
 

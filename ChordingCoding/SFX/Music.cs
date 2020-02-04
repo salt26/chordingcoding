@@ -587,6 +587,7 @@ namespace ChordingCoding.SFX
                     }
                 }
 
+                // 자동 반주 악보에 대해서만, 자동 반주가 꺼지면 음량이 0이 되도록
                 float volumeChanger(string scoreClassName)
                 {
                     switch (scoreClassName)
@@ -601,7 +602,7 @@ namespace ChordingCoding.SFX
                 }
 
                 // Play()로 재생 목록에 넣은 악보들을 재생
-                Score.PlayPerTick(syn, volumeChanger);   // TODO 자동 반주 악보에 대해서만, 자동 반주가 꺼지면 음량이 0이 되도록
+                Score.PlayPerTick(syn, volumeChanger);
             }
             Util.TaskQueue.Add("play", TickPlay);
 

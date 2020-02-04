@@ -28,7 +28,7 @@ namespace ChordingCoding.SFX
         /// PlayEnumerable()에 의해 재생되어야 하는 악보들의 목록.
         /// Key는 악보, Value는 악보의 다음 재생 위치(64 * measure + position)
         /// </summary>
-        private static List<ScoreWithPosition> playingScores = new List<ScoreWithPosition>();
+        private static Dictionary<string, List<ScoreWithPosition>> playingScores = new Dictionary<string, List<ScoreWithPosition>>();
 
         /// <summary>
         /// 악보의 길이
@@ -61,6 +61,14 @@ namespace ChordingCoding.SFX
                 return isPlaying;
             }
         }
+
+        /// <summary>
+        /// PlayPerTick()에서 각 악보 그룹별로 음량을 다르게 조절할 때 쓰이는 대리자입니다.
+        /// 반환값을 따로 지정하지 않을 그룹 이름에 대해서는 1f를 반환해야 합니다.
+        /// </summary>
+        /// <param name="scoreClassName">악보 그룹 이름</param>
+        /// <returns>연주 세기를 변화시키기 위해 해당 악보 그룹에 속한 악보들의 음 세기에 곱해질 값</returns>
+        public delegate float VolumeChanger(string scoreClassName);
 
         /// <summary>
         /// 음표를 생성하여 악보에 추가합니다.
@@ -302,7 +310,7 @@ namespace ChordingCoding.SFX
         {
             void playingScoresReset(object[] args)
             {
-                playingScores = new List<ScoreWithPosition>();
+                playingScores = new Dictionary<string, List<ScoreWithPosition>>();
             }
 
             Util.TaskQueue.Add("playingScores", playingScoresReset);
@@ -314,9 +322,10 @@ namespace ChordingCoding.SFX
         /// 한 번 호출하면 자동으로 악보의 끝까지 재생합니다.
         /// </summary>
         /// <param name="score">재생할 악보</param>
+        /// <param name="scoreClassName">재생할 악보가 속한 그룹 이름 (재생 중 일괄 음량 조절 시 필요)</param>
         /// <param name="startMeasure">재생을 시작할 마디 번호 (기본값은 0)</param>
         /// <param name="startPosition">재생을 시작할 마디 내 위치(0 ~ 63, 기본값은 0). 4/4박에서 한 마디를 64등분한 길이를 기준으로 합니다.</param>
-        public static void Play(Score score, long startMeasure = 0, int startPosition = 0)
+        public static void Play(Score score, string scoreClassName, long startMeasure = 0, int startPosition = 0)
         {
             if (startMeasure < 0) startMeasure = 0;
             if (startPosition < 0 || startPosition > 63) startPosition = 0;
@@ -324,14 +333,17 @@ namespace ChordingCoding.SFX
 
             void playingScoresAdd(object[] args)
             {
-                List<ScoreWithPosition> playingScores_ = args[0] as List<ScoreWithPosition>;
+                Dictionary<string, List<ScoreWithPosition>> playingScores_ = args[0] as Dictionary<string, List<ScoreWithPosition>>;
                 Score score_ = args[1] as Score;
-                long start_ = (long)args[2];
+                string scoreClassName_ = args[2] as string;
+                long start_ = (long)args[3];
                 Console.WriteLine("playingScoresAdd");
-                playingScores_.Add(new ScoreWithPosition(score_, start_));
+                if (!playingScores_.ContainsKey(scoreClassName_))
+                    playingScores_.Add(scoreClassName_, new List<ScoreWithPosition>());
+                playingScores_[scoreClassName_].Add(new ScoreWithPosition(score_, start_));
             }
 
-            Util.TaskQueue.Add("playingScores", playingScoresAdd, playingScores, score, start);
+            Util.TaskQueue.Add("playingScores", playingScoresAdd, playingScores, score, scoreClassName, start);
         }
 
         /// <summary>
@@ -340,10 +352,11 @@ namespace ChordingCoding.SFX
         /// 한 번 호출하면 자동으로 악보의 끝까지 재생합니다.
         /// </summary>
         /// <param name="score">재생할 악보</param>
+        /// <param name="scoreClassName">재생할 악보가 속한 그룹 이름 (재생 중 일괄 음량 조절 시 필요)</param>
         /// <param name="velocityChange">연주 세기를 변화시키기 위해 악보 전체의 음 세기에 곱해질 값</param>
         /// <param name="startMeasure">재생을 시작할 마디 번호 (기본값은 0)</param>
         /// <param name="startPosition">재생을 시작할 마디 내 위치(0 ~ 63, 기본값은 0). 4/4박에서 한 마디를 64등분한 길이를 기준으로 합니다.</param>
-        public static void Play(Score score, float velocityChange, long startMeasure = 0, int startPosition = 0)
+        public static void Play(Score score, string scoreClassName, float velocityChange, long startMeasure = 0, int startPosition = 0)
         {
             if (startMeasure < 0) startMeasure = 0;
             if (startPosition < 0 || startPosition > 63) startPosition = 0;
@@ -351,15 +364,18 @@ namespace ChordingCoding.SFX
 
             void playingScoresAddWithVelocity(object[] args)
             {
-                List<ScoreWithPosition> playingScores_ = args[0] as List<ScoreWithPosition>;
+                Dictionary<string, List<ScoreWithPosition>> playingScores_ = args[0] as Dictionary<string, List<ScoreWithPosition>>;
                 Score score_ = args[1] as Score;
-                float velocityChange_ = (float)args[2];
-                long start_ = (long)args[3];
+                string scoreClassName_ = args[2] as string;
+                float velocityChange_ = (float)args[3];
+                long start_ = (long)args[4];
                 Console.WriteLine("playingScoresAdd");
-                playingScores_.Add(new ScoreWithPosition(score_, start_, velocityChange_));
+                if (!playingScores_.ContainsKey(scoreClassName_))
+                    playingScores_.Add(scoreClassName_, new List<ScoreWithPosition>());
+                playingScores_[scoreClassName_].Add(new ScoreWithPosition(score_, start_, velocityChange_));
             }
 
-            Util.TaskQueue.Add("playingScores", playingScoresAddWithVelocity, playingScores, score, velocityChange, start);
+            Util.TaskQueue.Add("playingScores", playingScoresAddWithVelocity, playingScores, score, scoreClassName, velocityChange, start);
         }
 
         /// <summary>
@@ -367,38 +383,42 @@ namespace ChordingCoding.SFX
         /// </summary>
         /// <param name="syn">신디사이저</param>
         /// <param name="velocityChange">연주 세기를 변화시키기 위해 음 세기에 곱해질 값</param>
-        public static void PlayPerTick(Synth syn, float velocityChange = 1f)
+        public static void PlayPerTick(Synth syn, VolumeChanger velocityChanger)
         {
             void playingScoresPlay(object[] args)
             {
-                List<ScoreWithPosition> playingScores_ = args[0] as List<ScoreWithPosition>;
+                Dictionary<string, List<ScoreWithPosition>> playingScores_ = args[0] as Dictionary<string, List<ScoreWithPosition>>;
                 Synth syn_ = args[1] as Synth;
-                float velocityChange_ = (float)args[2];
-                List<ScoreWithPosition> deadScores = new List<ScoreWithPosition>();
-                foreach (ScoreWithPosition p in playingScores_)
+                VolumeChanger velocityChanger_ = args[2] as VolumeChanger;
+                foreach (KeyValuePair<string, List<ScoreWithPosition>> pair in playingScores_)
                 {
-                    long measure = p.position / 64;
-                    int position = (int)(p.position % 64);
-                    Console.WriteLine("Current position: " + p.position);
-                    p.score.Print();
-                    p.score.PlayEnumerable(syn, measure, position, -1, velocityChange_ * p.velocityChange);
+                    List<ScoreWithPosition> deadScores = new List<ScoreWithPosition>();
+                    foreach (ScoreWithPosition p in pair.Value)
+                    {
+                        long measure = p.position / 64;
+                        int position = (int)(p.position % 64);
+                        Console.WriteLine("Current position: " + p.position);
+                        p.score.Print();
+                        p.score.PlayEnumerable(syn, measure, position, -1, velocityChanger_(pair.Key) * p.velocityChange);
 
-                    if (p.position + 1 <= p.score.length)
-                    {
-                        p.position++;
+                        if (p.position + 1 <= p.score.length)
+                        {
+                            p.position++;
+                        }
+                        else
+                        {
+                            deadScores.Add(p);
+                            Console.WriteLine("End of score - length: " + p.score.length);
+                        }
+                        Console.WriteLine();
                     }
-                    else
-                    {
-                        deadScores.Add(p);
-                        Console.WriteLine("End of score - length: " + p.score.length);
-                    }
-                    Console.WriteLine();
+                    pair.Value.RemoveAll(x => deadScores.Contains(x));
+                    Console.WriteLine(pair.Key + " group: " + pair.Value.Count + " / " + playingScores[pair.Key].Count);
                 }
-                playingScores_.RemoveAll(x => deadScores.Contains(x));
-                Console.WriteLine(playingScores_.Count + " / " + playingScores.Count + "\n\n");
+                Console.WriteLine("\n");
             }
 
-            Util.TaskQueue.Add("playingScores", playingScoresPlay, playingScores, syn, velocityChange);
+            Util.TaskQueue.Add("playingScores", playingScoresPlay, playingScores, syn, velocityChanger);
         }
 
         /*

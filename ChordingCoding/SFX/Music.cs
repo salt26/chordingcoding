@@ -27,7 +27,7 @@ namespace ChordingCoding.SFX
     {
         public delegate void PlayEventDelegate(int pitch);
 
-        private static float TICK_PER_SECOND = 25f;   // 1초에 호출되는 tick 수
+        private static float TICK_PER_SECOND = 27f;   // 1초에 호출되는 tick 수
         private static long tickNumber = 0;           // 테마 변경 후 지금까지 지난 tick 수
 
         /// <summary>
@@ -332,21 +332,30 @@ namespace ChordingCoding.SFX
                 chord = new Chord(SFXTheme.CurrentSFXTheme.ChordTransition);
                 tickNumber = 0;
 
-                if (SFXTheme.IsReady)
-                {
-                    for (int staff = 7; staff <= 8; staff++)
-                    {
-                        if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(staff))
-                        {
-                            Accompaniment.SetNewCurrentPattern(staff);
-                            accompanimentPlayNumber[staff] = 0;
-                            accompanimentTickNumber[staff] = 0;
-                        }
-                    }
-                }
+                ResetAccompaniment();
             }
 
             Util.TaskQueue.Add("play", ChangeTheme);
+        }
+
+        /// <summary>
+        /// 자동 반주의 상태를 초기화합니다.
+        /// 이것을 호출하는 함수는 반드시 이 함수 호출을 "play"라는 lockName의 Util.TaskQueue 함수 안에서 수행해야 합니다.
+        /// </summary>
+        public static void ResetAccompaniment()
+        {
+            if (SFXTheme.IsReady)
+            {
+                for (int staff = 7; staff <= 8; staff++)
+                {
+                    if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(staff))
+                    {
+                        Accompaniment.SetNewCurrentPattern(staff);
+                        accompanimentPlayNumber[staff] = 0;
+                        accompanimentTickNumber[staff] = 0;
+                    }
+                }
+            }
         }
 
         /// <summary>
@@ -456,7 +465,7 @@ namespace ChordingCoding.SFX
 
             // 빠르기 변경
             Random r = new Random();
-            SetTickPerSecond((int)TICK_PER_SECOND + (int)(1.2f * Math.Round(Util.GaussianRandom(r), MidpointRounding.AwayFromZero)));
+            SetTickPerSecond((int)TICK_PER_SECOND + (int)(1f * Math.Round(Util.GaussianRandom(r), MidpointRounding.AwayFromZero)));
 
             OnChordTransition?.Invoke(pitch);
         }
@@ -483,19 +492,21 @@ namespace ChordingCoding.SFX
         /// <summary>
         /// 초당 Tick() 호출 횟수를 설정하여 음악의 빠르기를 바꿉니다.
         /// </summary>
-        /// <param name="tickPerSecond">초당 tick 수 (16 이상 35 이하, 높을수록 빠름)</param>
+        /// <param name="tickPerSecond">초당 tick 수 (20 이상 35 이하, 높을수록 빠름)</param>
         public static void SetTickPerSecond(int tickPerSecond)
         {
             // TPS = 16: 분당 4분음표 60개
             // TPS = 20: 분당 4분음표 75개, Adagio
             // TPS = 22: 분당 4분음표 83개, Andante
             // TPS = 25: 분당 4분음표 94개, Andantino
+            // TPS = 27: 분당 4분음표 101개
             // TPS = 29: 분당 4분음표 110개, Moderato
             // TPS = 32: 분당 4분음표 121개
             // TPS = 35: 분당 4분음표 134개, Allegro
+            // TPS = 38: 분당 4분음표 144개
             // TPS = 42: 분당 4분음표 163개, Vivace
 
-            if (tickPerSecond < 16) tickPerSecond = 16;
+            if (tickPerSecond < 20) tickPerSecond = 20;
             if (tickPerSecond > 35) tickPerSecond = 35;
             TICK_PER_SECOND = tickPerSecond;
             //Console.WriteLine(TICK_PER_SECOND);
@@ -547,6 +558,11 @@ namespace ChordingCoding.SFX
                                 Accompaniment.SetNewCurrentPattern(staff);
                                 accompanimentPlayNumber[staff] = 0;
                             }
+                            else
+                            {
+                                Score.Play(Accompaniment.currentPatterns[staff].score, "Accompaniment",
+                                    SFXTheme.CurrentSFXTheme.Instruments[staff].accompanimentVolume / 127f);
+                            }
                             accompanimentTickNumber[staff] = 0;
                         }
                         Score accompaniment = Accompaniment.currentPatterns[staff].score;
@@ -571,16 +587,31 @@ namespace ChordingCoding.SFX
                     }
                 }
 
-                Score.PlayPerTick(syn, (SFXTheme.CurrentSFXTheme.Volume / 100f));
+                float volumeChanger(string scoreClassName)
+                {
+                    switch (scoreClassName)
+                    {
+                        case "Accompaniment":
+                            float accompVolume = 1f;
+                            if (!SFXTheme.CurrentSFXTheme.hasAccompanied) accompVolume = 0f;
+                            return SFXTheme.CurrentSFXTheme.Volume / 100f * accompVolume;
+                        default:
+                            return SFXTheme.CurrentSFXTheme.Volume / 100f;
+                    }
+                }
+
+                // Play()로 재생 목록에 넣은 악보들을 재생
+                Score.PlayPerTick(syn, volumeChanger);   // TODO 자동 반주 악보에 대해서만, 자동 반주가 꺼지면 음량이 0이 되도록
             }
             Util.TaskQueue.Add("play", TickPlay);
 
-            if (tickNumber % 64 == 0 && (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(7) || SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(8)))
+            if (tickNumber % 64 == 0 && (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(7) || SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(8)) &&
+                SFXTheme.CurrentSFXTheme.hasAccompanied)
             {
                 syncTransitionBuffer = false;
                 PlayChordTransition();
             }
-            else if (syncTransitionBuffer && tickNumber % 32 == 0)
+            else if (syncTransitionBuffer && tickNumber % 16 == 0)
             {
                 syncTransitionBuffer = false;
                 PlayChordTransition();

@@ -120,17 +120,17 @@ namespace ChordingCoding.SFX
 
             /*
             score = new Score();
-            score.AddNoteInAccompaniment(() => Music.chord.NotesInChord()[0] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave + 1) * 12, 32, 0, 0, 7);
-            score.AddNoteInAccompaniment(() => Music.chord.NotesInChord()[2] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave) * 12, 32, 0, 0, 7);
-            score.AddNoteInAccompaniment(() => Music.chord.NotesInChord()[1] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave) * 12, 32, 0, 0, 7);
-            score.AddNoteInAccompaniment(() => Music.chord.NotesInChord()[0] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave) * 12, 32, 0, 0, 7);
-            score.AddNoteInAccompaniment(() => Music.chord.NotesInChord()[2] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave + 1) * 12, 32, 0, 32, 7);
-            score.AddNoteInAccompaniment(() => Music.chord.NotesInChord()[1] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave + 1) * 12, 32, 0, 32, 7);
-            availablePatterns.Add(new Pattern("2bits", "2비트", score, 64, 2)); // TODO 이름 바꾸기
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(3, 0), 32, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 0), 32, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 0), 32, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 0), 32, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 1), 32, 0, 32, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 1), 32, 0, 32, 7);
+            availablePatterns.Add(new Pattern("2 2", "2 2", score, 64, 4), "Timpani"); // TODO 이름 바꾸기
             */
 
             score = new Score();
-            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 16, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(3, 0), 16, 0, 0, 7);
             score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 0), 32, 0, 0, 7);
             score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 0), 32, 0, 0, 7);
             score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 0), 32, 0, 0, 7);
@@ -138,7 +138,50 @@ namespace ChordingCoding.SFX
             score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 1), 16, 0, 32, 7);
             score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 16, 0, 32, 7);
             score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 1), 16, 0, 48, 7);
-            availablePatterns.Add(new Pattern("4bits", "4비트", score, 64, 1), "Timpani");
+            availablePatterns.Add(new Pattern("4 4 4 4", "4 4 4 4", score, 64, 4), "Timpani");
+
+            score = new Score();
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(3, 0), 16, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 0), 32, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 0), 32, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 0), 32, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 16, 0, 16, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 0), 16, 0, 32, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 0), 16, 0, 32, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 0), 8, 0, 48, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(3, 0), 8, 0, 56, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 0), 8, 0, 56, 7);
+            availablePatterns.Add(new Pattern("4 4 4 8 8", "4 4 4 8 8", score, 64, 4), "Timpani");
+
+            score = new Score();
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(3, 0), 16, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 0), 32, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 0), 32, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 0), 32, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(3, 0), 16, 0, 16, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 0), 16, 0, 16, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 0), 12, 0, 32, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 0), 12, 0, 32, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 0), 12, 0, 44, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 0), 12, 0, 44, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 8, 0, 56, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 0), 8, 0, 56, 7);
+            availablePatterns.Add(new Pattern("4 4 8. 8. 8", "4 4 8. 8. 8", score, 64, 4), "Timpani");
+
+            score = new Score();
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(3, 0), 8, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 0), 32, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 0), 32, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 0), 32, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 1), 8, 0, 8, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 1), 8, 0, 16, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 1), 8, 0, 24, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 8, 0, 32, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 0), 32, 0, 32, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 1), 8, 0, 40, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 1), 8, 0, 48, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 1), 8, 0, 56, 7);
+            availablePatterns.Add(new Pattern("8 8 8 8 8 8 8 8", "8 8 8 8 8 8 8 8", score, 64, 4), "Timpani");
 
             /*
             score = new Score();
@@ -152,20 +195,6 @@ namespace ChordingCoding.SFX
             score.AddNoteInAccompaniment(() => Music.chord.NotesInChord()[1] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave + 1) * 12, 16, 0, 48, 7);
             availablePatterns.Add(new Pattern("7", "7", score, 64, 2)); // TODO 이름 바꾸기
             
-            score = new Score();
-            score.AddNoteInAccompaniment(() => Music.chord.NotesInChord()[0] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave + 1) * 12, 8, 0, 0, 7);
-            score.AddNoteInAccompaniment(() => Music.chord.NotesInChord()[2] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave) * 12, 32, 0, 0, 7);
-            score.AddNoteInAccompaniment(() => Music.chord.NotesInChord()[1] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave) * 12, 32, 0, 0, 7);
-            score.AddNoteInAccompaniment(() => Music.chord.NotesInChord()[0] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave) * 12, 32, 0, 0, 7);
-            score.AddNoteInAccompaniment(() => Music.chord.NotesInChord()[2] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave + 1) * 12, 8, 0, 8, 7);
-            score.AddNoteInAccompaniment(() => Music.chord.NotesInChord()[1] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave + 1) * 12, 8, 0, 16, 7);
-            score.AddNoteInAccompaniment(() => Music.chord.NotesInChord()[2] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave + 1) * 12, 8, 0, 24, 7);
-            score.AddNoteInAccompaniment(() => Music.chord.NotesInChord()[0] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave + 1) * 12, 8, 0, 32, 7);
-            score.AddNoteInAccompaniment(() => Music.chord.NotesInChord()[2] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave) * 12, 32, 0, 32, 7);
-            score.AddNoteInAccompaniment(() => Music.chord.NotesInChord()[2] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave + 1) * 12, 8, 0, 40, 7);
-            score.AddNoteInAccompaniment(() => Music.chord.NotesInChord()[1] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave + 1) * 12, 8, 0, 48, 7);
-            score.AddNoteInAccompaniment(() => Music.chord.NotesInChord()[2] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave + 1) * 12, 8, 0, 56, 7);
-            availablePatterns.Add(new Pattern("8bits", "8비트", score, 64, 2)); // TODO 이름 바꾸기
 
             score = new Score();
             score.AddNoteInAccompaniment(() => Music.chord.NotesInChord()[0] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave + 1) * 12, 4, 0, 0, 7);
@@ -220,7 +249,7 @@ namespace ChordingCoding.SFX
             score.AddNoteInAccompaniment(() => Music.chord.NotesInChord()[2] % 12 + (SFXTheme.CurrentSFXTheme.MinOctave) * 12, 4, 0, 52, 7);
             availablePatterns.Add(new Pattern("Accent", "악센트", score, 64, 2)); // TODO 이름 바꾸기
             */
-            
+
 
             score = new Score();
             score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 0), 4, 0, 0, 7);
@@ -476,6 +505,7 @@ namespace ChordingCoding.SFX
 
         /// <summary>
         /// 특정 staff의 현재 반주 패턴을 새로 설정하고 재생합니다.
+        /// 현재 음악 테마의 자동 반주가 꺼진 상태이더라도 호출되어야 합니다.
         /// </summary>
         /// <param name="staff">반주 staff 번호 (7 또는 8)</param>
         public static void SetNewCurrentPattern(int staff)
@@ -486,7 +516,7 @@ namespace ChordingCoding.SFX
             else if (staff == 8)
                 GenerateRhythmPattern();
 
-            Score.Play(Accompaniment.currentPatterns[staff].score, SFXTheme.CurrentSFXTheme.Instruments[staff].accompanimentVolume / 127f);
+            Score.Play(Accompaniment.currentPatterns[staff].score, "Accompaniment", SFXTheme.CurrentSFXTheme.Instruments[staff].accompanimentVolume / 127f);
         }
 
         /// <summary>

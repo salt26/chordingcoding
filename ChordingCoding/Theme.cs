@@ -242,7 +242,7 @@ namespace ChordingCoding
             */
 
             _availableThemes.Add(new Theme(
-                "Ruins", "고대 유적",
+                "Medieval ruins", "중세 유적지",
                 new ParticleSystem(1, 0,
                                    ParticleSystem.CreateFunction.TopRandom,
                                    Particle.Type.rain, () => Color.White,
@@ -255,7 +255,7 @@ namespace ChordingCoding
                                    Particle.Type.rain, () => Color.White,
                                    0.1f, (Form1.form1.Size.Height + 150) / 30),
                 new Theme.ParticleInfo(Particle.Type.note, (Form1.form1.Size.Height + 150) / 15, (pitch) => Chord.PitchColor(pitch), 0.1f),
-                "Ruins"));
+                "Medieval ruins"));
 
             IsReady = true;
         }

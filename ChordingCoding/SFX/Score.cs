@@ -483,11 +483,14 @@ namespace ChordingCoding.SFX
 
             if (p.Value > 0)
             {
+                int velocity = Util.RoundAndClamp(note.Velocity * velocityChange, 0, 127);
+                if (velocity == 0) return;
+
                 // 음표를 재생합니다.
                 // (Midi message pair를 번역하여 Midi message를 생성합니다.)
                 try
                 {
-                    syn.NoteOn(p.Value >> 16, p.Value & 65535, Util.RoundAndClamp(note.Velocity * velocityChange, 0, 127));
+                    syn.NoteOn(p.Value >> 16, p.Value & 65535, velocity);
                 }
                 catch (ObjectDisposedException) { }
                 catch (FluidSynthInteropException) { }
@@ -556,11 +559,14 @@ namespace ChordingCoding.SFX
 
             if (p.Value > 0)
             {
+                int velocity = Util.RoundAndClamp(note.Velocity * velocityChange, 0, 127);
+                if (velocity == 0) return;
+
                 // 음표를 재생합니다.
                 // (Midi message pair를 번역하여 Midi message를 생성합니다.)
                 try
                 {
-                    syn.NoteOn(p.Value >> 16, p.Value & 65535, Util.RoundAndClamp(note.Velocity * velocityChange, 0, 127));
+                    syn.NoteOn(p.Value >> 16, p.Value & 65535, velocity);
                 }
                 catch (ObjectDisposedException) { }
                 catch (FluidSynthInteropException) { }

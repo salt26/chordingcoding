@@ -462,23 +462,23 @@ namespace ChordingCoding.SFX
             availableInstruments.Add(new SFXInstrumentInfo(126, (pitch) => 45, 4, 24));                                                             // [6] Rain channel 5/6, Applause
             availableInstruments.Add(new CharacterInstrumentInfo(49, (pitch) => pitch - 12, 64, 60, (pitch) => (pitch + 6) % 12 + 54, 64, 48));     // [7] Star channel 0, String ensemble 2
             availableInstruments.Add(new CharacterInstrumentInfo(11, (pitch) => pitch, 64, 127, (pitch) => pitch, 64, 127));                        // [8] Star channel 1, Vibraphone
-            availableInstruments.Add(new CharacterInstrumentInfo(0, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12, 128, 80, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12, 128, 60));       // [9] Pianoforte channel 0, Acoustic grand piano
+            availableInstruments.Add(new CharacterInstrumentInfo(0, (pitch) => pitch % 24 + 36, 128, 80, (pitch) => pitch % 24 + 24, 128, 80));     // [9] Pianoforte channel 0, Acoustic grand piano
             availableInstruments.Add(new CharacterInstrumentInfo(0, (pitch) => pitch, 128, 127, (pitch) => pitch, 128, 127));                       // [10] Pianoforte channel 1, Acoustic grand piano
             availableInstruments.Add(new CharacterInstrumentInfo(46, (pitch) => pitch, 64, 127, (pitch) => pitch, 64, 127));                        // [11] Sky channel 1, Orchestral harp
             availableInstruments.Add(new CharacterInstrumentInfo(68, (pitch) => pitch, 64, 96, (pitch) => pitch, 64, 96));                          // [12] ??? channel 1, Oboe
             availableInstruments.Add(new CharacterInstrumentInfo(19, (pitch) => pitch, 48, 96, (pitch) => pitch, 48, 96));                          // [13] Medieval channel 1, Church organ
             availableInstruments.Add(new WhitespaceInstrumentInfo(9, (pitch) => pitch % 12 + 72, 256, 80));                                         // [14] Medieval channel 3, Glockenspiel
             availableInstruments.Add(new WhitespaceInstrumentInfo(9, (pitch) => (pitch + 7) % 12 + 48, 256, 80));                                   // [15] Medieval channel 4, Glockenspiel
-            availableInstruments.Add(new AccompanimentInstrumentInfo(0, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12, 128, 100));              // [16] Pianoforte channel 7, Acoustic grand piano
+            availableInstruments.Add(new AccompanimentInstrumentInfo(0, (pitch) => pitch % 24 + 24, 128, 100));                                     // [16] Pianoforte channel 7, Acoustic grand piano
             availableInstruments.Add(new AccompanimentInstrumentInfo(0, (pitch) => pitch, 128, 80));                                                // [17] Pianoforte channel 8, Acoustic grand piano
-            availableInstruments.Add(new AccompanimentInstrumentInfo(11, (pitch) => pitch % 12 + (pitch / 12) * 2 / 3 * 12, 128, 60));              // [18] ??? channel 7, Vibraphone
+            availableInstruments.Add(new AccompanimentInstrumentInfo(11, (pitch) => pitch % 24 + 36, 128, 60));                                     // [18] ??? channel 7, Vibraphone
             availableInstruments.Add(new AccompanimentInstrumentInfo(12, (pitch) => pitch, 128, 100));                                              // [19] ??? channel 8, Marimba
             availableInstruments.Add(new AccompanimentInstrumentInfo(-1, (pitch) => pitch, 0, 48));                                                 // [20] channel 7 또는 8에서 1번 악기를 참조하여 재생할 때 사용
             availableInstruments.Add(new AccompanimentInstrumentInfo(-1, (pitch) => pitch, 0, 96));                                                 // [21] channel 7 또는 8에서 1번 악기를 참조하여 재생할 때 사용
             availableInstruments.Add(new CharacterInstrumentInfo(101, (pitch) => pitch - 12, 56, 0, (pitch) => (pitch + 6) % 12 + 66, 56, 72));     // [22] Medieval channel 0, SFX(goblin)
-            availableInstruments.Add(new CharacterInstrumentInfo(19, (pitch) => (pitch + 8) % 12 + 40, 64, 0, (pitch) => (pitch + 8) % 12 + 40, 64, 84));       // [23] Choir channel 0, Church organ
-            availableInstruments.Add(new CharacterInstrumentInfo(52, (pitch) => (pitch + 19) % 24 + 53, 56, 127, (pitch) => (pitch + 19) % 24 + 53, 56, 0));    // [24] Choir channel 1, Choir aahs (Alto)
-            availableInstruments.Add(new CharacterInstrumentInfo(52, (pitch) => (pitch + 5) % 24 + 43, 56, 127, (pitch) => (pitch + 5) % 24 + 43, 56, 0));      // [25] Choir channel 2, Choir aahs (Bariton)
+            availableInstruments.Add(new CharacterInstrumentInfo(19, (pitch) => (pitch + 8) % 12 + 40, 64, 60, (pitch) => (pitch) % 12 + 48, 64, 72));          // [23] Choir channel 0, Church organ
+            availableInstruments.Add(new CharacterInstrumentInfo(52, (pitch) => (pitch + 19) % 24 + 53, 48, 127, (pitch) => (pitch + 19) % 24 + 53, 48, 0));    // [24] Choir channel 1, Choir aahs (Alto)
+            availableInstruments.Add(new CharacterInstrumentInfo(52, (pitch) => (pitch + 5) % 24 + 43, 48, 127, (pitch) => (pitch + 5) % 24 + 43, 48, 0));      // [25] Choir channel 2, Choir aahs (Bariton)
             availableInstruments.Add(new AccompanimentInstrumentInfo(47, (pitch) => ((pitch + 6) % 12) + 18, 64, 100));                                         // [26] Choir channel 7, Timpani
 
             Dictionary<int, InstrumentInfo> instruments;
@@ -504,7 +504,7 @@ namespace ChordingCoding.SFX
             instruments = new Dictionary<int, InstrumentInfo>();
             instruments.Add(0, availableInstruments[9]);
             instruments.Add(1, availableInstruments[10]);
-            availableInstrumentSets.Add(new InstrumentSet("Piano", "피아노", instruments, InstrumentSet.Type.character, 3, 8));
+            availableInstrumentSets.Add(new InstrumentSet("Piano", "피아노", instruments, InstrumentSet.Type.character, 3, 7));
 
             instruments = new Dictionary<int, InstrumentInfo>();
             instruments.Add(0, availableInstruments[9]);
@@ -586,7 +586,7 @@ namespace ChordingCoding.SFX
             availableSFXThemes.Add(new SFXTheme("Pianoforte_high", "피아노포르테 고음", ChordTransitionType.SomewhatHappy, "Piano_high", null, "Piano"));   // Disabled
             availableSFXThemes.Add(new SFXTheme("Sky", "구름 너머", ChordTransitionType.SomewhatHappy, "Sky", null, "Melody"));
             availableSFXThemes.Add(new SFXTheme("Medieval", "중세 탐방", ChordTransitionType.SomewhatBlue, "Medieval", "Bell", "Piano"));                   // Disabled
-            availableSFXThemes.Add(new SFXTheme("Ruins", "고대 유적", ChordTransitionType.SomewhatBlue, "Choir", "Bell", "Timpani"));
+            availableSFXThemes.Add(new SFXTheme("Medieval ruins", "중세 유적지", ChordTransitionType.SomewhatBlue, "Choir", "Bell", "Timpani"));
 
             IsReady = true;
         }

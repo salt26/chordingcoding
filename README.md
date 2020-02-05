@@ -4,7 +4,7 @@ With ChordingCoding, typing becomes composing music!
 (ChordingCoding과 함께라면, 타이핑이 곧 작곡이 됩니다!)
 
 ## Description
-![ChordingCoding](https://raw.githubusercontent.com/salt26/chordingcoding/master/ChordingCoding/Resources/NoteWord.ico)
+![ChordingCoding](https://raw.githubusercontent.com/salt26/chordingcoding/master/ChordingCoding/Resources/Title.png)
 
 ChordingCoding은 코딩과 문서 작업에 지친 사람들의 감성을 채워주기 위해 만들었습니다.
 
@@ -18,22 +18,29 @@ Windows Forms로 개발된 응용 프로그램으로, 64-bit Windows에서 사�
  
 2. Builds 폴더에 있는 "ChordingCoding.exe"를 실행합니다.
    * 바로 가기(.lnk)를 만들면 실행하기 편리합니다.
+   * 만약 프로그램의 경로를 옮기고 싶다면 Builds 폴더 내의 모든 파일을 통째로 옮겨주세요.
 
 3. 작업 표시줄에 있는 시스템 트레이에 음표 모양 ChordingCoding 아이콘(![Tray](https://raw.githubusercontent.com/salt26/chordingcoding/master/ChordingCoding/Resources/Tray.ico))이 있는 것을 볼 수 있습니다. 이 아이콘을 클릭하면 메뉴가 나타납니다.
 
-4. 메뉴에서 테마를 변경할 수 있습니다. 테마에 따라 악기, 화음 등이 달라집니다.
-   * '가을 산책', '별 헤는 밤' 테마에서는 타이핑에 의해서만 소리가 만들어집니다.
-   * '피아노포르테', '구름 너머', '중세 탐방' 테마에서는 타이핑에 반응하여 소리가 만들어지는 것은 물론, 타이핑하지 않을 때에도 자동으로 반주가 생성됩니다.
+4. 메뉴에서 테마를 변경할 수 있습니다. 테마에 따라 악기, 화음, 자동 반주 패턴 등이 달라집니다.
 
-5. 메뉴에서 단위 리듬 및 음량을 변경할 수 있습니다.
-   * 예를 들어, 16분음표 단위 박자에 맞춰 연주하고 싶다면 단위 리듬을 "16분음표"로 놓으면 되겠죠.
+5. 메뉴에서 단위 리듬, 음량 및 자동 반주 재생 여부를 변경할 수 있습니다.
+   * 예를 들어, 16분음표의 리듬에 맞춰 연주하고 싶다면 단위 리듬을 "16분음표"로 놓으면 되겠죠.
+   * 자동 반주를 켜면 타이핑에 반응하여 소리가 나는 것은 물론, 타이핑하지 않을 때에도 자동으로 반주가 생성됩니다.
+     * 글을 읽을 때 자동 반주를 켜보시는 건 어떨까요?
 
 6. 설정이 완료되면 소리를 켜고 키보드로 타이핑을 하면 됩니다.
    * 스페이스 등의 공백 문자를 입력할 때마다 화음이 달라집니다.
    * 일반 글자를 입력할 때마다 화음에 맞는 음이 무작위로 생성됩니다.
   
 ## Update Log
-### [v.1.3](https://github.com/salt26/chordingcoding/tree/master) - 20/01/14
+### [v.1.4](https://github.com/salt26/chordingcoding/tree/master) - 20/02/05
+* 테마 변경 (중세 탐방 -> 중세 유적지)
+* 전반적인 테마 개선
+* 자동 반주가 없던 모든 테마에 자동 반주 추가 (가을 산책, 별 헤는 밤)
+* 자동 반주 켜기/끄기 기능 추가
+
+### [v.1.3](https://github.com/salt26/chordingcoding/tree/c88de83e97e2b3d9c0b596ead8346596008a97b6) - 20/01/14
 * 전반적인 음질 향상
 * 두 종류의 기존 테마 제거 (비 오는 날, 숲 속 아침)
 * 64-bit 운영체제에서만 사용 가능하도록 변경

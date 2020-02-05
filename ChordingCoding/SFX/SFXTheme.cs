@@ -536,10 +536,10 @@ namespace ChordingCoding.SFX
              * InstrumentSet.Type.whitespace
              */
             /*
-           instruments = new Dictionary<int, InstrumentInfo>();
-           instruments.Add(3, availableInstruments[2]);
-           availableInstrumentSets.Add(new InstrumentSet("Bird", "새", instruments, InstrumentSet.Type.whitespace));
-           */
+            instruments = new Dictionary<int, InstrumentInfo>();
+            instruments.Add(3, availableInstruments[2]);
+            availableInstrumentSets.Add(new InstrumentSet("Bird", "새", instruments, InstrumentSet.Type.whitespace));
+            */
 
             instruments = new Dictionary<int, InstrumentInfo>();
             instruments.Add(3, availableInstruments[5]);
@@ -572,8 +572,11 @@ namespace ChordingCoding.SFX
 
             instruments = new Dictionary<int, InstrumentInfo>();
             instruments.Add(7, availableInstruments[21]);
-            //instruments.Add(8, availableInstruments[21]);
             availableInstrumentSets.Add(new InstrumentSet("Guitar", "기타", instruments, InstrumentSet.Type.accompaniment, 4, 5));   // 1번 채널의 악기를 사용, 밑반주 패턴이 "멜로디"와 다름
+
+            instruments = new Dictionary<int, InstrumentInfo>();
+            instruments.Add(7, availableInstruments[21]);
+            availableInstrumentSets.Add(new InstrumentSet("Star", "별", instruments, InstrumentSet.Type.accompaniment, 5, 6));   // 1번 채널의 악기를 사용, 밑반주 패턴이 "멜로디"와 다름
 
             // TODO
             isInstrumentsReady = true;
@@ -585,7 +588,7 @@ namespace ChordingCoding.SFX
             availableSFXThemes = new List<SFXTheme>();
             availableSFXThemes.Add(new SFXTheme("Autumn", "가을 산책", ChordTransitionType.SomewhatHappy, "Guitar", null, "Guitar"));
             availableSFXThemes.Add(new SFXTheme("Rain", "비 오는 날", ChordTransitionType.SomewhatBlue, "Forest", "Rain", null));                           // Disabled
-            availableSFXThemes.Add(new SFXTheme("Star", "별 헤는 밤", ChordTransitionType.SimilarOne, "Star", "Bell", null));
+            availableSFXThemes.Add(new SFXTheme("Star", "별 헤는 밤", ChordTransitionType.SimilarOne, "Star", "Bell", "Star"));
             availableSFXThemes.Add(new SFXTheme("Forest", "숲 속 아침", ChordTransitionType.SimilarOne, "Forest", null, "Melody"));                         // Disabled
             availableSFXThemes.Add(new SFXTheme("Pianoforte", "피아노포르테", ChordTransitionType.SimilarOne, "Piano", null, "Piano"));
             availableSFXThemes.Add(new SFXTheme("Pianoforte_low", "피아노포르테 저음", ChordTransitionType.SomewhatBlue, "Piano_low", null, "Piano"));      // Disabled

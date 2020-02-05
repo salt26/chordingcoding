@@ -123,6 +123,21 @@ namespace ChordingCoding.UI
             Music.Initialize(Theme.CurrentTheme.SFX.Name, resolution,
                 new ChordingCoding.SFX.Timer.TickDelegate[] { MarshallingUpdateFrame });
 
+            foreach (Theme t in Theme.AvailableThemes)
+            {
+                // 이 코드를 위의 foreach문과 합치면 CurrentSFXTheme이 아직 설정되지 않은 상태가 되어 문제가 발생할 수 있음
+                t.SFX.hasAccompanied = (bool)Properties.Settings.Default["Accompaniment" + t.Name];
+            }
+
+            if (Theme.CurrentTheme.SFX.hasAccompanied)
+            {
+                자동반주ToolStripMenuItem.CheckState = CheckState.Checked;
+            }
+            else
+            {
+                자동반주ToolStripMenuItem.CheckState = CheckState.Unchecked;
+            }
+
             if (ENABLE_VFX)
             {
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
@@ -172,6 +187,7 @@ namespace ChordingCoding.UI
             {
                 Properties.Settings.Default["Opacity" + theme.Name] = _opacity[theme.Name];
                 Properties.Settings.Default["Volume" + theme.Name] = theme.SFX.Volume;
+                Properties.Settings.Default["Accompaniment" + theme.Name] = theme.SFX.hasAccompanied;
             }
             Properties.Settings.Default["NoteResolution"] = Music.NoteResolution;
             Properties.Settings.Default.Save();
@@ -414,6 +430,22 @@ namespace ChordingCoding.UI
 
                 hasAddProperties = true;
             }
+            try
+            {
+                bool temp = (bool)Properties.Settings.Default["Accompaniment" + theme.Name];
+            }
+            catch (SettingsPropertyNotFoundException)
+            {
+                SettingsProperty accompanimentProperty = new SettingsProperty("Accompaniment" + theme.Name);
+                accompanimentProperty.DefaultValue = true;
+                accompanimentProperty.IsReadOnly = false;
+                accompanimentProperty.PropertyType = typeof(bool);
+                accompanimentProperty.Provider = Properties.Settings.Default.Providers["LocalFileSettingsProvider"];
+                accompanimentProperty.Attributes.Add(typeof(UserScopedSettingAttribute), new UserScopedSettingAttribute());
+                Properties.Settings.Default.Properties.Add(accompanimentProperty);
+
+                hasAddProperties = true;
+            }
 
             if (hasAddProperties)
             {
@@ -497,6 +529,15 @@ namespace ChordingCoding.UI
 
             trackBarMenuItem2.Value = SFXTheme.CurrentSFXTheme.Volume / 5;
             음량ToolStripMenuItem.Text = "음량 (" + SFXTheme.CurrentSFXTheme.Volume + "%)";
+
+            if (Theme.CurrentTheme.SFX.hasAccompanied)
+            {
+                자동반주ToolStripMenuItem.CheckState = CheckState.Checked;
+            }
+            else
+            {
+                자동반주ToolStripMenuItem.CheckState = CheckState.Unchecked;
+            }
         }
 
         /// <summary>
@@ -576,6 +617,19 @@ namespace ChordingCoding.UI
             if (Music.NoteResolution != 0)
             {
                 SetNoteResolution(0);
+            }
+        }
+
+        private void 자동반주ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Theme.CurrentTheme.SFX.hasAccompanied = !Theme.CurrentTheme.SFX.hasAccompanied;
+            if (Theme.CurrentTheme.SFX.hasAccompanied)
+            {
+                자동반주ToolStripMenuItem.CheckState = CheckState.Checked;
+            }
+            else
+            {
+                자동반주ToolStripMenuItem.CheckState = CheckState.Unchecked;
             }
         }
     }

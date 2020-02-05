@@ -73,18 +73,32 @@ namespace ChordingCoding.SFX
             get { return staff; }
         }
 
+        private int velocity;
+
+        /// <summary>
+        /// 음 세기(1 ~ 127). 재생 시의 실제 세기와는 다를 수 있습니다.
+        /// </summary>
+        public int Velocity
+        {
+            get { return velocity; }
+        }
+
         /// <summary>
         /// 음표를 생성합니다.
         /// </summary>
         /// <param name="pitch">음 높이(1 ~ 127). 예) 60: C4 / 64: E4 / 67: G4 / 72: C5</param>
+        /// <param name="velocity">음 세기(1 ~ 127).</param>
         /// <param name="rhythm">음표의 길이(1 이상). 4/4박에서 한 마디를 64등분한 길이를 기준으로 합니다. 예) 64: 온음표 / 16: 4분음표 / 4: 16분음표 / 1: 64분음표</param>
         /// <param name="measure">음표가 위치한 마디 번호(0부터 시작).</param>
         /// <param name="position">음표의 마디 내 위치(0 ~ 63). 4/4박에서 한 마디를 64등분한 길이를 기준으로 합니다.</param>
         /// <param name="staff">음표가 놓일 Staff 번호(0 ~ 15). 9번 Staff는 타악기 전용 Staff입니다.</param>
-        public Note(int pitch, int rhythm, long measure, int position, int staff = 0)
+        public Note(int pitch, int velocity, int rhythm, long measure, int position, int staff = 0)
         {
             if (pitch < 1 || pitch > 127) pitch = 60;
             this.pitch = () => pitch;
+
+            if (velocity < 1 || velocity > 127) velocity = 127;
+            this.velocity = velocity;
 
             if (rhythm < 1) rhythm = 16;
             this.rhythm = rhythm;
@@ -104,13 +118,17 @@ namespace ChordingCoding.SFX
         /// 음표를 생성합니다.
         /// </summary>
         /// <param name="pitch">음 높이(1 ~ 127)를 반환하는 함수. 예) () => 60: C4 / () => 64: E4 / () = > 67: G4 / () => 72: C5</param>
+        /// <param name="velocity">음 세기(1 ~ 127).</param>
         /// <param name="rhythm">음표의 길이(1 이상). 4/4박에서 한 마디를 64등분한 길이를 기준으로 합니다. 예) 64: 온음표 / 16: 4분음표 / 4: 16분음표 / 1: 64분음표</param>
         /// <param name="measure">음표가 위치한 마디 번호(0부터 시작).</param>
         /// <param name="position">음표의 마디 내 위치(0 ~ 63). 4/4박에서 한 마디를 64등분한 길이를 기준으로 합니다.</param>
         /// <param name="staff">음표가 놓일 Staff 번호(0 ~ 15). 9번 Staff는 타악기 전용 Staff입니다.</param>
-        public Note(PitchGenerator pitch, int rhythm, long measure, int position, int staff = 0)
+        public Note(PitchGenerator pitch, int velocity, int rhythm, long measure, int position, int staff = 0)
         {
             this.pitch = pitch;
+
+            if (velocity < 1 || velocity > 127) velocity = 127;
+            this.velocity = velocity;
 
             if (rhythm < 1) rhythm = 16;
             this.rhythm = rhythm;

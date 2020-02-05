@@ -495,7 +495,87 @@ namespace ChordingCoding.SFX
             score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(3, 0), 4, 1, 56, 7);
             score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 1), 4, 1, 60, 7);
             availablePatterns.Add(new Pattern("Mountain0202-2131", "산0202-2131", score, 128, 1), "Piano", "Melody");
-            
+
+            //
+
+            score = new Score();
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 4, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 0), 8, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 4, 0, 4, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 8, 0, 8, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 0), 8, 0, 8, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 0), 8, 0, 8, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(3, 0), 8, 0, 8, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 8, 0, 16, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 1), 8, 0, 16, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 4, 0, 24, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 8, 0, 28, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 0), 8, 0, 28, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 4, 0, 36, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 8, 0, 40, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 0), 8, 0, 40, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 0), 8, 0, 48, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 0), 8, 0, 48, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 4, 0, 56, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(3, 0), 8, 0, 56, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 4, 0, 60, 7);
+            availablePatterns.Add(new Pattern("16 16 8 8 16 8 16 8 8 16 16", "16 16 8 8 16 8 16 8 8 16 16", score, 64, 4), "Guitar");
+
+            score = new Score();
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 8, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 0), 8, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 0), 32, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 0), 8, 0, 8, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 8, 0, 12, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 0), 8, 0, 16, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 8, 0, 24, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 0), 8, 0, 24, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 0), 4, 0, 32, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 0), 8, 0, 32, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 8, 0, 36, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(3, 0), 8, 0, 36, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 0), 8, 0, 40, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 16, 0, 48, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 0), 8, 0, 48, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 0), 8, 0, 56, 7);
+            availablePatterns.Add(new Pattern("8 16 16 8 8 16 16 8 8 8", "8 16 16 8 8 16 16 8 8 8", score, 64, 4), "Guitar");
+
+            score = new Score();
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 1), 8, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 8, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 0), 8, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 0), 8, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 0), 8, 0, 8, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 8, 0, 12, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 1), 8, 0, 16, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 1), 16, 0, 24, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 16, 0, 24, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 0), 16, 0, 24, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 1), 8, 0, 40, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 8, 0, 40, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 0), 8, 0, 40, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(3, 0), 8, 0, 48, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 8, 0, 52, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 0), 8, 0, 52, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 1), 8, 0, 56, 7);
+            availablePatterns.Add(new Pattern("8 16 16 8 4 8 16 16 8", "8 16 16 8 4 8 16 16 8", score, 64, 4), "Guitar");
+
+            score = new Score();
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 0), 8, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 0), 8, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 0), 16, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 8, 0, 12, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 0), 16, 0, 16, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(3, 0), 16, 0, 16, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 1), 8, 0, 24, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 0), 16, 0, 32, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 1), 8, 0, 36, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(1, 1), 8, 0, 48, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(2, 0), 16, 0, 48, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 0), 16, 0, 48, 7);
+            score.AddNoteInAccompaniment(() => Music.chord.GetNoteInAccompaniment(0, 1), 8, 0, 56, 7);
+            availablePatterns.Add(new Pattern("8. 16 8 8 16 8. 8 8", "8. 16 8 8 16 8. 8 8", score, 64, 4), "Guitar");
+
 
             SetNewCurrentPattern(7);
             SetNewCurrentPattern(8);

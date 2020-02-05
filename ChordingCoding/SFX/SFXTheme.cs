@@ -570,14 +570,20 @@ namespace ChordingCoding.SFX
             instruments.Add(8, availableInstruments[21]);
             availableInstrumentSets.Add(new InstrumentSet("Timpani", "팀파니", instruments, InstrumentSet.Type.accompaniment, 1, 3));
 
+            instruments = new Dictionary<int, InstrumentInfo>();
+            instruments.Add(7, availableInstruments[21]);
+            //instruments.Add(8, availableInstruments[21]);
+            availableInstrumentSets.Add(new InstrumentSet("Guitar", "기타", instruments, InstrumentSet.Type.accompaniment, 4, 5));   // 1번 채널의 악기를 사용, 밑반주 패턴이 "멜로디"와 다름
+
             // TODO
             isInstrumentsReady = true;
 
             /*
              * Default SFXTheme
+             * Note: Please do not use ' '(space) on theme name.
              */
             availableSFXThemes = new List<SFXTheme>();
-            availableSFXThemes.Add(new SFXTheme("Autumn", "가을 산책", ChordTransitionType.SomewhatHappy, "Guitar", null, null));
+            availableSFXThemes.Add(new SFXTheme("Autumn", "가을 산책", ChordTransitionType.SomewhatHappy, "Guitar", null, "Guitar"));
             availableSFXThemes.Add(new SFXTheme("Rain", "비 오는 날", ChordTransitionType.SomewhatBlue, "Forest", "Rain", null));                           // Disabled
             availableSFXThemes.Add(new SFXTheme("Star", "별 헤는 밤", ChordTransitionType.SimilarOne, "Star", "Bell", null));
             availableSFXThemes.Add(new SFXTheme("Forest", "숲 속 아침", ChordTransitionType.SimilarOne, "Forest", null, "Melody"));                         // Disabled
@@ -586,7 +592,7 @@ namespace ChordingCoding.SFX
             availableSFXThemes.Add(new SFXTheme("Pianoforte_high", "피아노포르테 고음", ChordTransitionType.SomewhatHappy, "Piano_high", null, "Piano"));   // Disabled
             availableSFXThemes.Add(new SFXTheme("Sky", "구름 너머", ChordTransitionType.SomewhatHappy, "Sky", null, "Melody"));
             availableSFXThemes.Add(new SFXTheme("Medieval", "중세 탐방", ChordTransitionType.SomewhatBlue, "Medieval", "Bell", "Piano"));                   // Disabled
-            availableSFXThemes.Add(new SFXTheme("Medieval ruins", "중세 유적지", ChordTransitionType.SomewhatBlue, "Choir", "Bell", "Timpani"));
+            availableSFXThemes.Add(new SFXTheme("Medieval_ruins", "중세 유적지", ChordTransitionType.SomewhatBlue, "Choir", "Bell", "Timpani"));
 
             IsReady = true;
         }

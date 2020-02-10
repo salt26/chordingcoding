@@ -138,7 +138,6 @@ namespace ChordingCoding
                                    /*pSize*/ 1f, /*pLife*/ 128),
                 null, new Theme.ParticleInfo(Particle.Type.leaf, (Form1.form1.Size.Height + 150) / 4, (pitch) => Color.White, 1f),
                 "Autumn"));
-
             /*
             _availableThemes.Add(new Theme(
                 "Rain", "비 오는 날",
@@ -156,7 +155,6 @@ namespace ChordingCoding
                 new Theme.ParticleInfo(Particle.Type.note, (Form1.form1.Size.Height + 150) / 15, (pitch) => Chord.PitchColor(pitch), 0.1f),
                 "Rain"));
             */
-
             _availableThemes.Add(new Theme(
                 "Star", "별 헤는 밤",
                 new ParticleSystem(/*cNum*/ 1, /*cRange*/ 0,

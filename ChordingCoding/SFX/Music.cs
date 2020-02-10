@@ -178,7 +178,7 @@ namespace ChordingCoding.SFX
             });
             */
             SFXTheme.CurrentSFXTheme = SFXTheme.FindSFXTheme(SFXThemeName);
-            Console.WriteLine(SFXThemeName + " " + SFXTheme.CurrentSFXTheme.Name);
+            //Console.WriteLine(SFXThemeName + " " + SFXTheme.CurrentSFXTheme.Name);
             NoteResolution = noteResolution;
             Accompaniment.Initialize();
             ThemeChanged();
@@ -244,7 +244,6 @@ namespace ChordingCoding.SFX
             if (IsReady)
             {
                 for (int i = 0; i <= 8; i++) StopPlaying(i);
-                Score.ClearNoteOffBuffer();
                 timer.Stop();
                 IsReady = false;
             }
@@ -270,7 +269,6 @@ namespace ChordingCoding.SFX
             if (IsReady)
             {
                 for (int i = 0; i <= 8; i++) StopPlaying(i);
-                Score.ClearNoteOffBuffer();
                 timer.Stop();
                 //outDevice.Close();
                 adriver.Dispose();
@@ -297,7 +295,6 @@ namespace ChordingCoding.SFX
             {
                 Score.InitializePlaylist();
                 for (int i = 0; i <= 8; i++) StopPlaying(i);
-                Score.ClearNoteOffBuffer();
 
                 foreach (KeyValuePair<int, SFXTheme.InstrumentInfo> p in SFXTheme.CurrentSFXTheme.Instruments)
                 {
@@ -532,17 +529,17 @@ namespace ChordingCoding.SFX
                     {
                         StopPlaying(5);
                         SFXTheme.InstrumentInfo inst = SFXTheme.CurrentSFXTheme.Instruments[5];
-                        Note note = new Note(inst.sfxPitchModulator(45), inst.sfxVolume, inst.sfxRhythm, Measure, Position, 5);
+                        Note note = new Note(inst.sfxPitchModulator(45), inst.sfxVolume, inst.sfxRhythm * 64 * 60, Measure, Position, 5);   // 음표를 3840배 길게 늘여서 재생
                         //Score.PlayANoteForever(outDevice, note, (int)Math.Round(inst.sfxVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));     // 기본 빗소리 (사라지지 않아야 함)
-                        Score.PlayANoteForever(syn, note, SFXTheme.CurrentSFXTheme.Volume / 100f);
+                        Score.PlayANote(syn, note, SFXTheme.CurrentSFXTheme.Volume / 100f);
                     }
                     if (tickNumber % ((int)TICK_PER_SECOND * 10) == (int)TICK_PER_SECOND * 5)
                     {
                         StopPlaying(6);
                         SFXTheme.InstrumentInfo inst = SFXTheme.CurrentSFXTheme.Instruments[6];
-                        Note note = new Note(inst.sfxPitchModulator(45), inst.sfxVolume, inst.sfxRhythm, Measure, Position, 6);
+                        Note note = new Note(inst.sfxPitchModulator(45), inst.sfxVolume, inst.sfxRhythm * 64 * 60, Measure, Position, 6);   // 음표를 3840배 길게 늘여서 재생
                         //Score.PlayANoteForever(outDevice, note, (int)Math.Round(inst.sfxVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));     // 기본 빗소리 (사라지지 않아야 함)
-                        Score.PlayANoteForever(syn, note, SFXTheme.CurrentSFXTheme.Volume / 100f);
+                        Score.PlayANote(syn, note, SFXTheme.CurrentSFXTheme.Volume / 100f);
                     }
                 }
 

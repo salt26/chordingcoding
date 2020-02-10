@@ -20,9 +20,10 @@ namespace ChordingCoding.SFX
         private List<Note> score = new List<Note>();
 
         /// <summary>
-        /// NoteOff()를 호출할 음표들을 저장하는 버퍼
+        /// NoteOff()를 호출할 음표들을 저장하는 버퍼.
+        /// Key는 채널(staff), Value는 해당 채널에서 아직 재생 중인 음표들의 목록
         /// </summary>
-        private static List<Note> noteOffBuffer = new List<Note>();
+        private static Dictionary<int, List<Note>> noteOffBuffer = new Dictionary<int, List<Note>>();
 
         /// <summary>
         /// PlayEnumerable()에 의해 재생되어야 하는 악보들의 목록.
@@ -256,7 +257,7 @@ namespace ChordingCoding.SFX
             {
                 if (note.Measure == measure && note.Position == position && (staff == -1 || note.Staff == staff))
                 {
-                    Console.WriteLine("재생은 하는 거냐? velocityChange: " + velocityChange);
+                    //Console.WriteLine("PlayEnumerable velocityChange: " + velocityChange);
                     Note noteInCurrentTime = new Note(note.Pitch, note.Velocity, note.Rhythm, Music.Measure, Music.Position, note.Staff);
                     PlayANote(syn, noteInCurrentTime, velocityChange);
                 }
@@ -337,7 +338,7 @@ namespace ChordingCoding.SFX
                 Score score_ = args[1] as Score;
                 string scoreClassName_ = args[2] as string;
                 long start_ = (long)args[3];
-                Console.WriteLine("playingScoresAdd");
+                //Console.WriteLine("playingScoresAdd");
                 if (!playingScores_.ContainsKey(scoreClassName_))
                     playingScores_.Add(scoreClassName_, new List<ScoreWithPosition>());
                 playingScores_[scoreClassName_].Add(new ScoreWithPosition(score_, start_));
@@ -369,7 +370,7 @@ namespace ChordingCoding.SFX
                 string scoreClassName_ = args[2] as string;
                 float velocityChange_ = (float)args[3];
                 long start_ = (long)args[4];
-                Console.WriteLine("playingScoresAdd");
+                //Console.WriteLine("playingScoresAdd");
                 if (!playingScores_.ContainsKey(scoreClassName_))
                     playingScores_.Add(scoreClassName_, new List<ScoreWithPosition>());
                 playingScores_[scoreClassName_].Add(new ScoreWithPosition(score_, start_, velocityChange_));
@@ -397,8 +398,8 @@ namespace ChordingCoding.SFX
                     {
                         long measure = p.position / 64;
                         int position = (int)(p.position % 64);
-                        Console.WriteLine("Current position: " + p.position);
-                        p.score.Print();
+                        //Console.WriteLine("Current position: " + p.position);
+                        //p.score.Print();
                         p.score.PlayEnumerable(syn, measure, position, -1, velocityChanger_(pair.Key) * p.velocityChange);
 
                         if (p.position + 1 <= p.score.length)
@@ -408,14 +409,14 @@ namespace ChordingCoding.SFX
                         else
                         {
                             deadScores.Add(p);
-                            Console.WriteLine("End of score - length: " + p.score.length);
+                            //Console.WriteLine("End of score - length: " + p.score.length);
                         }
-                        Console.WriteLine();
+                        //Console.WriteLine();
                     }
                     pair.Value.RemoveAll(x => deadScores.Contains(x));
-                    Console.WriteLine(pair.Key + " group: " + pair.Value.Count + " / " + playingScores[pair.Key].Count);
+                    //Console.WriteLine(pair.Key + " group: " + pair.Value.Count + " / " + playingScores[pair.Key].Count);
                 }
-                Console.WriteLine("\n");
+                //Console.WriteLine("\n");
             }
 
             Util.TaskQueue.Add("playingScores", playingScoresPlay, playingScores, syn, velocityChanger);
@@ -477,33 +478,56 @@ namespace ChordingCoding.SFX
             // 이미 재생 중인 악보이면 중복하여 재생하지 않습니다.
             if (velocityChange < 0) return;
             //Console.WriteLine("Playing...");
-
-            // 악보에 있는 모든 음표를 재생합니다.
-            KeyValuePair<float, int> p = note.ToMidi()[0];
-
-            if (p.Value > 0)
+            
+            void noteOffBufferCheckAndPlay(object[] args)
             {
-                int velocity = Util.RoundAndClamp(note.Velocity * velocityChange, 0, 127);
-                if (velocity == 0) return;
-
-                // 음표를 재생합니다.
-                // (Midi message pair를 번역하여 Midi message를 생성합니다.)
-                try
-                {
-                    syn.NoteOn(p.Value >> 16, p.Value & 65535, velocity);
-                }
-                catch (ObjectDisposedException) { }
-                catch (FluidSynthInteropException) { }
-            }
-
-            void noteOffBufferAdd(object[] args)
-            {
-                List<Note> noteOffBuffer_ = args[0] as List<Note>;
+                Dictionary<int, List<Note>> noteOffBuffer_ = args[0] as Dictionary<int, List<Note>>;
                 Note note_ = args[1] as Note;
-                noteOffBuffer_.Add(note_);
+                float velocityChange_ = (float)args[2];
+                int staff = note_.Staff;
+                int pitch = note_.Pitch;
+                if (noteOffBuffer_.ContainsKey(staff))
+                {
+                    int i = noteOffBuffer_[staff].FindIndex((n) => (pitch == n.Pitch));
+                    if (i != -1)
+                    {
+                        // 해당 채널에서 같은 음 높이의 음이 이미 재생 중인 경우
+                        try
+                        {
+                            // 재생 중이었던 음표의 재생을 멈춥니다.
+                            syn.NoteOff(staff, pitch);
+                        }
+                        catch (ObjectDisposedException) { }
+                        catch (FluidSynthInteropException) { }
+                        noteOffBuffer_[staff].RemoveAt(i);
+                    }
+                }
+
+                KeyValuePair<float, int> p = note.ToMidi()[0];
+
+                if (p.Value > 0)
+                {
+                    int velocity = Util.RoundAndClamp(note.Velocity * velocityChange_, 0, 127);
+                    if (velocity == 0) return;
+
+                    // 음표를 재생합니다.
+                    // (Midi message pair를 번역하여 Midi message를 생성합니다.)
+                    try
+                    {
+                        syn.NoteOn(p.Value >> 16, p.Value & 65535, velocity);
+                        if (!noteOffBuffer_.ContainsKey(staff))
+                        {
+                            noteOffBuffer_.Add(staff, new List<Note>());
+                        }
+                        noteOffBuffer_[staff].Add(note_);
+                    }
+                    catch (ObjectDisposedException) { }
+                    catch (FluidSynthInteropException) { }
+                }
             }
 
-            Util.TaskQueue.Add("noteOffBuffer", noteOffBufferAdd, noteOffBuffer, note);
+            Util.TaskQueue.Add("noteOffBuffer", noteOffBufferCheckAndPlay, noteOffBuffer, note, velocityChange);
+
             //Console.WriteLine("End of note.");
         }
 
@@ -540,39 +564,6 @@ namespace ChordingCoding.SFX
             //Console.WriteLine("End of note.");
         }
         */
-        /// <summary>
-        /// 음표 하나를 음표의 길이와 관계없이 영원히 재생합니다.
-        /// 이미 재생 중인 다른 음표와 동시에 재생할 수 있습니다.
-        /// 재생을 멈추려면 해당 Staff에 Stop()을 호출해야 합니다.
-        /// </summary>
-        /// <param name="syn">신디사이저</param>
-        /// <param name="note">재생할 음표</param>
-        /// <param name="velocityChange">연주 세기를 변화시키기 위해 음 세기에 곱해질 값</param>
-        public static void PlayANoteForever(Synth syn, Note note, float velocityChange = 1f)
-        {
-            // 이미 재생 중인 악보이면 중복하여 재생하지 않습니다.
-            if (velocityChange < 0) return;
-            //Console.WriteLine("Playing...");
-
-            // 악보에 있는 모든 음표를 재생합니다.
-            KeyValuePair<float, int> p = note.ToMidi()[0];
-
-            if (p.Value > 0)
-            {
-                int velocity = Util.RoundAndClamp(note.Velocity * velocityChange, 0, 127);
-                if (velocity == 0) return;
-
-                // 음표를 재생합니다.
-                // (Midi message pair를 번역하여 Midi message를 생성합니다.)
-                try
-                {
-                    syn.NoteOn(p.Value >> 16, p.Value & 65535, velocity);
-                }
-                catch (ObjectDisposedException) { }
-                catch (FluidSynthInteropException) { }
-            }
-            //Console.WriteLine("End of note.");
-        }
 
         /*
         /// <summary>
@@ -606,22 +597,28 @@ namespace ChordingCoding.SFX
         /// <param name="syn">신디사이저</param>
         public static void Stop(Synth syn, int staff = 0)
         {
-            // 이미 재생 중인 악보이면 중복하여 재생하지 않습니다.
-            if (staff < 0 || staff >= 16) return;
-            //Console.WriteLine("Playing...");
-
-            for (int p = 0; p < 128; p++)
+            void noteOffBufferClear(object[] args)
             {
-                // 음표의 재생을 멈춥니다.
-                // (Midi message pair를 번역하여 Midi message를 생성합니다.)
-                try
+                Dictionary<int, List<Note>> noteOffBuffer_ = args[0] as Dictionary<int, List<Note>>;
+                int staff_ = (int)args[1];
+
+                if (!noteOffBuffer_.ContainsKey(staff_)) return;
+
+                foreach (Note n in noteOffBuffer_[staff])
                 {
-                    syn.NoteOff(staff, p);
+                    int p = n.Pitch;
+                    try
+                    {
+                        // 음표의 재생을 멈춥니다.
+                        syn.NoteOff(staff, p);
+                    }
+                    catch (ObjectDisposedException) { }
+                    catch (FluidSynthInteropException) { }
                 }
-                catch (ObjectDisposedException) { }
-                catch (FluidSynthInteropException) { }
+                noteOffBuffer_[staff].Clear();
             }
-            //Console.WriteLine("End of note.");
+
+            Util.TaskQueue.Add("noteOffBuffer", noteOffBufferClear, noteOffBuffer, staff);
         }
 
         /*
@@ -679,57 +676,49 @@ namespace ChordingCoding.SFX
         /// <param name="syn">신디사이저</param>
         public static void NoteOff(Synth syn)
         {
-            if (noteOffBuffer.Count <= 0) return;
+            //if (noteOffBuffer.Count <= 0) return;
             long measure = Music.Measure;
             int position = Music.Position;
 
             void noteOffBufferStop(object[] args)
             {
-                List<Note> noteOffBuffer_ = args[0] as List<Note>;
+                Dictionary<int, List<Note>> noteOffBuffer_ = args[0] as Dictionary<int, List<Note>>;
                 long measure_ = (long)args[1];
                 int position_ = (int)args[2];
                 Synth syn_ = args[3] as Synth;
 
-                List<Note> deadBuffer = new List<Note>();
-                for (int i = noteOffBuffer_.Count - 1; i >= 0; i--)
+                foreach (List<Note> l in noteOffBuffer_.Values)
                 {
-                    Note note = noteOffBuffer_[i];
-
-                    // 악보에 있는 모든 음표를 재생합니다.
-                    KeyValuePair<float, int> p = note.ToMidi()[1];
-
-                    if (p.Value <= 0 && p.Key <= measure_ * 64f + position_)
+                    List<Note> deadBuffer = new List<Note>();
+                    for (int i = l.Count - 1; i >= 0; i--)
                     {
-                        // 음표의 재생을 멈춥니다.
-                        // (Midi message pair를 번역하여 Midi message를 생성합니다.)
-                        try
+                        Note note = l[i];
+
+                        // 악보에 있는 모든 음표를 재생합니다.
+                        KeyValuePair<float, int> p = note.ToMidi()[1];
+
+                        if (p.Value <= 0 && p.Key <= measure_ * 64f + position_)
                         {
-                            syn_.NoteOff(-p.Value >> 16, -p.Value & 65535);
-                        }
-                        catch (ObjectDisposedException) { }
-                        catch (FluidSynthInteropException) { }
-                        finally
-                        {
-                            deadBuffer.Add(noteOffBuffer_[i]);
+                            // 음표의 재생을 멈춥니다.
+                            // (Midi message pair를 번역하여 Midi message를 생성합니다.)
+                            try
+                            {
+                                syn_.NoteOff(-p.Value >> 16, -p.Value & 65535);
+                            }
+                            catch (ObjectDisposedException) { }
+                            catch (FluidSynthInteropException) { }
+                            finally
+                            {
+                                deadBuffer.Add(l[i]);
+                            }
                         }
                     }
+                    l.RemoveAll(x => deadBuffer.Contains(x));
                 }
-                noteOffBuffer_.RemoveAll(x => deadBuffer.Contains(x));
             }
 
             Util.TaskQueue.Add("noteOffBuffer", noteOffBufferStop, noteOffBuffer, measure, position, syn);
 
-        }
-
-        public static void ClearNoteOffBuffer()
-        {
-            void noteOffBufferClear(object[] args)
-            {
-                List<Note> noteOffBuffer_ = args[0] as List<Note>;
-                noteOffBuffer_.Clear();
-            }
-
-            Util.TaskQueue.Add("noteOffBuffer", noteOffBufferClear, noteOffBuffer);
         }
     }
 

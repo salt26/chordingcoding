@@ -67,8 +67,9 @@ namespace ChordingCoding
                     // Form1을 실행합니다.
                     
 
-                    // 키보드 입력 이벤트를 감지하여 콜백을 호출하도록 합니다.
-                    InterceptKeys._hookID = InterceptKeys.SetHook(InterceptKeys._proc);
+                    // 키보드 및 마우스 입력 이벤트를 감지하여 콜백을 호출하도록 합니다.
+                    InterceptKeys._keyboardHookID = InterceptKeys.SetLowLevelKeyboardHook(InterceptKeys._keyboardProc);
+                    InterceptKeys._mouseHookID = InterceptKeys.SetLowLevelMouseHook(InterceptKeys._mouseProc);
 
                     Application.EnableVisualStyles();
                     Application.SetCompatibleTextRenderingDefault(false);
@@ -77,7 +78,8 @@ namespace ChordingCoding
                     Application.Run(form);
 
                     // SetHook에서 잡은 handle을 놓습니다.
-                    InterceptKeys.UnhookWindowsHookEx(InterceptKeys._hookID);
+                    InterceptKeys.UnhookWindowsHookEx(InterceptKeys._keyboardHookID);
+                    InterceptKeys.UnhookWindowsHookEx(InterceptKeys._mouseHookID);
                 }
                 finally
                 {

@@ -147,6 +147,11 @@
     <Compile Include="NFluidsynth\Synth.cs" />
     <Compile Include="NFluidsynth\Utility.cs" />
     <Compile Include="NFluidsynth\Voice.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="SFX\PowerManagement.cs" />
     <Compile Include="SFX\Accompaniment.cs" />
     <Compile Include="SFX\Chord.cs" />
@@ -163,11 +168,6 @@
     <Compile Include="Util.cs" />
     <Compile Include="VFX\Particle.cs" />
     <Compile Include="VFX\ParticleSystem.cs" />
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>Resources.resx</DependentUpon>
-    </Compile>
     <Compile Include="Theme.cs" />
     <Compile Include="Interfaces\TrackBarMenuItem.cs" />
     <Compile Include="SFX\Note.cs" />

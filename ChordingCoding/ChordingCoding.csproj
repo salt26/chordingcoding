@@ -165,6 +165,7 @@
     <Compile Include="SFX\Music.cs" />
     <Compile Include="SFX\SFXTheme.cs" />
     <Compile Include="SFX\Timer.cs" />
+    <Compile Include="WordTracker.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="VFX\Particle.cs" />
     <Compile Include="VFX\ParticleSystem.cs" />
@@ -237,8 +238,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Scripts\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

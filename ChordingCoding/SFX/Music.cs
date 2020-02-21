@@ -441,19 +441,24 @@ namespace ChordingCoding.SFX
             chord = new Chord(SFXTheme.CurrentSFXTheme.ChordTransition, chord);
             pitch = chord.NextNote();
             syncPlayBuffer = new List<Note>();
+            Random r = new Random();
 
-            SFXTheme.InstrumentInfo ii = SFXTheme.CurrentSFXTheme.Instruments[0];
-            foreach (int p in chord.NotesInChord())
+            if (r.Next(0, 27) > 0)
             {
-                if (p != pitch)
+                // TPS 29 기준으로 한 마디에 한 번씩 시도할 때 1분에 한 번 꼴로 발생하는 확률로 채널(staff) 0의 악기를 재생하지 않음
+                SFXTheme.InstrumentInfo ii = SFXTheme.CurrentSFXTheme.Instruments[0];
+                foreach (int p in chord.NotesInChord())
                 {
-                    PlayANoteSync(ii.whitespacePitchModulator(p),
-                        ii.whitespaceVolume, ii.whitespaceRhythm, 0);
+                    if (p != pitch)
+                    {
+                        PlayANoteSync(ii.whitespacePitchModulator(p),
+                            ii.whitespaceVolume, ii.whitespaceRhythm, 0);
+                    }
                 }
             }
             foreach (KeyValuePair<int, SFXTheme.InstrumentInfo> pair in SFXTheme.CurrentSFXTheme.Instruments)
             {
-                if (pair.Value.whitespaceVolume > 0 && pair.Key != 1)
+                if (pair.Value.whitespaceVolume > 0 && pair.Key > 1)
                 {
                     PlayANoteSync(pair.Value.whitespacePitchModulator(pitch),
                         pair.Value.whitespaceVolume, pair.Value.whitespaceRhythm, pair.Key);
@@ -461,7 +466,6 @@ namespace ChordingCoding.SFX
             }
 
             // 빠르기 변경
-            Random r = new Random();
             SetTickPerSecond((int)TICK_PER_SECOND + (int)(1f * Math.Round(Util.GaussianRandom(r), MidpointRounding.AwayFromZero)));
 
             OnChordTransition?.Invoke(pitch);
@@ -609,7 +613,7 @@ namespace ChordingCoding.SFX
                 syncTransitionBuffer = false;
                 PlayChordTransition();
             }
-            else if (syncTransitionBuffer && tickNumber % 16 == 0)
+            else if (syncTransitionBuffer && tickNumber % 32 == 0)
             {
                 syncTransitionBuffer = false;
                 PlayChordTransition();

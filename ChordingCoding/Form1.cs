@@ -271,7 +271,6 @@ namespace ChordingCoding.UI
 
         private void Form1_Paint(object sender, PaintEventArgs e)
         {
-            // TODO
             // 각 파티클 시스템 객체의 Draw 함수 호출
             void particleSystemsDraw(object[] args)
             {

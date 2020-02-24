@@ -121,6 +121,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Hangul\Hangul.cs" />
     <Compile Include="NFluidsynth\AudioDriver.cs" />
     <Compile Include="NFluidsynth\ConfigurationKeys.cs" />
     <Compile Include="NFluidsynth\Enums.cs" />

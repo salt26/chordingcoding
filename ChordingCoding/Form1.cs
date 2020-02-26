@@ -13,6 +13,7 @@ using System.Reflection;
 using System.Configuration;
 using ChordingCoding.SFX;
 using ChordingCoding.VFX;
+using ChordingCoding.Word;
 
 namespace ChordingCoding.UI
 {
@@ -173,6 +174,7 @@ namespace ChordingCoding.UI
             }
 
             SetNoteResolution(resolution);
+            SentimentAnalyzer.Initialize();
 
             notifyIcon1.ShowBalloonTip(8);
 

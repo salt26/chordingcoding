@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 namespace ChordingCoding
 {
@@ -78,8 +79,16 @@ namespace ChordingCoding
                 {
                     lockedTaskQueues[lockName].Key.Enqueue(new KeyValuePair<Task, object[]>(task, args));
                 }
-                var task2 = System.Threading.Tasks.Task.Run(() => DoTask(lockName));
-                System.Threading.Tasks.Task.WaitAll(task2);
+
+                try
+                {
+                    var task2 = System.Threading.Tasks.Task.Run(() => DoTask(lockName));
+                    System.Threading.Tasks.Task.WaitAll(task2);
+                }
+                catch (NullReferenceException)
+                {
+                    DoTask(lockName);
+                }
             }
 
             private static void DoTask(string lockName)
@@ -97,14 +106,110 @@ namespace ChordingCoding
                     KeyValuePair<Task, object[]> p = lockedTaskQueues[lockName].Key.Dequeue();
                     if (p.Key is null)
                     {
-                        throw new NullReferenceException();
+                        Console.WriteLine("Error: In DoTask(), dequeued task is null!");
                     }
-                    p.Key(p.Value);     // Task 수행
+                    else
+                    {
+                        try
+                        {
+                            p.Key(p.Value);     // Task 수행
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.StackTrace);
+                        }
+                    }
                 }
 
-                System.Threading.Tasks.Task.Run(() => DoTask(lockName));   // 연쇄적으로 다음 Task 수행
+                try
+                {
+                    System.Threading.Tasks.Task.Run(() => DoTask(lockName));   // 연쇄적으로 다음 Task 수행
+                }
+                catch (NullReferenceException)
+                {
+                    DoTask(lockName);
+                }
             }
         }
-        
+
+        public class CSVReader
+        {
+            StreamReader streamReader;
+            List<List<string>> data = new List<List<string>>();
+            List<string> header = new List<string>();
+            bool hasHeader = false;
+
+            public CSVReader(string filename, bool hasHeader, char delimiter = ',')
+            {
+                streamReader = new StreamReader(filename, Encoding.GetEncoding("UTF-8"));
+                int i = 0;
+                if (hasHeader)
+                {
+                    i = -1;
+                    this.hasHeader = true;
+                }
+                while (!streamReader.EndOfStream)
+                {
+                    string s = streamReader.ReadLine();
+                    if (i >= 0)
+                    {
+                        data.Add(new List<string>());
+                        string[] temp = s.Split(delimiter);
+                        for (int j = 0; j < temp.Length; j++)
+                        {
+                            data[i].Add(temp[j]);
+                        }
+                    }
+                    else
+                    {
+                        string[] temp = s.Split(delimiter);
+                        for (int j = 0; j < temp.Length; j++)
+                        {
+                            header.Add(temp[j]);
+                        }
+                    }
+                    i++;
+                }
+            }
+
+            public int GetHeaderIndex(string headerName)
+            {
+                return header.IndexOf(headerName);
+            }
+
+            public List<string> GetRow(int index)
+            {
+                if (index < 0 || index >= data.Count) return null;
+                return data[index];
+            }
+
+            public List<string> GetColumn(int headerIndex)
+            {
+                List<string> column = new List<string>();
+                for (int i = 0; i < data.Count; i++)
+                {
+                    column.Add(data[i][headerIndex]);
+                }
+                return column;
+            }
+
+            public List<string> GetColumn(string headerName)
+            {
+                return GetColumn(GetHeaderIndex(headerName));
+            }
+
+            public List<string> GetHeader()
+            {
+                if (hasHeader)
+                    return header;
+                else return null;
+            }
+
+            public List<List<string>> GetData()
+            {
+                return data;
+            }
+        }
+
     }
 }

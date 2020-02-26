@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ChordingCoding.Hangul
+namespace ChordingCoding.Word
 {
     /// <summary>
     /// 한글을 자음과 모음 단위로 분해하거나 재결합하는 클래스입니다.
@@ -47,14 +47,15 @@ namespace ChordingCoding.Hangul
         }
 
         /// <summary>
-        /// 한글이 포함된 문자열을 자음과 모음 단위로 분해했다가 앞에서부터 재결합합니다.
+        /// 한글이 포함된 문자열을 자음과 모음 단위로 분해했다가 재결합합니다.
         /// (예: "이ㅂ닏ㅏ" -> "입니다")
         /// </summary>
         /// <param name="sentence">문자열</param>
+        /// <param name="onlyHangul">이 값이 true이면 한글이 아닌 문자를 모두 제거합니다.</param>
         /// <returns>재결합한 문자열</returns>
-        public static string Assemble(string sentence)
+        public static string Assemble(string sentence, bool onlyHangul = false)
         {
-            string s = Disassemble(sentence);
+            string s = Disassemble(sentence, onlyHangul);
             string ret = "";
             string token = "";
             char[] c = s.ToCharArray();

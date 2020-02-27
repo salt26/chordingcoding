@@ -1120,6 +1120,86 @@
             <param name="channelVolume"></param>
             <param name="guid"></param>
         </member>
+        <member name="T:NAudio.CoreAudioApi.Connector">
+            <summary>
+            Connector
+            </summary>
+        </member>
+        <member name="M:NAudio.CoreAudioApi.Connector.ConnectTo(NAudio.CoreAudioApi.Connector)">
+            <summary>
+            Connects this connector to a connector in another device-topology object
+            </summary>
+        </member>
+        <member name="P:NAudio.CoreAudioApi.Connector.Type">
+            <summary>
+            Retreives the type of this connector
+            </summary>
+        </member>
+        <member name="P:NAudio.CoreAudioApi.Connector.DataFlow">
+            <summary>
+            Retreives the data flow of this connector
+            </summary>
+        </member>
+        <member name="M:NAudio.CoreAudioApi.Connector.Disconnect">
+            <summary>
+            Disconnects this connector from it's connected connector (if connected)
+            </summary>
+        </member>
+        <member name="P:NAudio.CoreAudioApi.Connector.IsConnected">
+            <summary>
+            Indicates whether this connector is connected to another connector
+            </summary>
+        </member>
+        <member name="P:NAudio.CoreAudioApi.Connector.ConnectedTo">
+            <summary>
+            Retreives the connector this connector is connected to (if connected)
+            </summary>
+        </member>
+        <member name="P:NAudio.CoreAudioApi.Connector.ConnectedToConnectorId">
+            <summary>
+            Retreives the global ID of the connector this connector is connected to (if connected)
+            </summary>
+        </member>
+        <member name="P:NAudio.CoreAudioApi.Connector.ConnectedToDeviceId">
+            <summary>
+            Retreives the device ID of the audio device this connector is connected to (if connected)
+            </summary>
+        </member>
+        <member name="T:NAudio.CoreAudioApi.ConnectorType">
+            <summary>
+            Connector Type
+            </summary>
+        </member>
+        <member name="F:NAudio.CoreAudioApi.ConnectorType.UnknownConnector">
+            <summary>
+            The connector is part of a connection of unknown type.
+            </summary>
+        </member>
+        <member name="F:NAudio.CoreAudioApi.ConnectorType.PhysicalInternal">
+            <summary>
+            The connector is part of a physical connection to an auxiliary device that is installed inside the system chassis
+            </summary>
+        </member>
+        <member name="F:NAudio.CoreAudioApi.ConnectorType.PhysicalExternal">
+            <summary>
+            The connector is part of a physical connection to an external device.
+            </summary>
+        </member>
+        <member name="F:NAudio.CoreAudioApi.ConnectorType.SoftwareIo">
+            <summary>
+            The connector is part of a software-configured I/O connection (typically a DMA channel) between system memory and an audio hardware device on an audio adapter.
+            </summary>
+        </member>
+        <member name="F:NAudio.CoreAudioApi.ConnectorType.SoftwareFixed">
+            <summary>
+            The connector is part of a permanent connection that is fixed and cannot be configured under software control.
+            </summary>
+        </member>
+        <member name="F:NAudio.CoreAudioApi.ConnectorType.Network">
+            <summary>
+            The connector is part of a connection to a network.
+            </summary>
+        </member>
         <member name="T:NAudio.CoreAudioApi.DataFlow">
             <summary>
             The EDataFlow enumeration defines constants that indicate the direction 
@@ -1172,6 +1252,26 @@
         <member name="F:NAudio.CoreAudioApi.DeviceState.All">
             <summary>
             DEVICE_STATEMASK_ALL
+            </summary>
+        </member>
+        <member name="T:NAudio.CoreAudioApi.DeviceTopology">
+            <summary>
+            Windows CoreAudio DeviceTopology
+            </summary>
+        </member>
+        <member name="P:NAudio.CoreAudioApi.DeviceTopology.ConnectorCount">
+            <summary>
+            Retrieves the number of connections associated with this device-topology object
+            </summary>
+        </member>
+        <member name="M:NAudio.CoreAudioApi.DeviceTopology.GetConnector(System.UInt32)">
+            <summary>
+            Retrieves the connector at the supplied index
+            </summary>
+        </member>
+        <member name="P:NAudio.CoreAudioApi.DeviceTopology.DeviceId">
+            <summary>
+            Retrieves the device id of the device represented by this device-topology object
             </summary>
         </member>
         <member name="T:NAudio.CoreAudioApi.EEndpointHardwareSupport">
@@ -1674,6 +1774,18 @@
             <param name="newSession">session being added</param>
             <returns>An HRESULT code indicating whether the operation succeeded of failed.</returns>
         </member>
+        <member name="T:NAudio.CoreAudioApi.Interfaces.IConnector">
+            <summary>
+            Windows CoreAudio IConnector interface
+            Defined in devicetopology.h
+            </summary>
+        </member>
+        <member name="T:NAudio.CoreAudioApi.Interfaces.IDeviceTopology">
+            <summary>
+            Windows CoreAudio IDeviceTopology interface
+            Defined in devicetopology.h
+            </summary>
+        </member>
         <member name="T:NAudio.CoreAudioApi.Interfaces.IMMEndpoint">
             <summary>
             defined in MMDeviceAPI.h
@@ -1710,6 +1822,18 @@
             </summary>
             <param name="pwstrDeviceId"></param>
             <param name="key"></param>
+        </member>
+        <member name="T:NAudio.CoreAudioApi.Interfaces.IPart">
+            <summary>
+            Windows CoreAudio IPart interface
+            Defined in devicetopology.h
+            </summary>
+        </member>
+        <member name="T:NAudio.CoreAudioApi.Interfaces.IPartsList">
+            <summary>
+            Windows CoreAudio IPartsList interface
+            Defined in devicetopology.h
+            </summary>
         </member>
         <member name="T:NAudio.CoreAudioApi.Interfaces.IPropertyStore">
             <summary>
@@ -1958,6 +2082,11 @@
             AudioSessionManager instance
             </summary>
         </member>
+        <member name="P:NAudio.CoreAudioApi.MMDevice.DeviceTopology">
+            <summary>
+            DeviceTopology instance
+            </summary>
+        </member>
         <member name="P:NAudio.CoreAudioApi.MMDevice.Properties">
             <summary>
             Properties
@@ -1976,6 +2105,11 @@
         <member name="P:NAudio.CoreAudioApi.MMDevice.IconPath">
             <summary>
             Icon path of device
+            </summary>
+        </member>
+        <member name="P:NAudio.CoreAudioApi.MMDevice.InstanceId">
+            <summary>
+            Device Instance Id of Device
             </summary>
         </member>
         <member name="P:NAudio.CoreAudioApi.MMDevice.ID">
@@ -2204,6 +2338,11 @@
         <member name="F:NAudio.CoreAudioApi.PropertyKeys.PKEY_Device_InterfaceKey">
             <summary>
             Device interface key property.
+            </summary>
+        </member>
+        <member name="F:NAudio.CoreAudioApi.PropertyKeys.PKEY_Device_InstanceId">
+            <summary>
+            System-supplied device instance identification string, assigned by PnP manager, persistent across system restarts.
             </summary>
         </member>
         <member name="T:NAudio.CoreAudioApi.PropertyStore">
@@ -14571,7 +14710,7 @@
         </member>
         <member name="M:NAudio.SoundFont.SampleHeader.ToString">
             <summary>
-            <see cref="!:Object.ToString"/>
+            <see cref="M:System.Object.ToString"/>
             </summary>
         </member>
         <member name="T:NAudio.SoundFont.SampleMode">

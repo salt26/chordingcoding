@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Moda.Korean.TwitterKoreanProcessorCS;
 
 namespace ChordingCoding.Word
 {
@@ -35,34 +36,238 @@ namespace ChordingCoding.Word
         static Util.CSVReader hangulSentimentCSV1;
         static Util.CSVReader hangulSentimentCSV2;
         static Util.CSVReader hangulSentimentCSV3;
-        static Dictionary<string, WordSentiment> hangulSentiment1;
-        static Dictionary<string, WordSentiment> hangulSentiment2;
-        static Dictionary<string, WordSentiment> hangulSentiment3;
+        static List<Dictionary<string, WordSentiment>> koreanSentimentDictionary;
 
+        // aggregateSentiment
+        static int[] aggregatePolarity;
+        static int[] aggregateIntensity;
+        static int[] aggregateSubjectivityType;
+        static int[] aggregateSubjectivityPolarity;
+
+        public static bool IsReady { get; private set; } = false;
+
+        /// <summary>
+        /// 감정 사전을 로딩하여 감정 분석기를 초기화합니다.
+        /// </summary>
         public static void Initialize()
         {
-            #region Load Hangul dictionaries
+            System.Threading.Tasks.Task.Run(() => TwitterKoreanProcessorCS.Normalize("초기화"));     // Initial loading
+
+            #region Load Korean dictionaries
             hangulSentimentCSV1 = new Util.CSVReader("HangulSentiment1.csv", true);
             hangulSentimentCSV2 = new Util.CSVReader("HangulSentiment2.csv", true);
             hangulSentimentCSV3 = new Util.CSVReader("HangulSentiment3.csv", true);
-            hangulSentiment1 = new Dictionary<string, WordSentiment>();
-            hangulSentiment2 = new Dictionary<string, WordSentiment>();
-            hangulSentiment3 = new Dictionary<string, WordSentiment>();
+            koreanSentimentDictionary = new List<Dictionary<string, WordSentiment>>
+            {
+                new Dictionary<string, WordSentiment>(),
+                new Dictionary<string, WordSentiment>(),
+                new Dictionary<string, WordSentiment>()
+            };
             foreach (List<string> row in hangulSentimentCSV1.GetData())
             {
-                hangulSentiment1.Add(row[0], new WordSentiment(row[0], row[1], row[2], row[3], row[4]));
+                koreanSentimentDictionary[0].Add(row[0], new WordSentiment(row[0], row[1], row[2], row[3], row[4]));
             }
             foreach (List<string> row in hangulSentimentCSV2.GetData())
             {
-                hangulSentiment2.Add(row[0], new WordSentiment(row[0], row[1], row[2], row[3], row[4]));
+                koreanSentimentDictionary[1].Add(row[0], new WordSentiment(row[0], row[1], row[2], row[3], row[4]));
             }
             foreach (List<string> row in hangulSentimentCSV3.GetData())
             {
-                hangulSentiment3.Add(row[0], new WordSentiment(row[0], row[1], row[2], row[3], row[4]));
+                koreanSentimentDictionary[2].Add(row[0], new WordSentiment(row[0], row[1], row[2], row[3], row[4]));
             }
             #endregion
+            
+            Util.TaskQueue.Add("aggregateSentiment", InitializeAggregate);
+
+            IsReady = true;
+            
+            string sample1 = "그는 밝은 미소를 지으며 의미심장한 말을 꺼냈다.";
+            foreach (string s in sample1.Split(' '))
+            {
+                AnalyzeKorean(s);
+                GetSentimentAndFlush().Print();
+            }
+            Console.WriteLine(sample1);
         }
 
+        public static void AnalyzeKorean(string input)
+        {
+            if (!IsReady) return;
+
+            string a = Hangul.Assemble(input, true);
+            a = TwitterKoreanProcessorCS.Normalize(a);
+            var b = TwitterKoreanProcessorCS.Tokenize(a);
+            //b = TwitterKoreanProcessorCS.Stem(b);
+            var c = TwitterKoreanProcessorCS.TokensToStrings(b);
+            int count = c.Count();
+            List<string> tokens = c.ToList();
+
+            for (int j = 1; j <= 3; j++)
+            {
+                for (int i = 0; i < count - j + 1; i++)
+                {
+                    string word = String.Join(";", tokens.GetRange(i, j));
+                    Console.WriteLine(word);
+                    if (koreanSentimentDictionary[j - 1].ContainsKey(word))
+                    {
+                        void UpdateAggregate(object[] args)
+                        {
+                            WordSentiment sentiment = args[0] as WordSentiment;
+                            int weight = 1;
+                            aggregatePolarity[(int)sentiment.Polarity] += weight;
+                            aggregateIntensity[(int)sentiment.Intensity] += weight;
+                            aggregateSubjectivityType[(int)sentiment.SubjectivityType] += weight;
+                            aggregateSubjectivityPolarity[(int)sentiment.SubjectivityPolarity] += weight;
+                        }
+                        Util.TaskQueue.Add("aggregateSentiment", UpdateAggregate,
+                            koreanSentimentDictionary[j - 1][word]);
+                    }
+                }
+            }
+        }
+        
+        /// <summary>
+        /// 현재까지 누적된 단어들의 감정 분석 결과를 반환하고 이를 초기화합니다.
+        /// </summary>
+        /// <returns>Polarity, Intensity, SubjectivityType, SubjectivityPolarity가 들어있는 감정 분석 결과</returns>
+        public static WordSentiment GetSentimentAndFlush()
+        {
+            WordSentiment.PolarityValue p = WordSentiment.PolarityValue.NULL;
+            WordSentiment.IntensityValue i = WordSentiment.IntensityValue.NULL;
+            WordSentiment.SubjectivityTypeValue st = WordSentiment.SubjectivityTypeValue.NULL;
+            WordSentiment.SubjectivityPolarityValue sp = WordSentiment.SubjectivityPolarityValue.NULL;
+
+            void GetAggregate(object[] args)
+            {
+                List<WordSentiment.PolarityValue> pBox = new List<WordSentiment.PolarityValue>();
+                List<WordSentiment.IntensityValue> iBox = new List<WordSentiment.IntensityValue>();
+                Random r = new Random();
+
+                // Polarity -> drawing a lot from cubic frequencies
+                if (aggregatePolarity.Sum() <= 0)
+                {
+                    p = WordSentiment.PolarityValue.NULL;
+                }
+                else
+                {
+                    for (int j = 0; j < aggregatePolarity.Length; j++)
+                    {
+                        for (int k = 0; k < aggregatePolarity[j] * aggregatePolarity[j] * aggregatePolarity[j]; k++)
+                        {
+                            pBox.Add((WordSentiment.PolarityValue)j);
+                        }
+                    }
+                    p = pBox[r.Next(pBox.Count)];
+                }
+
+                // Intensity -> drawing a lot from cubic frequencies
+                if (aggregateIntensity.Sum() <= 0)
+                {
+                    i = WordSentiment.IntensityValue.NULL;
+                }
+                else
+                {
+                    for (int j = 0; j < aggregateIntensity.Length; j++)
+                    {
+                        for (int k = 0; k < aggregateIntensity[j] * aggregateIntensity[j] * aggregateIntensity[j]; k++)
+                        {
+                            iBox.Add((WordSentiment.IntensityValue)j);
+                        }
+                    }
+                    i = iBox[r.Next(iBox.Count)];
+                }
+
+                // SubjectivityType -> take argmax
+                if (aggregateSubjectivityType.Sum() <= 0)
+                {
+                    st = WordSentiment.SubjectivityTypeValue.NULL;
+                }
+                else
+                {
+                    int max = 0;
+                    List<int> argmax = new List<int>();
+                    for (int j = 0; j < aggregateSubjectivityType.Length; j++)
+                    {
+                        if (aggregateSubjectivityType[j] > max)
+                        {
+                            max = aggregateSubjectivityType[j];
+                            argmax = new List<int>() { j };
+                        }
+                        else if (aggregateSubjectivityType[j] == max)
+                        {
+                            argmax.Add(j);
+                        }
+                    }
+                    st = (WordSentiment.SubjectivityTypeValue)argmax[r.Next(argmax.Count)];
+                }
+
+                // SubjectivityPolarity -> take argmax
+                if (aggregateSubjectivityPolarity.Sum() <= 0)
+                {
+                    sp = WordSentiment.SubjectivityPolarityValue.NULL;
+                }
+                else
+                {
+                    int max = 0;
+                    List<int> argmax = new List<int>();
+                    for (int j = 0; j < aggregateSubjectivityPolarity.Length; j++)
+                    {
+                        if (aggregateSubjectivityPolarity[j] > max)
+                        {
+                            max = aggregateSubjectivityPolarity[j];
+                            argmax = new List<int>() { j };
+                        }
+                        else if (aggregateSubjectivityPolarity[j] == max)
+                        {
+                            argmax.Add(j);
+                        }
+                    }
+                    sp = (WordSentiment.SubjectivityPolarityValue)argmax[r.Next(argmax.Count)];
+                }
+            }
+
+            Util.TaskQueue.Add("aggregateSentiment", GetAggregate);
+            Util.TaskQueue.Add("aggregateSentiment", InitializeAggregate);
+
+            return new WordSentiment("", p, i, st, sp);
+        }
+
+        private static void PrintAggregate(object[] args)
+        {
+            string s = "";
+            for (int i = 0; i < aggregatePolarity.Length; i++)
+            {
+                s += ((WordSentiment.PolarityValue)i).ToString() + ": " + aggregatePolarity[i] + "\t";
+            }
+            s += "\n";
+            for (int i = 0; i < aggregateIntensity.Length; i++)
+            {
+                s += ((WordSentiment.IntensityValue)i).ToString() + ": " + aggregateIntensity[i] + "\t";
+            }
+            s += "\n";
+            for (int i = 0; i < aggregateSubjectivityType.Length; i++)
+            {
+                s += ((WordSentiment.SubjectivityTypeValue)i).ToString() + ": " + aggregateSubjectivityType[i] + "\t";
+            }
+            s += "\n";
+            for (int i = 0; i < aggregateSubjectivityPolarity.Length; i++)
+            {
+                s += ((WordSentiment.SubjectivityPolarityValue)i).ToString() + ": " + aggregateSubjectivityPolarity[i] + "\t";
+            }
+            Console.WriteLine(s);
+        }
+
+        /// <summary>
+        /// 감정 분석 총계를 초기화합니다.
+        /// 반드시 "aggregateSentiment"라는 lockName의 Util.TaskQueue로 실행되어야 합니다.
+        /// </summary>
+        private static void InitializeAggregate(object[] args)
+        {
+            aggregatePolarity = new int[5] { 0, 0, 0, 0, 0 };
+            aggregateIntensity = new int[4] { 0, 0, 0, 0 };
+            aggregateSubjectivityType = new int[7] { 0, 0, 0, 0, 0, 0, 0 };
+            aggregateSubjectivityPolarity = new int[4] { 0, 0, 0, 0 };
+        }
     }
     
     /// <summary>
@@ -70,11 +275,13 @@ namespace ChordingCoding.Word
     /// </summary>
     public class WordSentiment
     {
-        public enum PolarityValue { COMP, NEG, NEUT, NONE, POS };
-        public enum IntensityValue { High, Low, Medium, None };
-        public enum SubjectivityTypeValue { Agreement, Argument,
-            Emotion, Intention, Judgment, Others, Speculation };
-        public enum SubjectivityPolarityValue { COMP, NEG, NEUT, POS };
+        public enum PolarityValue { COMP = 0, NEG = 1, NEUT = 2, NONE = 3, POS = 4, NULL = -1 };
+        public enum IntensityValue { High = 0, Low = 1, Medium = 2, None = 3, NULL = -1 };
+        public enum SubjectivityTypeValue {
+            Agreement = 0, Argument = 1, Emotion = 2, Intention = 3,
+            Judgment = 4, Others = 5, Speculation = 6, NULL = -1
+        };
+        public enum SubjectivityPolarityValue { COMP = 0, NEG = 1, NEUT = 2, POS = 3, NULL = -1 };
 
         public string Word { get; }
         public PolarityValue Polarity { get; }
@@ -112,7 +319,8 @@ namespace ChordingCoding.Word
                 case "NEUT": return PolarityValue.NEUT;
                 case "NONE": return PolarityValue.NONE;
                 case "POS": return PolarityValue.POS;
-                default: throw new ArgumentException("Invalid Polarity string");
+                default: //throw new ArgumentException("Invalid Polarity string");
+                    return PolarityValue.NULL;
             }
         }
         
@@ -124,7 +332,8 @@ namespace ChordingCoding.Word
                 case "Low": return IntensityValue.Low;
                 case "Medium": return IntensityValue.Medium;
                 case "None": return IntensityValue.None;
-                default: throw new ArgumentException("Invalid Intensity string");
+                default: //throw new ArgumentException("Invalid Intensity string");
+                    return IntensityValue.NULL;
             }
         }
 
@@ -139,7 +348,8 @@ namespace ChordingCoding.Word
                 case "Judgment": return SubjectivityTypeValue.Judgment;
                 case "Others": return SubjectivityTypeValue.Others;
                 case "Speculation": return SubjectivityTypeValue.Speculation;
-                default: throw new ArgumentException("Invalid SubjectivityType string");
+                default: //throw new ArgumentException("Invalid SubjectivityType string");
+                    return SubjectivityTypeValue.NULL;
             }
         }
 
@@ -151,8 +361,17 @@ namespace ChordingCoding.Word
                 case "NEG": return SubjectivityPolarityValue.NEG;
                 case "NEUT": return SubjectivityPolarityValue.NEUT;
                 case "POS": return SubjectivityPolarityValue.POS;
-                default: throw new ArgumentException("Invalid SubjectivityPolarity string");
+                default: //throw new ArgumentException("Invalid SubjectivityPolarity string");
+                    return SubjectivityPolarityValue.NULL;
             }
+        }
+
+        public void Print()
+        {
+            string s = "Polarity: " + Polarity.ToString() + "\tIntensity: " + Intensity.ToString() +
+                "\tSubjectivityType: " + SubjectivityType.ToString() + "\tSubjectivityPolarity: " +
+                SubjectivityPolarity.ToString();
+            Console.WriteLine(s);
         }
     }
 }

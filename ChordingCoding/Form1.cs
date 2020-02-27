@@ -174,7 +174,7 @@ namespace ChordingCoding.UI
             }
 
             SetNoteResolution(resolution);
-            SentimentAnalyzer.Initialize();
+            SentimentAnalyzer.Initialize(); // 반드시 Music.Initialize()가 완료된 후에 호출할 것.
 
             notifyIcon1.ShowBalloonTip(8);
 

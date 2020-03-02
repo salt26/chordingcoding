@@ -100,22 +100,30 @@ namespace ChordingCoding.UI
                 //Console.WriteLine("KeyCode: " + (Keys)vkCode);
 
                 Keys key = (Keys)vkCode;
-                if ((vkCode >= 48 && vkCode <= 90) ||
+                if ((Control.ModifierKeys & Keys.Control) == Keys.Control ||
+                    (Control.ModifierKeys & Keys.Alt) == Keys.Alt)
+                {
+                    // Modifier (Ctrl, Alt)
+                    Util.TaskQueue.Add("wordState", ResetWord);
+                }
+                else if (vkCode >= 65 && vkCode <= 90)
+                {
+                    // Characters (Alphabet)
+                    bool hasShiftPressed = (Control.ModifierKeys & Keys.Shift) == Keys.Shift;
+
+                    Util.TaskQueue.Add("wordState", AddCharToWord, vkCode, hasShiftPressed);
+
+                    Music.PlayNoteInChord();
+                    // 음표 재생 후에 Music.OnPlayNotes()가 호출되면서 시각 효과 발생
+                }
+                else if ((vkCode >= 48 && vkCode <= 57) ||
                     (vkCode >= 96 && vkCode <= 111) ||
                     (vkCode >= 186 && vkCode <= 192) ||
                     (vkCode >= 219 && vkCode <= 223) ||
                     (vkCode == 226))
                 {
-                    // Characters
-                    void AddCharToWord(object[] args)
-                    {
-                        int vkCode_ = (int)args[0];
-                        StringBuilder charPressed = new StringBuilder(256);
-                        ToUnicode((uint)vkCode_, 0, new byte[256], charPressed, charPressed.Capacity, 0);
-                        wordState += charPressed.ToString();
-                        // TODO 사전 검색
-                    }
-                    Util.TaskQueue.Add("wordState", AddCharToWord, vkCode);
+                    // Characters (Non-alphabet)
+                    Util.TaskQueue.Add("wordState", ResetWord);
 
                     Music.PlayNoteInChord();
                     // 음표 재생 후에 Music.OnPlayNotes()가 호출되면서 시각 효과 발생
@@ -123,41 +131,70 @@ namespace ChordingCoding.UI
                 else if (vkCode == 8)
                 {
                     // Backspace
-                    void BackspaceWord(object[] args)
-                    {
-                        if (wordState.Length > 0)
-                            wordState = wordState.Substring(0, wordState.Length - 1);
-                    }
                     Util.TaskQueue.Add("wordState", BackspaceWord);
                 }
                 else if ((vkCode == 32) || (vkCode == 9) || (vkCode == 13))
                 {
                     // Whitespaces (Space, Enter, Tab)
-                    void ResetWord(object[] args)
-                    {
-                        if (wordState.Length > 0)
-                            Console.WriteLine("wordState: " + wordState);
-                        wordState = "";
-                    }
                     Util.TaskQueue.Add("wordState", ResetWord);
 
                     Music.PlayChordTransitionSync();
                     // 화음 전이 후에 Music.OnChordTransition()이 호출되면서 시각 효과 발생
                 }
-                else if ((vkCode >= 33 && vkCode <= 40) || (vkCode == 27) || /*(vkCode == 17) || (vkCode == 18) ||
-                    (vkCode >= 91 && vkCode <= 95) || */(vkCode >= 162 && vkCode <= 165) || (vkCode >= 131072))
+                else if ((vkCode >= 33 && vkCode <= 40) || (vkCode == 27) ||
+                    (vkCode >= 91 && vkCode <= 95))
                 {
-                    // Cursor relocation (Page Up, Page Down, End, Home, Arrows), Modifier (Ctrl), etc (ESC, WinLogo, App, Sleep)
-                    void ResetWord(object[] args)
-                    {
-                        if (wordState.Length > 0)
-                            Console.WriteLine("wordState: " + wordState);
-                        wordState = "";
-                    }
+                    // Cursor relocation (Page Up, Page Down, End, Home, Arrows), etc (ESC, WinLogo, App, Sleep)
                     Util.TaskQueue.Add("wordState", ResetWord);
                 }
             }
             return CallNextHookEx(_keyboardHookID, nCode, wParam, lParam);
+        }
+
+        /// <summary>
+        /// 현재까지 추적한 단어를 감정 분석기에 넘기고 초기화합니다.
+        /// </summary>
+        /// <param name="args">없음</param>
+        private static void ResetWord(object[] args)
+        {
+            if (wordState.Length > 0)
+            {
+                Console.WriteLine("wordState: " + Word.Hangul.Assemble(wordState));
+                Word.SentimentAnalyzer.AnalyzeKorean(Word.Hangul.Assemble(wordState));
+                Word.SentimentAnalyzer.GetSentimentAndFlush().Print();
+            }
+            wordState = "";
+        }
+
+        /// <summary>
+        /// 추적하고 있는 단어에서 Backspace 입력을 처리합니다.
+        /// </summary>
+        /// <param name="args">없음</param>
+        private static void BackspaceWord(object[] args)
+        {
+            if (wordState.Length > 0)
+                wordState = wordState.Substring(0, wordState.Length - 1);
+        }
+
+        /// <summary>
+        /// 추적하고 있는 단어에 새 글자를 추가합니다.
+        /// </summary>
+        /// <param name="args">첫 번째 인자: 입력된 키 코드(int), 두 번째 인자: 키 입력 시 Shift가 함께 눌렸는지 여부(bool)</param>
+        private static void AddCharToWord(object[] args)
+        {
+            int vkCode_ = (int)args[0];
+            bool hasShiftPressed_ = (bool)args[1];
+            StringBuilder charPressed = new StringBuilder(256);
+            ToUnicode((uint)vkCode_, 0, new byte[256], charPressed, charPressed.Capacity, 0);
+            // TODO 영어와 한글 구분하여 처리
+            if (IsIMESetToEnglish())
+            {
+                wordState += Util.ToUpperCase(charPressed.ToString(), hasShiftPressed_);
+            }
+            else
+            {
+                wordState += Word.Hangul.EnglishToKorean(Util.ToUpperCase(charPressed.ToString(), hasShiftPressed_));
+            }
         }
 
         /// <summary>
@@ -177,13 +214,7 @@ namespace ChordingCoding.UI
                 {
                     //LowLevelMouseHookStruct hookStruct = (LowLevelMouseHookStruct)Marshal.PtrToStructure(lParam, typeof(LowLevelMouseHookStruct));
                     //Console.WriteLine("(" + hookStruct.point.x + ", " + hookStruct.point.y + ")");
-
-                    void ResetWord(object[] args)
-                    {
-                        if (wordState.Length > 0)
-                            Console.WriteLine("wordState: " + wordState);
-                        wordState = "";
-                    }
+                    
                     Util.TaskQueue.Add("wordState", ResetWord);
                 }
             }
@@ -235,6 +266,42 @@ namespace ChordingCoding.UI
             int bufferSize,
             uint flags
         );
+
+        [DllImport("imm32.dll")]
+        private static extern IntPtr ImmGetDefaultIMEWnd(IntPtr hWnd);
+
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, IntPtr wParam, IntPtr IParam);
+
+        /// <summary>
+        /// 현재 포커스를 가진 창을 가져옵니다.
+        /// </summary>
+        /// <returns></returns>
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern IntPtr GetForegroundWindow();
+
+        private const int WM_IME_CONTROL = 643;
+
+        // https://m.blog.naver.com/gostarst/220627552770
+        /// <summary>
+        /// 현재 입력기의 상태가 영어 입력 모드인지 확인합니다.
+        /// 영어이면 true, 다른 언어이면 false를 반환합니다.
+        /// </summary>
+        /// <returns></returns>
+        private static bool IsIMESetToEnglish()
+        {
+            IntPtr hwnd = GetForegroundWindow();
+            if (hwnd == null)
+            {
+                //Console.WriteLine("IME is English? null");
+                return true;
+            }
+            IntPtr hime = ImmGetDefaultIMEWnd(hwnd);
+            IntPtr status = SendMessage(hime, WM_IME_CONTROL, new IntPtr(0x5), new IntPtr(0));
+
+            //Console.WriteLine("IME is English? " + status.ToInt32());
+            return status.ToInt32() == 0;
+        }
 
     }
 }

@@ -36,6 +36,68 @@ namespace ChordingCoding
             else if (r > max) return max;
             else return r;
         }
+
+        public static string ToUpperCase(string str, bool hasShiftPressed)
+        {
+            if (!hasShiftPressed) return str;
+
+            string newStr = "";
+            for (int i = 0; i < str.Length; i++)
+            {
+                switch (str[i])
+                {
+                    case '`': newStr += '~'; break;
+                    case '1': newStr += '!'; break;
+                    case '2': newStr += '@'; break;
+                    case '3': newStr += '#'; break;
+                    case '4': newStr += '$'; break;
+                    case '5': newStr += '%'; break;
+                    case '6': newStr += '^'; break;
+                    case '7': newStr += '&'; break;
+                    case '8': newStr += '*'; break;
+                    case '9': newStr += '('; break;
+                    case '0': newStr += ')'; break;
+                    case '-': newStr += '_'; break;
+                    case '=': newStr += '+'; break;
+                    case 'q': newStr += 'Q'; break;
+                    case 'w': newStr += 'W'; break;
+                    case 'e': newStr += 'E'; break;
+                    case 'r': newStr += 'R'; break;
+                    case 't': newStr += 'T'; break;
+                    case 'y': newStr += 'Y'; break;
+                    case 'u': newStr += 'U'; break;
+                    case 'i': newStr += 'I'; break;
+                    case 'o': newStr += 'O'; break;
+                    case 'p': newStr += 'P'; break;
+                    case '[': newStr += '{'; break;
+                    case ']': newStr += '}'; break;
+                    case '\\': newStr += '|'; break;
+                    case 'a': newStr += 'A'; break;
+                    case 's': newStr += 'S'; break;
+                    case 'd': newStr += 'D'; break;
+                    case 'f': newStr += 'F'; break;
+                    case 'g': newStr += 'G'; break;
+                    case 'h': newStr += 'H'; break;
+                    case 'j': newStr += 'J'; break;
+                    case 'k': newStr += 'K'; break;
+                    case 'l': newStr += 'L'; break;
+                    case ';': newStr += ':'; break;
+                    case '\'': newStr += '"'; break;
+                    case 'z': newStr += 'Z'; break;
+                    case 'x': newStr += 'X'; break;
+                    case 'c': newStr += 'C'; break;
+                    case 'v': newStr += 'V'; break;
+                    case 'b': newStr += 'B'; break;
+                    case 'n': newStr += 'N'; break;
+                    case 'm': newStr += 'M'; break;
+                    case ',': newStr += '<'; break;
+                    case '.': newStr += '>'; break;
+                    case '/': newStr += '?'; break;
+                    default: newStr += str[i]; break;
+                }
+            }
+            return newStr;
+        }
         
         /// <summary>
         /// 한 번에 하나씩만 수행되어야 하는 작업들을 관리합니다.

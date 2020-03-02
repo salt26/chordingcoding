@@ -100,7 +100,25 @@ namespace ChordingCoding.UI
                 //Console.WriteLine("KeyCode: " + (Keys)vkCode);
 
                 Keys key = (Keys)vkCode;
-                if ((Control.ModifierKeys & Keys.Control) == Keys.Control ||
+                if (vkCode >= 21 && vkCode <= 25 && (Control.ModifierKeys & Keys.Alt) == Keys.Alt)
+                {
+                    // Alt + IME Mode Change
+                    // Do nothing!
+                }
+                else if (vkCode >= 21 && vkCode <= 25)
+                {
+                    // IME Mode Change (Hangul/Kana mode, Junja mode, Final mode, Hanja/Kanji mode)
+                    Util.TaskQueue.Add("wordState", ResetWord);
+                }
+                else if ((vkCode == 91 || vkCode == 92) && 
+                    ((Control.ModifierKeys & Keys.Control) == Keys.Control ||
+                    (Control.ModifierKeys & Keys.Alt) == Keys.Alt ||
+                    (Control.ModifierKeys & Keys.Shift) == Keys.Shift))
+                {
+                    // Modifier (Ctrl, Alt, Shift) + WinLogo 
+                    // Do nothing!
+                }
+                else if ((Control.ModifierKeys & Keys.Control) == Keys.Control ||
                     (Control.ModifierKeys & Keys.Alt) == Keys.Alt)
                 {
                     // Modifier (Ctrl, Alt)

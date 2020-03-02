@@ -27,15 +27,17 @@ namespace ChordingCoding.Word
         // TODO ChordingCoding이 시작할 때 CSV 파일을 읽어와서 Dictionary에 로딩*
         // InterceptKeys.cs에서 여기에 문자열을 넘기면(함수 호출),
         // 문자열을 TwitterKoreanProcessorCS로 분석하고
-        // 토큰을 하나, 둘 또는 셋씩 묶어서 Dictionary에서 검색해 본다.
+        // 토큰을 하나, 둘 또는 셋씩 묶어서 Dictionary에서 검색해 본다.*
         // 검색 결과를 가지고 입력된 문자열에서 발생한 감정 이벤트를 일으킨다.
         // (예: 다음 화음의 성격 결정, 빠르기 변화, 조성 변화, 반주 패턴 변화, 악기 변화 등)
 
         // TODO 영어 감정 사전도 지원하기
 
-        static Util.CSVReader hangulSentimentCSV1;
-        static Util.CSVReader hangulSentimentCSV2;
-        static Util.CSVReader hangulSentimentCSV3;
+        const int NUM_OF_GRAMS = 1;
+
+        static List<Util.CSVReader> hangulSentimentCSV;
+        //static Util.CSVReader hangulSentimentCSV2;
+        //static Util.CSVReader hangulSentimentCSV3;
         static List<Dictionary<string, WordSentiment>> koreanSentimentDictionary;
 
         // aggregateSentiment
@@ -54,26 +56,19 @@ namespace ChordingCoding.Word
             System.Threading.Tasks.Task.Run(() => TwitterKoreanProcessorCS.Normalize("초기화"));     // Initial loading
 
             #region Load Korean dictionaries
-            hangulSentimentCSV1 = new Util.CSVReader("HangulSentiment1.csv", true);
-            hangulSentimentCSV2 = new Util.CSVReader("HangulSentiment2.csv", true);
-            hangulSentimentCSV3 = new Util.CSVReader("HangulSentiment3.csv", true);
-            koreanSentimentDictionary = new List<Dictionary<string, WordSentiment>>
+
+            hangulSentimentCSV = new List<Util.CSVReader>();
+            koreanSentimentDictionary = new List<Dictionary<string, WordSentiment>>();
+
+            for (int i = 0; i < NUM_OF_GRAMS; i++)
             {
-                new Dictionary<string, WordSentiment>(),
-                new Dictionary<string, WordSentiment>(),
-                new Dictionary<string, WordSentiment>()
-            };
-            foreach (List<string> row in hangulSentimentCSV1.GetData())
-            {
-                koreanSentimentDictionary[0].Add(row[0], new WordSentiment(row[0], row[1], row[2], row[3], row[4]));
-            }
-            foreach (List<string> row in hangulSentimentCSV2.GetData())
-            {
-                koreanSentimentDictionary[1].Add(row[0], new WordSentiment(row[0], row[1], row[2], row[3], row[4]));
-            }
-            foreach (List<string> row in hangulSentimentCSV3.GetData())
-            {
-                koreanSentimentDictionary[2].Add(row[0], new WordSentiment(row[0], row[1], row[2], row[3], row[4]));
+                hangulSentimentCSV.Add(new Util.CSVReader("HangulSentiment" + (i + 1) + ".csv", true));
+                koreanSentimentDictionary.Add(new Dictionary<string, WordSentiment>());
+
+                foreach (List<string> row in hangulSentimentCSV[i].GetData())
+                {
+                    koreanSentimentDictionary[i].Add(row[0], new WordSentiment(row[0], row[1], row[2], row[3], row[4]));
+                }
             }
             #endregion
             
@@ -97,12 +92,21 @@ namespace ChordingCoding.Word
             string a = Hangul.Assemble(input, true);
             a = TwitterKoreanProcessorCS.Normalize(a);
             var b = TwitterKoreanProcessorCS.Tokenize(a);
-            //b = TwitterKoreanProcessorCS.Stem(b);
+            b = TwitterKoreanProcessorCS.Stem(b);
+            b = b.SkipWhile((e) => !(
+                e.Pos == KoreanPos.Adjective ||
+                e.Pos == KoreanPos.Adverb ||
+                e.Pos == KoreanPos.Exclamation ||
+                e.Pos == KoreanPos.Noun ||
+                e.Pos == KoreanPos.NounPrefix ||
+                e.Pos == KoreanPos.Verb ||
+                e.Pos == KoreanPos.VerbPrefix
+            ));
             var c = TwitterKoreanProcessorCS.TokensToStrings(b);
             int count = c.Count();
             List<string> tokens = c.ToList();
 
-            for (int j = 1; j <= 3; j++)
+            for (int j = 1; j <= NUM_OF_GRAMS; j++)
             {
                 for (int i = 0; i < count - j + 1; i++)
                 {
@@ -139,42 +143,54 @@ namespace ChordingCoding.Word
 
             void GetAggregate(object[] args)
             {
-                List<WordSentiment.PolarityValue> pBox = new List<WordSentiment.PolarityValue>();
-                List<WordSentiment.IntensityValue> iBox = new List<WordSentiment.IntensityValue>();
                 Random r = new Random();
 
-                // Polarity -> drawing a lot from cubic frequencies
+                // Polarity -> take argmax
                 if (aggregatePolarity.Sum() <= 0)
                 {
                     p = WordSentiment.PolarityValue.NULL;
                 }
                 else
                 {
+                    int max = 0;
+                    List<int> argmax = new List<int>();
                     for (int j = 0; j < aggregatePolarity.Length; j++)
                     {
-                        for (int k = 0; k < aggregatePolarity[j] * aggregatePolarity[j] * aggregatePolarity[j]; k++)
+                        if (aggregatePolarity[j] > max)
                         {
-                            pBox.Add((WordSentiment.PolarityValue)j);
+                            max = aggregatePolarity[j];
+                            argmax = new List<int>() { j };
+                        }
+                        else if (aggregatePolarity[j] == max)
+                        {
+                            argmax.Add(j);
                         }
                     }
-                    p = pBox[r.Next(pBox.Count)];
+                    p = (WordSentiment.PolarityValue)argmax[r.Next(argmax.Count)];
                 }
 
-                // Intensity -> drawing a lot from cubic frequencies
+                // Intensity -> take argmax
                 if (aggregateIntensity.Sum() <= 0)
                 {
                     i = WordSentiment.IntensityValue.NULL;
                 }
                 else
                 {
+                    int max = 0;
+                    List<int> argmax = new List<int>();
                     for (int j = 0; j < aggregateIntensity.Length; j++)
                     {
-                        for (int k = 0; k < aggregateIntensity[j] * aggregateIntensity[j] * aggregateIntensity[j]; k++)
+                        if (aggregateIntensity[j] > max)
                         {
-                            iBox.Add((WordSentiment.IntensityValue)j);
+                            max = aggregateIntensity[j];
+                            argmax = new List<int>() { j };
+                        }
+                        else if (aggregateIntensity[j] == max)
+                        {
+                            argmax.Add(j);
                         }
                     }
-                    i = iBox[r.Next(iBox.Count)];
+                    i = (WordSentiment.IntensityValue)argmax[r.Next(argmax.Count)];
                 }
 
                 // SubjectivityType -> take argmax
@@ -227,6 +243,7 @@ namespace ChordingCoding.Word
             }
 
             Util.TaskQueue.Add("aggregateSentiment", GetAggregate);
+            //Util.TaskQueue.Add("aggregateSentiment", PrintAggregate);
             Util.TaskQueue.Add("aggregateSentiment", InitializeAggregate);
 
             return new WordSentiment("", p, i, st, sp);

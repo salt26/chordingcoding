@@ -84,6 +84,79 @@ namespace ChordingCoding.Word
             return ret;
         }
 
+        /// <summary>
+        /// 두벌식 키보드 기준으로 영어 글자를 한글 글자로 변환합니다.
+        /// </summary>
+        /// <param name="english"></param>
+        /// <returns></returns>
+        public static string EnglishToKorean(string english, bool assemble = false)
+        {
+            string korean = "";
+            for (int i = 0; i < english.Length; i++)
+            {
+                switch (english[i])
+                {
+                    case 'q': korean += 'ㅂ'; break;
+                    case 'Q': korean += 'ㅃ'; break;
+                    case 'w': korean += 'ㅈ'; break;
+                    case 'W': korean += 'ㅉ'; break;
+                    case 'e': korean += 'ㄷ'; break;
+                    case 'E': korean += 'ㄸ'; break;
+                    case 'r': korean += 'ㄱ'; break;
+                    case 'R': korean += 'ㄲ'; break;
+                    case 't': korean += 'ㅅ'; break;
+                    case 'T': korean += 'ㅆ'; break;
+                    case 'y':
+                    case 'Y': korean += 'ㅛ'; break;
+                    case 'u':
+                    case 'U': korean += 'ㅕ'; break;
+                    case 'i':
+                    case 'I': korean += 'ㅑ'; break;
+                    case 'o': korean += 'ㅐ'; break;
+                    case 'O': korean += 'ㅒ'; break;
+                    case 'p': korean += 'ㅔ'; break;
+                    case 'P': korean += 'ㅖ'; break;
+                    case 'a':
+                    case 'A': korean += 'ㅁ'; break;
+                    case 's':
+                    case 'S': korean += 'ㄴ'; break;
+                    case 'd':
+                    case 'D': korean += 'ㅇ'; break;
+                    case 'f':
+                    case 'F': korean += 'ㄹ'; break;
+                    case 'g':
+                    case 'G': korean += 'ㅎ'; break;
+                    case 'h':
+                    case 'H': korean += 'ㅗ'; break;
+                    case 'j':
+                    case 'J': korean += 'ㅓ'; break;
+                    case 'k':
+                    case 'K': korean += 'ㅏ'; break;
+                    case 'l':
+                    case 'L': korean += 'ㅣ'; break;
+                    case 'z':
+                    case 'Z': korean += 'ㅋ'; break;
+                    case 'x':
+                    case 'X': korean += 'ㅌ'; break;
+                    case 'c':
+                    case 'C': korean += 'ㅊ'; break;
+                    case 'v':
+                    case 'V': korean += 'ㅍ'; break;
+                    case 'b':
+                    case 'B': korean += 'ㅠ'; break;
+                    case 'n':
+                    case 'N': korean += 'ㅜ'; break;
+                    case 'm':
+                    case 'M': korean += 'ㅡ'; break;
+                    default: korean += english[i]; break;
+                }
+            }
+            if (assemble)
+                return Assemble(korean);
+            else
+                return korean;
+        }
+
         #region Helper methods
 
         static string Choseong(int index)

@@ -93,7 +93,8 @@ namespace ChordingCoding.UI
             Form form = (Form)sender;
             form.ShowInTaskbar = false;
             form1 = this;
-            
+            InterceptKeys.NewContext();
+
             Theme.Initialize();
 
             bool themeExist = false;
@@ -194,6 +195,7 @@ namespace ChordingCoding.UI
             Properties.Settings.Default["NoteResolution"] = Music.NoteResolution;
             Properties.Settings.Default.Save();
             notifyIcon1.Dispose();
+            InterceptKeys.DestroyContext();
             _isReady = false;
         }
 

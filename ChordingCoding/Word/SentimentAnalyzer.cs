@@ -75,14 +75,6 @@ namespace ChordingCoding.Word
             Util.TaskQueue.Add("aggregateSentiment", InitializeAggregate);
 
             IsReady = true;
-            
-            string sample1 = "그는 밝은 미소를 지으며 의미심장한 말을 꺼냈다.";
-            foreach (string s in sample1.Split(' '))
-            {
-                AnalyzeKorean(s);
-                GetSentimentAndFlush().Print();
-            }
-            Console.WriteLine(sample1);
         }
 
         public static void AnalyzeKorean(string input)

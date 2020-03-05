@@ -64,9 +64,7 @@ namespace ChordingCoding
 
                     
                     // 아래 코드는 프로그램이 단독으로 실행할 때 수행할 명령들입니다.
-                    // Form1을 실행합니다.
                     
-
                     // 키보드 및 마우스 입력 이벤트를 감지하여 콜백을 호출하도록 합니다.
                     InterceptKeys._keyboardHookID = InterceptKeys.SetLowLevelKeyboardHook(InterceptKeys._keyboardProc);
                     InterceptKeys._mouseHookID = InterceptKeys.SetLowLevelMouseHook(InterceptKeys._mouseProc);
@@ -74,6 +72,7 @@ namespace ChordingCoding
                     Application.EnableVisualStyles();
                     Application.SetCompatibleTextRenderingDefault(false);
 
+                    // Form1을 실행합니다.
                     Form1 form = new Form1();
                     Application.Run(form);
 

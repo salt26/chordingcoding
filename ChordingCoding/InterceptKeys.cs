@@ -59,7 +59,8 @@ namespace ChordingCoding.UI
         public static IntPtr _keyboardHookID = IntPtr.Zero;
         public static IntPtr _mouseHookID = IntPtr.Zero;
 
-        public static string wordState = "";
+        private static string wordState = "";
+        private static string backspaceState = null;
 
         public static IntPtr SetLowLevelKeyboardHook(HookProc proc)
         {
@@ -109,20 +110,27 @@ namespace ChordingCoding.UI
                 {
                     // IME Mode Change (Hangul/Kana mode, Junja mode, Final mode, Hanja/Kanji mode)
                     Util.TaskQueue.Add("wordState", ResetWord);
+                    Util.TaskQueue.Add("wordState", BackspaceStateToNull);
+                }
+                else if ((vkCode == 91 || vkCode == 92) &&
+                    (Control.ModifierKeys & Keys.Alt) == Keys.Alt)
+                {
+                    // Alt + WinLogo 
+                    // Do nothing!
                 }
                 else if ((vkCode == 91 || vkCode == 92) && 
                     ((Control.ModifierKeys & Keys.Control) == Keys.Control ||
-                    (Control.ModifierKeys & Keys.Alt) == Keys.Alt ||
                     (Control.ModifierKeys & Keys.Shift) == Keys.Shift))
                 {
-                    // Modifier (Ctrl, Alt, Shift) + WinLogo 
-                    // Do nothing!
+                    // Modifier (Ctrl, Shift) + WinLogo 
+                    Util.TaskQueue.Add("wordState", BackspaceStateToNull);
                 }
                 else if ((Control.ModifierKeys & Keys.Control) == Keys.Control ||
                     (Control.ModifierKeys & Keys.Alt) == Keys.Alt)
                 {
                     // Modifier (Ctrl, Alt)
                     Util.TaskQueue.Add("wordState", ResetWord);
+                    Util.TaskQueue.Add("wordState", BackspaceStateToNull);
                 }
                 else if (vkCode >= 65 && vkCode <= 90)
                 {
@@ -130,6 +138,7 @@ namespace ChordingCoding.UI
                     bool hasShiftPressed = (Control.ModifierKeys & Keys.Shift) == Keys.Shift;
 
                     Util.TaskQueue.Add("wordState", AddCharToWord, vkCode, hasShiftPressed);
+                    Util.TaskQueue.Add("wordState", BackspaceStateToNull);
 
                     Music.PlayNoteInChord();
                     // 음표 재생 후에 Music.OnPlayNotes()가 호출되면서 시각 효과 발생
@@ -142,6 +151,7 @@ namespace ChordingCoding.UI
                 {
                     // Characters (Non-alphabet)
                     Util.TaskQueue.Add("wordState", ResetWord);
+                    Util.TaskQueue.Add("wordState", BackspaceStateToNull);
 
                     Music.PlayNoteInChord();
                     // 음표 재생 후에 Music.OnPlayNotes()가 호출되면서 시각 효과 발생
@@ -155,6 +165,7 @@ namespace ChordingCoding.UI
                 {
                     // Whitespaces (Space, Enter, Tab)
                     Util.TaskQueue.Add("wordState", ResetWord);
+                    Util.TaskQueue.Add("wordState", BackspaceStateToNull);
 
                     Music.PlayChordTransitionSync();
                     // 화음 전이 후에 Music.OnChordTransition()이 호출되면서 시각 효과 발생
@@ -164,6 +175,19 @@ namespace ChordingCoding.UI
                 {
                     // Cursor relocation (Page Up, Page Down, End, Home, Arrows), etc (ESC, WinLogo, App, Sleep)
                     Util.TaskQueue.Add("wordState", ResetWord);
+                    Util.TaskQueue.Add("wordState", BackspaceStateToNull);
+                }
+                else if (vkCode == 18 || vkCode == 164 || vkCode == 165)
+                {
+                    // Alt
+                    // This key input may not be detected...
+                    Util.TaskQueue.Add("wordState", BackspaceStateToNull);
+                }
+                else if (vkCode == 45 || vkCode == 46 ||
+                    vkCode == 20 || vkCode == 144 || vkCode == 145)
+                {
+                    // Insert, Delete, Caps Lock, Num Lock, Scroll Lock
+                    Util.TaskQueue.Add("wordState", BackspaceStateToNull);
                 }
             }
             return CallNextHookEx(_keyboardHookID, nCode, wParam, lParam);
@@ -191,7 +215,33 @@ namespace ChordingCoding.UI
         private static void BackspaceWord(object[] args)
         {
             if (wordState.Length > 0)
-                wordState = wordState.Substring(0, wordState.Length - 1);
+            {
+                if (IsIMESetToEnglish())
+                    wordState = wordState.Substring(0, wordState.Length - 1);
+                else
+                {
+                    if (backspaceState is null)
+                    {
+                        backspaceState = Word.Hangul.Assemble(wordState);
+                        backspaceState = backspaceState.Substring(0, backspaceState.Length - 1) +
+                            Word.Hangul.Disassemble(backspaceState.Substring(backspaceState.Length - 1, 1));
+                    }
+                    if (backspaceState.Length > 0)
+                    {
+                        backspaceState = backspaceState.Substring(0, backspaceState.Length - 1);
+                        wordState = backspaceState;
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// 백스페이스 키를 연속으로 누르지 않은 경우 호출되어야 합니다.
+        /// </summary>
+        /// <param name="args"></param>
+        private static void BackspaceStateToNull(object[] args)
+        {
+            backspaceState = null;
         }
 
         /// <summary>
@@ -303,23 +353,50 @@ namespace ChordingCoding.UI
         // https://m.blog.naver.com/gostarst/220627552770
         /// <summary>
         /// 현재 입력기의 상태가 영어 입력 모드인지 확인합니다.
-        /// 영어이면 true, 다른 언어이면 false를 반환합니다.
+        /// 영어이면 true, 다른 언어(한글)이면 false를 반환합니다.
         /// </summary>
         /// <returns></returns>
         private static bool IsIMESetToEnglish()
         {
             IntPtr hwnd = GetForegroundWindow();
-            if (hwnd == null)
+            if (hwnd == IntPtr.Zero)
             {
-                //Console.WriteLine("IME is English? null");
                 return true;
             }
             IntPtr hime = ImmGetDefaultIMEWnd(hwnd);
             IntPtr status = SendMessage(hime, WM_IME_CONTROL, new IntPtr(0x5), new IntPtr(0));
 
-            //Console.WriteLine("IME is English? " + status.ToInt32());
+            //Console.WriteLine("IME is English? " + (status.ToInt32() == 0));
             return status.ToInt32() == 0;
         }
 
+        [DllImport("imm32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern IntPtr ImmCreateContext();
+
+        [DllImport("imm32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern IntPtr ImmAssociateContext(IntPtr hWnd, IntPtr hImc);
+
+        [DllImport("imm32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        public static extern IntPtr ImmDestroyContext(IntPtr hImc);
+
+        private static IntPtr newHwnd, newHimc, oldImc;
+        private static bool hasNewContext = false;
+
+        public static void NewContext()
+        {
+            if (hasNewContext) return;
+            newHwnd = Form1.form1.Handle;
+            newHimc = ImmCreateContext();
+            oldImc = ImmAssociateContext(newHwnd, newHimc);
+            hasNewContext = true;
+        }
+
+        public static void DestroyContext()
+        {
+            if (!hasNewContext) return;
+            ImmAssociateContext(newHwnd, oldImc);
+            ImmDestroyContext(newHimc);
+            hasNewContext = false;
+        }
     }
 }

@@ -30,6 +30,7 @@ namespace ChordingCoding.UI
         static ParticleSystem basicParticleSystem = null;
         //Bitmap bitmap;
         public static Form1 form1;
+        public KoreanSentimentAnalyzer ksa;
         
         /*
          * 새 Theme을 추가할 때
@@ -175,7 +176,7 @@ namespace ChordingCoding.UI
             }
 
             SetNoteResolution(resolution);
-            SentimentAnalyzer.Initialize(); // 반드시 Music.Initialize()가 완료된 후에 호출할 것.
+            ksa = new KoreanSentimentAnalyzer(); // 반드시 Music.Initialize()가 완료된 후에 호출할 것.
 
             notifyIcon1.ShowBalloonTip(8);
 

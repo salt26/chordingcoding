@@ -199,6 +199,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Word\Korean\KoreanWordSentiment.cs" />
     <Compile Include="Word\Korean\TwitterKoreanProcessorCS.cs" />
     <Compile Include="Word\Korean\Hangul.cs" />
     <Compile Include="NFluidsynth\AudioDriver.cs" />
@@ -245,7 +246,7 @@
     <Compile Include="SFX\Music.cs" />
     <Compile Include="SFX\SFXTheme.cs" />
     <Compile Include="SFX\Timer.cs" />
-    <Compile Include="Word\SentimentAnalyzer.cs" />
+    <Compile Include="Word\Korean\KoreanSentimentAnalyzer.cs" />
     <Compile Include="Util.cs" />
     <Compile Include="VFX\Particle.cs" />
     <Compile Include="VFX\ParticleSystem.cs" />
@@ -255,6 +256,8 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SFX\Score.cs" />
+    <Compile Include="Word\SentimentAnalyzer.cs" />
+    <Compile Include="Word\WordSentiment.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
     </EmbeddedResource>
@@ -264,8 +267,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="Word\Korean\HangulSentiment1.csv" />
-    <None Include="Word\Korean\HangulSentiment2.csv" />
-    <None Include="Word\Korean\HangulSentiment3.csv" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -321,6 +322,8 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Word\English\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

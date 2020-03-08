@@ -201,9 +201,19 @@ namespace ChordingCoding.UI
         {
             if (wordState.Length > 0)
             {
-                Console.WriteLine("wordState: " + Word.Hangul.Assemble(wordState));
-                Word.SentimentAnalyzer.AnalyzeKorean(Word.Hangul.Assemble(wordState));
-                Word.SentimentAnalyzer.GetSentimentAndFlush().Print();
+                if (IsIMESetToEnglish())
+                {
+                    Console.WriteLine("wordState(TODO): " + wordState);
+                    // TODO!
+                    //Word.EnglishSentimentAnalyzer.instance.Analyze(wordState);
+                }
+                else
+                {
+                    Console.WriteLine("wordState: " + Word.Hangul.Assemble(wordState));
+                    Word.KoreanSentimentAnalyzer.instance.Analyze(Word.Hangul.Assemble(wordState));
+                    Word.KoreanSentimentAnalyzer.instance.GetSentimentAndFlush().Print();
+                    // TODO 음악 생성기에 넘기기
+                }
             }
             wordState = "";
         }
@@ -325,6 +335,16 @@ namespace ChordingCoding.UI
         private static extern IntPtr GetModuleHandle(string lpModuleName);
 
         // https://stackoverflow.com/questions/23170259/convert-keycode-to-char-string
+        /// <summary>
+        /// 키보드로 입력한 문자를 문자열로 변환하여 receivingBuffer에 넣어줍니다.
+        /// </summary>
+        /// <param name="virtualKeyCode">가상 키 코드</param>
+        /// <param name="scanCode"></param>
+        /// <param name="keyboardState">입력받을 키 수만큼 할당된 배열</param>
+        /// <param name="receivingBuffer">입력받을 키 수만큼 문자열을 받을 버퍼</param>
+        /// <param name="bufferSize">입력받을 문자 수</param>
+        /// <param name="flags"></param>
+        /// <returns></returns>
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
         public static extern int ToUnicode(
             uint virtualKeyCode,
@@ -335,11 +355,17 @@ namespace ChordingCoding.UI
             uint flags
         );
 
+        /// <summary>
+        /// 핸들의 기본 IME 윈도우를 가져옵니다.
+        /// 동아시아권(한국, 중국, 일본) 운영체제에서만 작동합니다.
+        /// </summary>
+        /// <param name="hWnd"></param>
+        /// <returns></returns>
         [DllImport("imm32.dll")]
         private static extern IntPtr ImmGetDefaultIMEWnd(IntPtr hWnd);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, IntPtr wParam, IntPtr IParam);
+        private static extern IntPtr SendMessage(IntPtr hWnd, UInt32 Msg, IntPtr wParam, IntPtr IParam);
 
         /// <summary>
         /// 현재 포커스를 가진 창을 가져옵니다.
@@ -353,7 +379,9 @@ namespace ChordingCoding.UI
         // https://m.blog.naver.com/gostarst/220627552770
         /// <summary>
         /// 현재 입력기의 상태가 영어 입력 모드인지 확인합니다.
-        /// 영어이면 true, 다른 언어(한글)이면 false를 반환합니다.
+        /// 영어이면 true, 한글이면 false를 반환합니다.
+        /// 동아시아권(한국, 중국, 일본) 운영체제에서만 작동하며,
+        /// 이외의 운영체제에서는 true를 반환합니다.
         /// </summary>
         /// <returns></returns>
         private static bool IsIMESetToEnglish()
@@ -363,40 +391,100 @@ namespace ChordingCoding.UI
             {
                 return true;
             }
-            IntPtr hime = ImmGetDefaultIMEWnd(hwnd);
-            IntPtr status = SendMessage(hime, WM_IME_CONTROL, new IntPtr(0x5), new IntPtr(0));
+            try
+            {
+                IntPtr hime = ImmGetDefaultIMEWnd(hwnd);
+                IntPtr status = SendMessage(hime, WM_IME_CONTROL, new IntPtr(0x5), new IntPtr(0));
 
-            //Console.WriteLine("IME is English? " + (status.ToInt32() == 0));
-            return status.ToInt32() == 0;
+                //Console.WriteLine("IME is English? " + (status.ToInt32() == 0));
+                return status.ToInt32() == 0;
+            }
+            catch (Exception e)
+            {
+                if (e is DllNotFoundException || e is EntryPointNotFoundException)
+                    return true;
+                throw;
+            }
         }
 
+        /// <summary>
+        /// 새 input context를 만듭니다.
+        /// 동아시아권(한국, 중국, 일본) 운영체제에서만 작동합니다.
+        /// </summary>
+        /// <returns></returns>
         [DllImport("imm32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern IntPtr ImmCreateContext();
+        private static extern IntPtr ImmCreateContext();
 
+        /// <summary>
+        /// 윈도우 핸들에 input context를 연결합니다.
+        /// 동아시아권(한국, 중국, 일본) 운영체제에서만 작동합니다.
+        /// </summary>
+        /// <param name="hWnd"></param>
+        /// <param name="hImc"></param>
+        /// <returns></returns>
         [DllImport("imm32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern IntPtr ImmAssociateContext(IntPtr hWnd, IntPtr hImc);
+        private static extern IntPtr ImmAssociateContext(IntPtr hWnd, IntPtr hImc);
 
+        /// <summary>
+        /// input context를 제거합니다.
+        /// ImmCreateContext()를 호출한 적이 있으면 프로그램 종료 전에 반드시 호출되어야 합니다.
+        /// 동아시아권(한국, 중국, 일본) 운영체제에서만 작동합니다.
+        /// </summary>
+        /// <param name="hImc"></param>
+        /// <returns></returns>
         [DllImport("imm32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern IntPtr ImmDestroyContext(IntPtr hImc);
+        private static extern IntPtr ImmDestroyContext(IntPtr hImc);
 
         private static IntPtr newHwnd, newHimc, oldImc;
         private static bool hasNewContext = false;
 
+        /// <summary>
+        /// Form에서 텍스트 입력을 활성화합니다.
+        /// ChordingCoding의 Form에 포커스가 놓인 동안 한/영 전환이 가능합니다.
+        /// 동아시아권(한국, 중국, 일본) 운영체제에서만 작동합니다.
+        /// </summary>
         public static void NewContext()
         {
             if (hasNewContext) return;
             newHwnd = Form1.form1.Handle;
-            newHimc = ImmCreateContext();
-            oldImc = ImmAssociateContext(newHwnd, newHimc);
-            hasNewContext = true;
+            try
+            {
+                newHimc = ImmCreateContext();
+                oldImc = ImmAssociateContext(newHwnd, newHimc);
+            }
+            catch (Exception e)
+            {
+                if (!(e is DllNotFoundException || e is EntryPointNotFoundException))
+                    throw;
+            }
+            finally
+            {
+                hasNewContext = true;
+            }
         }
 
+        /// <summary>
+        /// NewContext()를 호출한 적이 있는 경우,
+        /// 프로그램이 종료되기 전에 반드시 호출되어야 합니다.
+        /// 동아시아권(한국, 중국, 일본) 운영체제에서만 작동합니다.
+        /// </summary>
         public static void DestroyContext()
         {
             if (!hasNewContext) return;
-            ImmAssociateContext(newHwnd, oldImc);
-            ImmDestroyContext(newHimc);
-            hasNewContext = false;
+            try
+            {
+                ImmAssociateContext(newHwnd, oldImc);
+                ImmDestroyContext(newHimc);
+            }
+            catch (Exception e)
+            {
+                if (!(e is DllNotFoundException || e is EntryPointNotFoundException))
+                    throw;
+            }
+            finally
+            {
+                hasNewContext = false;
+            }
         }
     }
 }

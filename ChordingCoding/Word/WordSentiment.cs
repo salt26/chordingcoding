@@ -8,12 +8,12 @@ namespace ChordingCoding.Word
 {
     /// <summary>
     /// An abstract structure that contains word sentiment information.
-    /// This interface is language independent.
+    /// You can inherit and implement it for your own language.
     /// </summary>
     public abstract class WordSentiment
     {
-        // http://www.wjh.harvard.edu/~inquirer/homecat.htm
-        // http://ling.snu.ac.kr/kosac/pub/PACLIC26.pdf
+        // English: http://www.wjh.harvard.edu/~inquirer/homecat.htm
+        // Korean: http://ling.snu.ac.kr/kosac/pub/PACLIC26.pdf
 
         public enum Valence
         {

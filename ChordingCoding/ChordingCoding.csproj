@@ -199,6 +199,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Word\English\EnglishSentimentAnalyzer.cs" />
+    <Compile Include="Word\English\EnglishWordSentiment.cs" />
     <Compile Include="Word\Korean\KoreanWordSentiment.cs" />
     <Compile Include="Word\Korean\TwitterKoreanProcessorCS.cs" />
     <Compile Include="Word\Korean\Hangul.cs" />
@@ -266,6 +268,7 @@
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <None Include="Word\English\EnglishSentiment.csv" />
     <None Include="Word\Korean\HangulSentiment1.csv" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -322,8 +325,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Word\English\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

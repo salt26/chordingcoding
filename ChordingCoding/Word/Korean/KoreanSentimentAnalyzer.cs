@@ -38,7 +38,7 @@ namespace ChordingCoding.Word
         private List<Util.CSVReader> hangulSentimentCSV;
         private List<Dictionary<string, KoreanWordSentiment>> koreanSentimentDictionary;
 
-        // aggregateSentiment
+        // aggregateKoreanSentiment
         private int[] aggregatePolarity;
         private int[] aggregateIntensity;
         private int[] aggregateSubjectivityType;
@@ -82,7 +82,7 @@ namespace ChordingCoding.Word
             }
             #endregion
             
-            Util.TaskQueue.Add("aggregateSentiment", InitializeAggregate);
+            Util.TaskQueue.Add("aggregateKoreanSentiment", InitializeAggregate);
 
             IsReady = true;
         }
@@ -130,7 +130,7 @@ namespace ChordingCoding.Word
                             aggregateSubjectivityType[(int)sentiment.SubjectivityType] += weight;
                             aggregateSubjectivityPolarity[(int)sentiment.SubjectivityPolarity] += weight;
                         }
-                        Util.TaskQueue.Add("aggregateSentiment", UpdateAggregate,
+                        Util.TaskQueue.Add("aggregateKoreanSentiment", UpdateAggregate,
                             koreanSentimentDictionary[j - 1][word]);
                     }
                 }
@@ -140,7 +140,7 @@ namespace ChordingCoding.Word
         /// <summary>
         /// 현재까지 누적된 단어들의 감정 분석 결과를 반환하고 이를 초기화합니다.
         /// </summary>
-        /// <returns>Polarity, Intensity, SubjectivityType, SubjectivityPolarity가 들어있는 감정 분석 결과</returns>
+        /// <returns>감정 분석 결과. Get...() 함수로 원하는 값을 가져올 수 있습니다.</returns>
         public override WordSentiment GetSentimentAndFlush()
         {
             KoreanWordSentiment.PolarityValue p = KoreanWordSentiment.PolarityValue.NULL;
@@ -249,9 +249,9 @@ namespace ChordingCoding.Word
                 }
             }
 
-            Util.TaskQueue.Add("aggregateSentiment", GetAggregate);
-            //Util.TaskQueue.Add("aggregateSentiment", PrintAggregate);
-            Util.TaskQueue.Add("aggregateSentiment", InitializeAggregate);
+            Util.TaskQueue.Add("aggregateKoreanSentiment", GetAggregate);
+            //Util.TaskQueue.Add("aggregateKoreanSentiment", PrintAggregate);
+            Util.TaskQueue.Add("aggregateKoreanSentiment", InitializeAggregate);
 
             return new KoreanWordSentiment("", p, i, st, sp);
         }
@@ -283,7 +283,7 @@ namespace ChordingCoding.Word
 
         /// <summary>
         /// 감정 분석 총계를 초기화합니다.
-        /// 반드시 "aggregateSentiment"라는 lockName의 Util.TaskQueue로 실행되어야 합니다.
+        /// 반드시 "aggregateKoreanSentiment"라는 lockName의 Util.TaskQueue로 실행되어야 합니다.
         /// </summary>
         private void InitializeAggregate(object[] args)
         {

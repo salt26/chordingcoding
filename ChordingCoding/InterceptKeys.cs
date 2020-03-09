@@ -143,6 +143,17 @@ namespace ChordingCoding.UI
                     Music.PlayNoteInChord();
                     // 음표 재생 후에 Music.OnPlayNotes()가 호출되면서 시각 효과 발생
                 }
+                else if (vkCode == 109 || 
+                    ((vkCode == 110 || vkCode == 189 || vkCode == 190) &&
+                    (Control.ModifierKeys & Keys.Shift) != Keys.Shift))
+                {
+                    // Characters (-, .)
+                    Util.TaskQueue.Add("wordState", AddCharToWord, vkCode, false);
+                    Util.TaskQueue.Add("wordState", BackspaceStateToNull);
+
+                    Music.PlayNoteInChord();
+                    // 음표 재생 후에 Music.OnPlayNotes()가 호출되면서 시각 효과 발생
+                }
                 else if ((vkCode >= 48 && vkCode <= 57) ||
                     (vkCode >= 96 && vkCode <= 111) ||
                     (vkCode >= 186 && vkCode <= 192) ||

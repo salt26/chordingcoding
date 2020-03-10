@@ -58,6 +58,13 @@ namespace ChordingCoding.Word
         /// Print the state of this structure.
         /// Implementing this method is not required.
         /// </summary>
-        public virtual void Print() { }
+        public virtual void Print()
+        {
+            string s = "Valence: " + GetValence().ToString() + "\tStateIntensity: " + GetStateIntensity().ToString() +
+                "\tEmotion: " + GetEmotion().ToString() + "\tJudgment: " +
+                GetJudgment().ToString() + "\tAgreement: " + GetAgreement().ToString() +
+                "\tIntention: " + GetIntention().ToString();
+            Console.WriteLine(s);
+        }
     }
 }

@@ -82795,7 +82795,6 @@ clamor 300000
 co-operation 300000
 co-ordinate 300000
 co-ordination 300000
-co. 300000
 color 300000
 colorful 300000
 common-market 300000
@@ -82816,7 +82815,6 @@ dissention 300000
 distingiush 300000
 dominican-republic 300000
 dr 300000
-dr. 300000
 drive-in 300000
 east-germany 300000
 east-west 300000
@@ -82830,7 +82828,6 @@ embitter 300000
 endeavor 300000
 enroll 300000
 enrollment 300000
-etc. 300000
 etrans 300000
 excitedness 300000
 expell 300000
@@ -82856,7 +82853,6 @@ humor 300000
 ill-defined 300000
 illussion 300000
 inate 300000
-inc. 300000
 incontestability 300000
 incredibility 300000
 ineffectualness 300000
@@ -82891,9 +82887,8 @@ meager 300000
 merchantile 300000
 middle-class 300000
 misbehavior 300000
-mr. 300000
-mrs. 300000
-ms. 300000
+mr 300000
+ms 300000
 multilateral-force 300000
 neighbor 300000
 neighborhood 300000
@@ -82996,3 +82991,4 @@ world-wide 300000
 worth-while 300000
 wreakage 300000
 ya 300000
+chordingcoding 300000

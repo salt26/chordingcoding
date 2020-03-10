@@ -13,7 +13,8 @@ using System.Reflection;
 using System.Configuration;
 using ChordingCoding.SFX;
 using ChordingCoding.VFX;
-using ChordingCoding.Word;
+using ChordingCoding.Word.Korean;
+using ChordingCoding.Word.English;
 
 namespace ChordingCoding.UI
 {
@@ -31,7 +32,8 @@ namespace ChordingCoding.UI
         //Bitmap bitmap;
         public static Form1 form1;
         public KoreanSentimentAnalyzer ksa;
-        
+        public EnglishSentimentAnalyzer esa;
+
         /*
          * 새 Theme을 추가할 때
          * 1. SFXTheme.cs의 Initialize()에서 availableSFXThemes.Add()로 새 음악 테마 생성
@@ -177,6 +179,7 @@ namespace ChordingCoding.UI
 
             SetNoteResolution(resolution);
             ksa = new KoreanSentimentAnalyzer(); // 반드시 Music.Initialize()가 완료된 후에 호출할 것.
+            esa = new EnglishSentimentAnalyzer(); // 반드시 Music.Initialize()가 완료된 후에 호출할 것.
 
             notifyIcon1.ShowBalloonTip(8);
 

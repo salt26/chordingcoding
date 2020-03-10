@@ -199,37 +199,44 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Word\English\SymSpell\EditDistance.cs" />
     <Compile Include="Word\English\EnglishSentimentAnalyzer.cs" />
     <Compile Include="Word\English\EnglishWordSentiment.cs" />
+    <Compile Include="Word\English\SymSpell\SoftWx.Match\DamerauOSA.cs" />
+    <Compile Include="Word\English\SymSpell\SoftWx.Match\Helpers.cs" />
+    <Compile Include="Word\English\SymSpell\SoftWx.Match\IDistance.cs" />
+    <Compile Include="Word\English\SymSpell\SoftWx.Match\ISimilarity.cs" />
+    <Compile Include="Word\English\SymSpell\SoftWx.Match\Levenshtein.cs" />
+    <Compile Include="Word\English\SymSpell\SymSpell.cs" />
     <Compile Include="Word\Korean\KoreanWordSentiment.cs" />
     <Compile Include="Word\Korean\TwitterKoreanProcessorCS.cs" />
     <Compile Include="Word\Korean\Hangul.cs" />
-    <Compile Include="NFluidsynth\AudioDriver.cs" />
-    <Compile Include="NFluidsynth\ConfigurationKeys.cs" />
-    <Compile Include="NFluidsynth\Enums.cs" />
-    <Compile Include="NFluidsynth\FileRenderer.cs" />
-    <Compile Include="NFluidsynth\FluidSynthInteropException.cs" />
-    <Compile Include="NFluidsynth\FluidsynthObject.cs" />
-    <Compile Include="NFluidsynth\Logger.cs" />
-    <Compile Include="NFluidsynth\MidiDriver.cs" />
-    <Compile Include="NFluidsynth\MidiEvent.cs" />
-    <Compile Include="NFluidsynth\MidiEventHandler.cs" />
-    <Compile Include="NFluidsynth\MidiRouter.cs" />
-    <Compile Include="NFluidsynth\MidiRouterRule.cs" />
-    <Compile Include="NFluidsynth\Native\LibFluidsynth.Audio.cs" />
-    <Compile Include="NFluidsynth\Native\LibFluidsynth.cs" />
-    <Compile Include="NFluidsynth\Native\LibFluidsynth.Midi.cs" />
-    <Compile Include="NFluidsynth\Native\LibFluidsynth.Misc.cs" />
-    <Compile Include="NFluidsynth\Native\LibFluidsynth.Settings.cs" />
-    <Compile Include="NFluidsynth\Native\LibFluidsynth.SfLoader.cs" />
-    <Compile Include="NFluidsynth\Native\LibFluidsynth.Synth.cs" />
-    <Compile Include="NFluidsynth\Player.cs" />
-    <Compile Include="NFluidsynth\Settings.cs" />
-    <Compile Include="NFluidsynth\SoundFont.cs" />
-    <Compile Include="NFluidsynth\SoundFontLoader.cs" />
-    <Compile Include="NFluidsynth\Synth.cs" />
-    <Compile Include="NFluidsynth\Utility.cs" />
-    <Compile Include="NFluidsynth\Voice.cs" />
+    <Compile Include="SFX\NFluidsynth\AudioDriver.cs" />
+    <Compile Include="SFX\NFluidsynth\ConfigurationKeys.cs" />
+    <Compile Include="SFX\NFluidsynth\Enums.cs" />
+    <Compile Include="SFX\NFluidsynth\FileRenderer.cs" />
+    <Compile Include="SFX\NFluidsynth\FluidSynthInteropException.cs" />
+    <Compile Include="SFX\NFluidsynth\FluidsynthObject.cs" />
+    <Compile Include="SFX\NFluidsynth\Logger.cs" />
+    <Compile Include="SFX\NFluidsynth\MidiDriver.cs" />
+    <Compile Include="SFX\NFluidsynth\MidiEvent.cs" />
+    <Compile Include="SFX\NFluidsynth\MidiEventHandler.cs" />
+    <Compile Include="SFX\NFluidsynth\MidiRouter.cs" />
+    <Compile Include="SFX\NFluidsynth\MidiRouterRule.cs" />
+    <Compile Include="SFX\NFluidsynth\Native\LibFluidsynth.Audio.cs" />
+    <Compile Include="SFX\NFluidsynth\Native\LibFluidsynth.cs" />
+    <Compile Include="SFX\NFluidsynth\Native\LibFluidsynth.Midi.cs" />
+    <Compile Include="SFX\NFluidsynth\Native\LibFluidsynth.Misc.cs" />
+    <Compile Include="SFX\NFluidsynth\Native\LibFluidsynth.Settings.cs" />
+    <Compile Include="SFX\NFluidsynth\Native\LibFluidsynth.SfLoader.cs" />
+    <Compile Include="SFX\NFluidsynth\Native\LibFluidsynth.Synth.cs" />
+    <Compile Include="SFX\NFluidsynth\Player.cs" />
+    <Compile Include="SFX\NFluidsynth\Settings.cs" />
+    <Compile Include="SFX\NFluidsynth\SoundFont.cs" />
+    <Compile Include="SFX\NFluidsynth\SoundFontLoader.cs" />
+    <Compile Include="SFX\NFluidsynth\Synth.cs" />
+    <Compile Include="SFX\NFluidsynth\Utility.cs" />
+    <Compile Include="SFX\NFluidsynth\Voice.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -285,6 +292,8 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="frequency_bigramdictionary_en_243_342.txt" />
+    <Content Include="frequency_dictionary_en_82_765.txt" />
     <Content Include="Resources\NoteWord.ico" />
     <Content Include="Resources\Dot.png" />
     <Content Include="Resources\Leaf11.png" />

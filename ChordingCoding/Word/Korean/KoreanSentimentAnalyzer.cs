@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Moda.Korean.TwitterKoreanProcessorCS;
 
-namespace ChordingCoding.Word
+namespace ChordingCoding.Word.Korean
 {
     /// <summary>
     /// 한글 문자열에 대한 감정 분석기 클래스입니다.
@@ -63,10 +63,21 @@ namespace ChordingCoding.Word
             if (!(instance is null)) return;
             instance = this;
 
-            System.Threading.Tasks.Task.Run(() => TwitterKoreanProcessorCS.Normalize("초기화"));     // Initial loading
+            #region Load TwitterKoreanProcessor (morpheme analysis engine)
+            System.Threading.Tasks.Task.Run(() => {
+                var a = TwitterKoreanProcessorCS.Normalize("초기화");
+                var b = TwitterKoreanProcessorCS.Tokenize(a);
+                b = TwitterKoreanProcessorCS.Stem(b);
+                var c = TwitterKoreanProcessorCS.TokensToStrings(b);
+            });
+            #endregion
 
-            #region Load Korean dictionaries
+            #region Load Korean sentiment dictionaries
 
+            /*
+             * HangulSentiment1.csv is created by MorphemeParser(https://github.com/salt26/morpheme-parser).
+             * The original data source is Korean Sentiment Lexicon(http://word.snu.ac.kr/kosac/lexicon.php).
+             */
             hangulSentimentCSV = new List<Util.CSVReader>();
             koreanSentimentDictionary = new List<Dictionary<string, KoreanWordSentiment>>();
 
@@ -80,9 +91,9 @@ namespace ChordingCoding.Word
                     koreanSentimentDictionary[i].Add(row[0], new KoreanWordSentiment(row[0], row[1], row[2], row[3], row[4]));
                 }
             }
-            #endregion
             
             Util.TaskQueue.Add("aggregateKoreanSentiment", InitializeAggregate);
+            #endregion
 
             IsReady = true;
         }

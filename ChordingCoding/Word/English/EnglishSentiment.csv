@@ -1374,7 +1374,6 @@ co,Neutral,Normal,NULL,NULL,NULL,NULL
 co-operation,Positive,Normal,NULL,Virtue,Affiliation,NULL
 co-ordinate,Neutral,Normal,NULL,NULL,NULL,NULL
 co-ordination,Neutral,Normal,NULL,NULL,NULL,NULL
-co.,Neutral,Normal,NULL,NULL,NULL,NULL
 coach,Neutral,Normal,NULL,NULL,Affiliation,Active
 coachman,Neutral,Normal,NULL,NULL,NULL,NULL
 coal,Neutral,Normal,NULL,NULL,NULL,NULL
@@ -2437,7 +2436,6 @@ downhearted,Negative,Normal,Pain,NULL,NULL,NULL
 downtown,Neutral,Normal,NULL,NULL,NULL,NULL
 dozen,Neutral,Normal,NULL,NULL,NULL,NULL
 dr,Neutral,Normal,NULL,NULL,NULL,NULL
-dr.,Neutral,Normal,NULL,NULL,NULL,NULL
 drab,Negative,Normal,NULL,Vice,NULL,NULL
 draft,Neutral,Normal,NULL,NULL,NULL,NULL
 drag,Negative,Normal,NULL,NULL,Hostility,Active
@@ -2776,7 +2774,6 @@ estrange,Neutral,Normal,NULL,NULL,NULL,NULL
 estranged,Negative,Normal,Pain,NULL,NULL,NULL
 estrangement,Neutral,Normal,NULL,NULL,NULL,NULL
 etc,Neutral,Overstated,NULL,NULL,NULL,NULL
-etc.,Neutral,Normal,NULL,NULL,NULL,NULL
 eternal,Neutral,Overstated,NULL,NULL,NULL,NULL
 ethical,Positive,Normal,NULL,Virtue,NULL,NULL
 ethics,Positive,Normal,NULL,NULL,NULL,NULL
@@ -3974,7 +3971,7 @@ inane,Negative,Normal,NULL,Vice,NULL,NULL
 inate,Neutral,Normal,NULL,NULL,NULL,NULL
 inaugurate,Positive,Normal,NULL,NULL,Affiliation,Active
 inauguration,Positive,Normal,NULL,NULL,NULL,NULL
-inc.,Neutral,Normal,NULL,NULL,NULL,NULL
+inc,Neutral,Normal,NULL,NULL,NULL,NULL
 incalculable,Neutral,Understated,NULL,NULL,NULL,NULL
 incapable,Negative,Normal,NULL,Vice,NULL,Passive
 incapacity,Neutral,Normal,NULL,NULL,NULL,NULL
@@ -5049,9 +5046,9 @@ mover,Neutral,Normal,NULL,NULL,NULL,Active
 movie,Neutral,Normal,NULL,NULL,NULL,NULL
 mozambique,Neutral,Normal,NULL,NULL,NULL,NULL
 mph,Neutral,Normal,NULL,NULL,NULL,NULL
-mr.,Neutral,Normal,NULL,NULL,NULL,NULL
-mrs.,Neutral,Normal,NULL,NULL,NULL,NULL
-ms.,Neutral,Normal,NULL,NULL,NULL,NULL
+mr,Neutral,Normal,NULL,NULL,NULL,NULL
+mrs,Neutral,Normal,NULL,NULL,NULL,NULL
+ms,Neutral,Normal,NULL,NULL,NULL,NULL
 much,Neutral,Normal,NULL,NULL,NULL,NULL
 mud,Neutral,Normal,NULL,NULL,NULL,NULL
 muddle,Negative,Normal,NULL,NULL,NULL,Active
@@ -8638,3 +8635,4 @@ zero,Neutral,Normal,NULL,NULL,NULL,NULL
 zest,Positive,Normal,Neutral,NULL,NULL,NULL
 zinc,Neutral,Normal,NULL,NULL,NULL,NULL
 zone,Neutral,Normal,NULL,NULL,NULL,NULL
+chordingcoding,Positive,Normal,NULL,NULL,NULL,NULL

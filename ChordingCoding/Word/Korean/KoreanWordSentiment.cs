@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ChordingCoding.Word
+namespace ChordingCoding.Word.Korean
 {
     /// <summary>
     /// 한국어 단어의 감정 정보를 담는 구조체입니다.
@@ -108,6 +108,7 @@ namespace ChordingCoding.Word
                 "\tSubjectivityType: " + SubjectivityType.ToString() + "\tSubjectivityPolarity: " +
                 SubjectivityPolarity.ToString();
             Console.WriteLine(s);
+            base.Print();
         }
 
         public override Valence GetValence()

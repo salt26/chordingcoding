@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ChordingCoding.Word
+namespace ChordingCoding.Word.Korean
 {
     /// <summary>
     /// 한글을 자음과 모음 단위로 분해하거나 재결합하는 클래스입니다.

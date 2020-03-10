@@ -6,6 +6,8 @@ using System.Text;
 using System.Drawing;
 using System.Collections.Generic;
 using ChordingCoding.SFX;
+using ChordingCoding.Word.English;
+using ChordingCoding.Word.Korean;
 
 namespace ChordingCoding.UI
 {
@@ -144,10 +146,10 @@ namespace ChordingCoding.UI
                     // 음표 재생 후에 Music.OnPlayNotes()가 호출되면서 시각 효과 발생
                 }
                 else if (vkCode == 109 || 
-                    ((vkCode == 110 || vkCode == 189 || vkCode == 190) &&
+                    ((vkCode == 189 || vkCode == 222) &&
                     (Control.ModifierKeys & Keys.Shift) != Keys.Shift))
                 {
-                    // Characters (-, .)
+                    // Characters (-, ')
                     Util.TaskQueue.Add("wordState", AddCharToWord, vkCode, false);
                     Util.TaskQueue.Add("wordState", BackspaceStateToNull);
 
@@ -214,15 +216,16 @@ namespace ChordingCoding.UI
             {
                 if (IsIMESetToEnglish())
                 {
-                    Console.WriteLine("wordState(TODO): " + wordState);
-                    // TODO!
-                    //Word.EnglishSentimentAnalyzer.instance.Analyze(wordState);
+                    Console.WriteLine("wordState: " + wordState);
+                    EnglishSentimentAnalyzer.instance.Analyze(wordState);
+                    EnglishSentimentAnalyzer.instance.GetSentimentAndFlush().Print();
+                    // TODO 음악 생성기에 넘기기
                 }
                 else
                 {
-                    Console.WriteLine("wordState: " + Word.Hangul.Assemble(wordState));
-                    Word.KoreanSentimentAnalyzer.instance.Analyze(Word.Hangul.Assemble(wordState));
-                    Word.KoreanSentimentAnalyzer.instance.GetSentimentAndFlush().Print();
+                    Console.WriteLine("wordState: " + Hangul.Assemble(wordState));
+                    KoreanSentimentAnalyzer.instance.Analyze(Hangul.Assemble(wordState));
+                    KoreanSentimentAnalyzer.instance.GetSentimentAndFlush().Print();
                     // TODO 음악 생성기에 넘기기
                 }
             }
@@ -243,9 +246,9 @@ namespace ChordingCoding.UI
                 {
                     if (backspaceState is null)
                     {
-                        backspaceState = Word.Hangul.Assemble(wordState);
+                        backspaceState = Hangul.Assemble(wordState);
                         backspaceState = backspaceState.Substring(0, backspaceState.Length - 1) +
-                            Word.Hangul.Disassemble(backspaceState.Substring(backspaceState.Length - 1, 1));
+                            Hangul.Disassemble(backspaceState.Substring(backspaceState.Length - 1, 1));
                     }
                     if (backspaceState.Length > 0)
                     {
@@ -282,7 +285,7 @@ namespace ChordingCoding.UI
             }
             else
             {
-                wordState += Word.Hangul.EnglishToKorean(Util.ToUpperCase(charPressed.ToString(), hasShiftPressed_));
+                wordState += Hangul.EnglishToKorean(Util.ToUpperCase(charPressed.ToString(), hasShiftPressed_));
             }
         }
 

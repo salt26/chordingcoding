@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
+using symspell;
 
 namespace ChordingCoding.Word.English
 {
@@ -13,6 +15,7 @@ namespace ChordingCoding.Word.English
     {
         private Util.CSVReader englishSentimentCSV;
         private Dictionary<string, EnglishWordSentiment> englishSentimentDictionary;
+        private SymSpell symSpell;
 
         // aggregateEnglishSentiment
         private int[] aggregateValence;
@@ -42,6 +45,11 @@ namespace ChordingCoding.Word.English
             if (!(instance is null)) return;
             instance = this;
 
+            #region Load English sentiment dictionary
+            /*
+             * EnglishSentiment.csv is created by MorphemeParser(https://github.com/salt26/morpheme-parser).
+             * The original data source is Inquirer Dictionary(http://www.wjh.harvard.edu/~inquirer/homecat.htm).
+             */
             englishSentimentCSV = new Util.CSVReader("EnglishSentiment.csv", true);
             englishSentimentDictionary = new Dictionary<string, EnglishWordSentiment>();
 
@@ -52,6 +60,17 @@ namespace ChordingCoding.Word.English
             }
 
             Util.TaskQueue.Add("aggregateEnglishSentiment", InitializeAggregate);
+            #endregion
+
+            #region Load SymSpell (spelling correction engine)
+            symSpell = new SymSpell(82998, 2);
+            string dictionaryPath = "EnglishFrequencyDictionary.txt";
+            if (!symSpell.LoadDictionary(dictionaryPath, 0, 1))
+            {
+                throw new FileNotFoundException("EnglishFrequencyDictionary.txt not found!");
+            }
+            var a = symSpell.WordSegmentation("initialize", 0);
+            #endregion
 
             IsReady = true;
         }
@@ -65,8 +84,50 @@ namespace ChordingCoding.Word.English
         {
             if (!IsReady) return;
 
-            // TODO attach spelling correction engine!
+            // attach spelling correction engine
+            var suggestion = symSpell.WordSegmentation(input.ToLowerInvariant(), 2);
 
+            Console.WriteLine(suggestion.correctedString);
+
+            List<string> tokens = suggestion.correctedString.Split(' ').ToList();
+            foreach (string word in tokens)
+            {
+                if (englishSentimentDictionary.ContainsKey(word))
+                {
+                    void UpdateAggregate(object[] args)
+                    {
+                        EnglishWordSentiment sentiment = args[0] as EnglishWordSentiment;
+                        int weight = 1;
+
+                        if (sentiment.GetValence() != WordSentiment.Valence.NULL)
+                        {
+                            aggregateValence[(int)sentiment.GetValence()] += weight;
+                        }
+                        if (sentiment.GetStateIntensity() != WordSentiment.StateIntensity.NULL)
+                        {
+                            aggregateStateIntensity[(int)sentiment.GetStateIntensity()] += weight;
+                        }
+                        if (sentiment.GetEmotion() != WordSentiment.Emotion.NULL)
+                        {
+                            aggregateEmotion[(int)sentiment.GetEmotion()] += weight;
+                        }
+                        if (sentiment.GetJudgment() != WordSentiment.Judgment.NULL)
+                        {
+                            aggregateJudgment[(int)sentiment.GetJudgment()] += weight;
+                        }
+                        if (sentiment.GetAgreement() != WordSentiment.Agreement.NULL)
+                        {
+                            aggregateAgreement[(int)sentiment.GetAgreement()] += weight;
+                        }
+                        if (sentiment.GetIntention() != WordSentiment.Intention.NULL)
+                        {
+                            aggregateIntention[(int)sentiment.GetIntention()] += weight;
+                        }
+                    }
+                    Util.TaskQueue.Add("aggregateEnglishSentiment", UpdateAggregate,
+                        englishSentimentDictionary[word]);
+                }
+            }
         }
 
         /// <summary>

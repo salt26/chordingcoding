@@ -5086,8 +5086,7 @@ mutton,Neutral,Normal,NULL,NULL,NULL,NULL
 mutual,Positive,Normal,NULL,NULL,Affiliation,NULL
 my,Neutral,Normal,NULL,NULL,NULL,NULL
 myriad,Positive,Normal,NULL,NULL,NULL,NULL
-myself,Neutral,Normal,NULL,NULL,NULL,NULL
-myself>,Negative,Normal,Pain,NULL,NULL,Passive
+myself,Negative,Normal,Pain,NULL,NULL,Passive
 mysterious,Neutral,Normal,NULL,NULL,NULL,NULL
 mystery,Neutral,Normal,NULL,NULL,NULL,NULL
 mystic,Neutral,Normal,NULL,NULL,NULL,NULL

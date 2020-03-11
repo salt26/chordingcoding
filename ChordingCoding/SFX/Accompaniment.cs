@@ -43,7 +43,9 @@ namespace ChordingCoding.SFX
         /// </summary>
         public static Dictionary<int, Pattern> currentPatterns = new Dictionary<int, Pattern>();
 
-        public static bool IsReady { get; private set; } = false;
+        private static bool IsReady { get; set; } = false;
+        public static bool HasStart { get; private set; } = false;
+
 
         /// <summary>
         /// 반주 패턴 구조체입니다.
@@ -673,6 +675,18 @@ namespace ChordingCoding.SFX
         }
 
         /// <summary>
+        /// 반주 패턴 재생 기능이 작동하기 위해서는
+        /// Initialize()가 호출된 후에 반드시 호출되어야 합니다.
+        /// </summary>
+        public static void Start()
+        {
+            if (IsReady && !HasStart)
+            {
+                HasStart = true;
+            }
+        }
+
+        /// <summary>
         /// 특정 staff의 현재 반주 패턴을 새로 설정하고 재생합니다.
         /// 현재 음악 테마의 자동 반주가 꺼진 상태이더라도 호출되어야 합니다.
         /// </summary>
@@ -687,7 +701,9 @@ namespace ChordingCoding.SFX
                 GenerateRhythmPattern(Music.NoteResolution);
             }
 
-            Score.Play(Accompaniment.currentPatterns[staff].score, "Accompaniment", SFXTheme.CurrentSFXTheme.Instruments[staff].accompanimentVolume / 127f);
+            if (HasStart) {
+                Score.Play(Accompaniment.currentPatterns[staff].score, "Accompaniment", SFXTheme.CurrentSFXTheme.Instruments[staff].accompanimentVolume / 127f);
+            }
         }
 
         /// <summary>

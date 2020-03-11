@@ -26,30 +26,33 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
+using System.Threading;
 //using Sanford.Multimedia.Midi;
 using System.Runtime.InteropServices;
 using System.Reflection;
 using System.Configuration;
+using ChordingCoding.Utility;
 using ChordingCoding.SFX;
-using ChordingCoding.VFX;
+using ChordingCoding.UI.VFX;
 using ChordingCoding.Word.Korean;
 using ChordingCoding.Word.English;
 
 namespace ChordingCoding.UI
 {
-    public partial class Form1 : Form
+    public partial class MainForm : Form
     {
         /// <summary>
         /// 시각 효과를 표시할지 결정합니다.
         /// </summary>
         const bool ENABLE_VFX = false;
 
-        static bool _isReady = false;
         static Dictionary<string, int> _opacity = new Dictionary<string, int>();
         static List<ParticleSystem> particleSystems = new List<ParticleSystem>();
         static ParticleSystem basicParticleSystem = null;
+        static Thread splash;
+
         //Bitmap bitmap;
-        public static Form1 form1;
+        public static MainForm instance;
         public KoreanSentimentAnalyzer ksa;
         public EnglishSentimentAnalyzer esa;
 
@@ -59,14 +62,8 @@ namespace ChordingCoding.UI
          * 2. Theme.cs의 Initialize()에서 _availableThemes.Add()로 새 테마(시각 효과)를 생성하고 음악 테마와 연동
          */
 
-        #region 프로퍼티 정의 (isReady, opacity)
-        public static bool isReady
-        {
-            get
-            {
-                return _isReady;
-            }
-        }
+        #region 프로퍼티 정의 (IsReady, opacity)
+        public static bool IsReady { get; private set; }
 
         public static int opacity
         {
@@ -100,8 +97,10 @@ namespace ChordingCoding.UI
         }
         #endregion
 
-        public Form1()
+        public MainForm()
         {
+            splash = new Thread(new ThreadStart(() =>Application.Run(new SplashScreen())));
+            splash.Start();
             InitializeComponent();
         }
 
@@ -112,10 +111,12 @@ namespace ChordingCoding.UI
         /// <param name="e"></param>
         private void Form1_Load(object sender, EventArgs e)
         {
+            #region Initialize phase
+
             Form form = (Form)sender;
             form.ShowInTaskbar = false;
-            form1 = this;
-            TypingTracker.NewContext();
+            instance = this;
+            TypingTracker.NewIMEContext();
 
             Theme.Initialize();
 
@@ -200,9 +201,22 @@ namespace ChordingCoding.UI
             ksa = new KoreanSentimentAnalyzer(); // 반드시 Music.Initialize()가 완료된 후에 호출할 것.
             esa = new EnglishSentimentAnalyzer(); // 반드시 Music.Initialize()가 완료된 후에 호출할 것.
 
-            notifyIcon1.ShowBalloonTip(8);
+            #endregion
 
-            _isReady = true;
+
+            #region Start phase
+
+            TypingTracker.Start();
+            ksa.Start();
+            esa.Start();
+            Music.Start();
+
+            notifyIcon1.ShowBalloonTip(8);
+            splash.Abort();
+
+            IsReady = true;
+
+            #endregion
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -218,8 +232,9 @@ namespace ChordingCoding.UI
             Properties.Settings.Default["NoteResolution"] = Music.NoteResolution;
             Properties.Settings.Default.Save();
             notifyIcon1.Dispose();
-            TypingTracker.DestroyContext();
-            _isReady = false;
+            TypingTracker.DestroyIMEContext();
+            TypingTracker.Stop();
+            IsReady = false;
         }
 
         /// <summary>
@@ -227,7 +242,7 @@ namespace ChordingCoding.UI
         /// </summary>
         private void MarshallingUpdateFrame()
         {
-            if (ENABLE_VFX && isReady)
+            if (ENABLE_VFX && IsReady)
             {
                 BeginInvoke(new ChordingCoding.SFX.Timer.TickDelegate(UpdateFrame));
             }

@@ -162,7 +162,7 @@ namespace ChordingCoding.SFX
             {
                 _theme = value;
 
-                if (Music.IsReady)
+                if (Music.HasStart)
                 {
                     Music.ThemeChanged();
                 }

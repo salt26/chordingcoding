@@ -51,12 +51,12 @@
     <ApplicationIcon>Resources\NoteWord.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>ChordingCoding.Program</StartupObject>
+    <StartupObject>ChordingCoding.UI.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <LangVersion>7.3</LangVersion>
@@ -199,6 +199,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="UI\SplashScreen.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\SplashScreen.Designer.cs">
+      <DependentUpon>SplashScreen.cs</DependentUpon>
+    </Compile>
     <Compile Include="Word\English\SymSpell\EditDistance.cs" />
     <Compile Include="Word\English\EnglishSentimentAnalyzer.cs" />
     <Compile Include="Word\English\EnglishWordSentiment.cs" />
@@ -245,35 +251,38 @@
     <Compile Include="SFX\PowerManagement.cs" />
     <Compile Include="SFX\Accompaniment.cs" />
     <Compile Include="SFX\Chord.cs" />
-    <Compile Include="Form1.cs">
+    <Compile Include="UI\MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="UI\MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="InterceptKeys.cs" />
+    <Compile Include="UI\TypingTracker.cs" />
     <Compile Include="SFX\Music.cs" />
     <Compile Include="SFX\SFXTheme.cs" />
     <Compile Include="SFX\Timer.cs" />
     <Compile Include="Word\Korean\KoreanSentimentAnalyzer.cs" />
     <Compile Include="Util.cs" />
-    <Compile Include="VFX\Particle.cs" />
-    <Compile Include="VFX\ParticleSystem.cs" />
-    <Compile Include="Theme.cs" />
-    <Compile Include="Interfaces\TrackBarMenuItem.cs" />
+    <Compile Include="UI\VFX\Particle.cs" />
+    <Compile Include="UI\VFX\ParticleSystem.cs" />
+    <Compile Include="UI\Theme.cs" />
+    <Compile Include="UI\TrackBarMenuItem.cs" />
     <Compile Include="SFX\Note.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SFX\Score.cs" />
     <Compile Include="Word\SentimentAnalyzer.cs" />
     <Compile Include="Word\WordSentiment.cs" />
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <EmbeddedResource Include="UI\MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="UI\SplashScreen.resx">
+      <DependentUpon>SplashScreen.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Word\English\EnglishSentiment.csv" />
     <None Include="Word\Korean\HangulSentiment1.csv" />
@@ -292,8 +301,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="frequency_bigramdictionary_en_243_342.txt" />
-    <Content Include="frequency_dictionary_en_82_765.txt" />
     <Content Include="Resources\NoteWord.ico" />
     <Content Include="Resources\Dot.png" />
     <Content Include="Resources\Leaf11.png" />
@@ -315,12 +322,11 @@
     <Content Include="Resources\Leaf35.png" />
     <Content Include="Resources\Leaf36.png" />
     <Content Include="Resources\Note8_.png" />
-    <None Include="Resources\NewIcon.png" />
     <Content Include="Resources\Rain.png" />
     <Content Include="Resources\Rain_.png" />
     <Content Include="Resources\Star.png" />
+    <Content Include="Resources\Title.png" />
     <Content Include="Resources\Tray.ico" />
-    <Content Include="Resources\Tray.png" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">

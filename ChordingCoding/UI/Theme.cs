@@ -25,10 +25,9 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using ChordingCoding.SFX;
-using ChordingCoding.VFX;
-using ChordingCoding.UI;
+using ChordingCoding.UI.VFX;
 
-namespace ChordingCoding
+namespace ChordingCoding.UI
 {
     /// <summary>
     /// SFXTheme과 시각 효과 속성을 포함하는 테마 클래스입니다.
@@ -136,7 +135,7 @@ namespace ChordingCoding
             ParticleSystemForWhitespace = PSForWhitespace;
             ParticleInfoForCharacter = PIForCharacter;
             SFX = SFXTheme.FindSFXTheme(SFXThemeName);
-            Form1.form1.AddNewThemeToolStripMenuItem(this);
+            MainForm.instance.AddNewThemeToolStripMenuItem(this);
         }
 
         /// <summary>
@@ -156,7 +155,7 @@ namespace ChordingCoding
                                    ParticleSystem.CreateFunction.TopRandom,
                                    Particle.Type.leaf, () => Color.White,
                                    /*pSize*/ 1f, /*pLife*/ 128),
-                null, new Theme.ParticleInfo(Particle.Type.leaf, (Form1.form1.Size.Height + 150) / 4, (pitch) => Color.White, 1f),
+                null, new Theme.ParticleInfo(Particle.Type.leaf, (MainForm.instance.Size.Height + 150) / 4, (pitch) => Color.White, 1f),
                 "Autumn"));
             /*
             _availableThemes.Add(new Theme(
@@ -181,8 +180,8 @@ namespace ChordingCoding
                                    ParticleSystem.CreateFunction.Random,
                                    Particle.Type.star, () => Color.Black,
                                    /*pSize*/ 1f, /*pLife*/ 64),
-                new ParticleSystem(/*posX*/ () => (float)(new Random().NextDouble() * Form1.form1.Size.Width),
-                                   /*posY*/ () => (float)(new Random().NextDouble() * Form1.form1.Size.Height * 5 / 6 - Form1.form1.Size.Height / 12),
+                new ParticleSystem(/*posX*/ () => (float)(new Random().NextDouble() * MainForm.instance.Size.Width),
+                                   /*posY*/ () => (float)(new Random().NextDouble() * MainForm.instance.Size.Height * 5 / 6 - MainForm.instance.Size.Height / 12),
                                    /*velX*/ 2, /*velY*/ 8, /*life*/ 38,
                                    /*cNum*/ 7, /*cRange*/ 4,
                                    ParticleSystem.CreateFunction.Gaussian,
@@ -215,14 +214,14 @@ namespace ChordingCoding
                                    ParticleSystem.CreateFunction.TopRandom,
                                    Particle.Type.leaf, () => Color.White,
                                    /*pSize*/ 0.1f, /*pLife*/ 128),
-                new ParticleSystem(/*posX*/ () => (float)(new Random().NextDouble() * Form1.form1.Size.Width),
-                                   /*posY*/ () => (float)(new Random().NextDouble() * Form1.form1.Size.Height * 5 / 6 - Form1.form1.Size.Height / 12),
+                new ParticleSystem(/*posX*/ () => (float)(new Random().NextDouble() * MainForm.instance.Size.Width),
+                                   /*posY*/ () => (float)(new Random().NextDouble() * MainForm.instance.Size.Height * 5 / 6 - MainForm.instance.Size.Height / 12),
                                    /*velX*/ 0, /*velY*/ 16, /*life*/ 38,
                                    /*cNum*/ 2, /*cRange*/ 200,
                                    ParticleSystem.CreateFunction.Gaussian,
                                    Particle.Type.leaf, () => Music.chord.ChordColor(),
                                    /*pSize*/ 0.7f, /*pLife*/ 40),
-                new Theme.ParticleInfo(Particle.Type.rain, (Form1.form1.Size.Height + 150) / 4, (pitch) => Color.White, 0.2f),
+                new Theme.ParticleInfo(Particle.Type.rain, (MainForm.instance.Size.Height + 150) / 4, (pitch) => Color.White, 0.2f),
                 "Pianoforte"));
             
             _availableThemes.Add(new Theme(
@@ -231,8 +230,8 @@ namespace ChordingCoding
                                    ParticleSystem.CreateFunction.Random,
                                    Particle.Type.star, () => Color.Black,
                                    /*pSize*/ 1f, /*pLife*/ 64),
-                new ParticleSystem(/*posX*/ () => (float)(new Random().NextDouble() * Form1.form1.Size.Width),
-                                   /*posY*/ () => (float)(new Random().NextDouble() * Form1.form1.Size.Height * 5 / 6 - Form1.form1.Size.Height / 12),
+                new ParticleSystem(/*posX*/ () => (float)(new Random().NextDouble() * MainForm.instance.Size.Width),
+                                   /*posY*/ () => (float)(new Random().NextDouble() * MainForm.instance.Size.Height * 5 / 6 - MainForm.instance.Size.Height / 12),
                                    /*velX*/ 2, /*velY*/ 8, /*life*/ 38,
                                    /*cNum*/ 7, /*cRange*/ 4,
                                    ParticleSystem.CreateFunction.Gaussian,
@@ -264,15 +263,15 @@ namespace ChordingCoding
                 new ParticleSystem(1, 0,
                                    ParticleSystem.CreateFunction.TopRandom,
                                    Particle.Type.rain, () => Color.White,
-                                   0.1f, (Form1.form1.Size.Height + 150) / 30),
+                                   0.1f, (MainForm.instance.Size.Height + 150) / 30),
                 new ParticleSystem(() => 0,
                                    () => 0,
                                    0, 0, 160,
                                    1, 0,
                                    ParticleSystem.CreateFunction.TopRandom,
                                    Particle.Type.rain, () => Color.White,
-                                   0.1f, (Form1.form1.Size.Height + 150) / 30),
-                new Theme.ParticleInfo(Particle.Type.note, (Form1.form1.Size.Height + 150) / 15, (pitch) => Chord.PitchColor(pitch), 0.1f),
+                                   0.1f, (MainForm.instance.Size.Height + 150) / 30),
+                new Theme.ParticleInfo(Particle.Type.note, (MainForm.instance.Size.Height + 150) / 15, (pitch) => Chord.PitchColor(pitch), 0.1f),
                 "Medieval_ruins"));
 
             IsReady = true;

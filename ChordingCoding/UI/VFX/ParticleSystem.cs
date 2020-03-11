@@ -24,9 +24,9 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using ChordingCoding.UI;
+using ChordingCoding.Utility;
 
-namespace ChordingCoding.VFX
+namespace ChordingCoding.UI.VFX
 {
     public class ParticleSystem
     {
@@ -296,16 +296,16 @@ namespace ChordingCoding.VFX
                     posY = positionY;
                     break;
                 case CreateFunction.TopRandom:
-                    posX = (float)(random.NextDouble() * Form1.form1.Size.Width);
+                    posX = (float)(random.NextDouble() * MainForm.instance.Size.Width);
                     posY = -50f - 25f * (float)random.NextDouble();
                     break;
                 case CreateFunction.Random:
-                    posX = (float)(random.NextDouble() * Form1.form1.Size.Width);
-                    posY = (float)(random.NextDouble() * Form1.form1.Size.Height);
+                    posX = (float)(random.NextDouble() * MainForm.instance.Size.Width);
+                    posY = (float)(random.NextDouble() * MainForm.instance.Size.Height);
                     break;
                 case CreateFunction.BottomRandom:
-                    posX = (float)(random.NextDouble() * Form1.form1.Size.Width);
-                    posY = Form1.form1.Size.Height + 50f + 25f * (float)random.NextDouble();
+                    posX = (float)(random.NextDouble() * MainForm.instance.Size.Width);
+                    posY = MainForm.instance.Size.Height + 50f + 25f * (float)random.NextDouble();
                     break;
             }
         }

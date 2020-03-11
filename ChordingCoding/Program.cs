@@ -28,9 +28,8 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Security.AccessControl;
 using System.Security.Principal;
-using ChordingCoding.UI;
 
-namespace ChordingCoding
+namespace ChordingCoding.UI
 {
     static class Program
     {
@@ -84,20 +83,12 @@ namespace ChordingCoding
                     
                     // 아래 코드는 프로그램이 단독으로 실행할 때 수행할 명령들입니다.
                     
-                    // 키보드 및 마우스 입력 이벤트를 감지하여 콜백을 호출하도록 합니다.
-                    TypingTracker._keyboardHookID = TypingTracker.SetLowLevelKeyboardHook(TypingTracker._keyboardProc);
-                    TypingTracker._mouseHookID = TypingTracker.SetLowLevelMouseHook(TypingTracker._mouseProc);
-
                     Application.EnableVisualStyles();
                     Application.SetCompatibleTextRenderingDefault(false);
 
                     // Form1을 실행합니다.
-                    Form1 form = new Form1();
+                    MainForm form = new MainForm();
                     Application.Run(form);
-
-                    // SetHook에서 잡은 handle을 놓습니다.
-                    TypingTracker.UnhookWindowsHookEx(TypingTracker._keyboardHookID);
-                    TypingTracker.UnhookWindowsHookEx(TypingTracker._mouseHookID);
                 }
                 finally
                 {

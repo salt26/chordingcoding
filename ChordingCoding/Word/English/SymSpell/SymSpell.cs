@@ -33,7 +33,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 
-namespace symspell
+namespace SymSpell
 {
     public class SymSpell
     {

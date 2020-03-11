@@ -26,10 +26,12 @@ using System.Collections.Generic;
 using System.Text;
 using System.IO;
 
-namespace ChordingCoding
+namespace ChordingCoding.Utility
 {
     class Util
     {
+        private static Dictionary<string, bool> cachedModuleName = new Dictionary<string, bool>();
+
         /// <summary>
         /// 평균이 0, 표준편차가 1인 표준정규분포를 따르는 랜덤한 값을 생성합니다.
         /// </summary>
@@ -57,7 +59,13 @@ namespace ChordingCoding
             else return r;
         }
 
-        public static string ToUpperCase(string str, bool hasShiftPressed)
+        /// <summary>
+        /// QWERTY 자판에서 Shift를 눌렀는지 여부에 따라 str을 변환합니다.
+        /// </summary>
+        /// <param name="str">Shift를 누르지 않았을 때 기준으로 입력한 키들의 문자열</param>
+        /// <param name="hasShiftPressed">Shift가 눌린 상태이면 true, 아니면 false</param>
+        /// <returns></returns>
+        public static string StringWithShift(string str, bool hasShiftPressed)
         {
             if (!hasShiftPressed) return str;
 
@@ -119,6 +127,49 @@ namespace ChordingCoding
             return newStr;
         }
         
+        /// <summary>
+        /// 주어진 moduleName이 이 프로젝트에 포함되어 있는지 런타임에 확인합니다.
+        /// 같은 moduleName으로 여러 번 호출할 경우 항상 처음과 같은 결과를, 빠르게 반환합니다.
+        /// </summary>
+        /// <param name="moduleName">모듈 이름 (예: "ChordingCoding.UI.MainForm")</param>
+        /// <returns></returns>
+        public static bool HasModuleExists(string moduleName)
+        {
+            if (moduleName is null)
+            {
+                return false;
+            }
+            else if (cachedModuleName.ContainsKey(moduleName))
+            {
+                return cachedModuleName[moduleName];
+            }
+            else
+            {
+                if (Type.GetType(moduleName) is null)
+                {
+                    cachedModuleName.Add(moduleName, false);
+                    return false;
+                }
+                else
+                {
+                    cachedModuleName.Add(moduleName, true);
+                    return true;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 주어진 namespaceName과 className이 이 프로젝트에 포함되어 있는지 런타임에 확인합니다.
+        /// 같은 인자 쌍으로 여러 번 호출할 경우 항상 처음과 같은 결과를, 빠르게 반환합니다.
+        /// </summary>
+        /// <param name="namespaceName">네임스페이스 이름</param>
+        /// <param name="className">클래스 이름</param>
+        /// <returns></returns>
+        public static bool HasModuleExists(string namespaceName, string className)
+        {
+            return HasModuleExists(namespaceName + "." + className);
+        }
+
         /// <summary>
         /// 한 번에 하나씩만 수행되어야 하는 작업들을 관리합니다.
         /// </summary>
@@ -214,13 +265,23 @@ namespace ChordingCoding
             }
         }
 
+        /// <summary>
+        /// .csv 형식의 파일을 읽고 그 안의 데이터를 보관하는 클래스입니다.
+        /// </summary>
         public class CSVReader
         {
             StreamReader streamReader;
             List<List<string>> data = new List<List<string>>();
             List<string> header = new List<string>();
             bool hasHeader = false;
+            Dictionary<int, List<string>> columns = new Dictionary<int, List<string>>();
 
+            /// <summary>
+            /// filename의 .csv 파일을 읽고 그 데이터를 정리하여 보관합니다.
+            /// </summary>
+            /// <param name="filename">파일 이름(경로)</param>
+            /// <param name="hasHeader">첫 줄에 헤더가 오면 true, 헤더 없이 데이터가 바로 오면 false</param>
+            /// <param name="delimiter">열 구분 문자</param>
             public CSVReader(string filename, bool hasHeader, char delimiter = ',')
             {
                 streamReader = new StreamReader(filename, Encoding.GetEncoding("UTF-8"));
@@ -254,32 +315,82 @@ namespace ChordingCoding
                 }
             }
 
+            /// <summary>
+            /// 주어진 headerName이 몇 번째 열(0부터 시작)의 헤더 이름인지 반환합니다.
+            /// 없으면 -1을 반환합니다.
+            /// </summary>
+            /// <param name="headerName">헤더 이름</param>
+            /// <returns></returns>
             public int GetHeaderIndex(string headerName)
             {
                 return header.IndexOf(headerName);
             }
 
+            /// <summary>
+            /// index(0부터 시작)번째 행의 데이터를 반환합니다.
+            /// 반환된 데이터를 함부로 수정하지 마세요.
+            /// </summary>
+            /// <param name="index">행 인덱스 (0 이상)</param>
+            /// <returns></returns>
             public List<string> GetRow(int index)
             {
                 if (index < 0 || index >= data.Count) return null;
                 return data[index];
             }
 
+            /// <summary>
+            /// headerIndex(0부터 시작)번째 열의 데이터를 반환합니다.
+            /// 특정 headerIndex에 대해 처음 호출하면 시간이 조금 걸릴 수 있습니다.
+            /// 데이터의 어떤 행에 headerIndex번째 값이 없으면
+            /// 그 행의 값은 null로 채워집니다.
+            /// </summary>
+            /// <param name="headerIndex">열 인덱스 (0 이상)</param>
+            /// <returns></returns>
             public List<string> GetColumn(int headerIndex)
             {
-                List<string> column = new List<string>();
-                for (int i = 0; i < data.Count; i++)
+                if (headerIndex < 0)
                 {
-                    column.Add(data[i][headerIndex]);
+                    return null;
                 }
-                return column;
+                else if (columns.ContainsKey(headerIndex))
+                {
+                    return columns[headerIndex];
+                }
+                else
+                {
+                    List<string> column = new List<string>();
+                    for (int i = 0; i < data.Count; i++)
+                    {
+                        if (headerIndex < data[i].Count)
+                        {
+                            column.Add(data[i][headerIndex]);
+                        }
+                        else
+                        {
+                            column.Add(null);
+                        }
+                    }
+                    columns.Add(headerIndex, column);
+                    return column;
+                }
             }
 
+            /// <summary>
+            /// headerName을 헤더 이름으로 하는 열의 데이터를 반환합니다.
+            /// 특정 headerName에 대해 처음 호출하면 시간이 조금 걸릴 수 있습니다.
+            /// </summary>
+            /// <param name="headerName">헤더 이름</param>
+            /// <returns></returns>
             public List<string> GetColumn(string headerName)
             {
                 return GetColumn(GetHeaderIndex(headerName));
             }
 
+            /// <summary>
+            /// 헤더가 있는 경우 헤더 목록을 반환합니다.
+            /// 없으면 null을 반환합니다.
+            /// </summary>
+            /// <returns></returns>
             public List<string> GetHeader()
             {
                 if (hasHeader)
@@ -287,6 +398,13 @@ namespace ChordingCoding
                 else return null;
             }
 
+            /// <summary>
+            /// 데이터 전체를 반환합니다.
+            /// 반환된 이중 배열의 첫 번째 인덱스는 행 인덱스,
+            /// 두 번째 인덱스는 열 인덱스입니다.
+            /// 반환된 데이터를 함부로 수정하지 마세요.
+            /// </summary>
+            /// <returns></returns>
             public List<List<string>> GetData()
             {
                 return data;

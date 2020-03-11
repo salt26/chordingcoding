@@ -25,7 +25,7 @@ using System;
 using System.Drawing;
 using System.Drawing.Imaging;
 
-namespace ChordingCoding.VFX
+namespace ChordingCoding.UI.VFX
 {
     public class Particle
     {

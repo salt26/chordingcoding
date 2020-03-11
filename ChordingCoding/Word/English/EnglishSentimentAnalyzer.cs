@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using ChordingCoding.Utility;
 
 namespace ChordingCoding.Word.English
 {
@@ -102,7 +103,7 @@ namespace ChordingCoding.Word.English
         /// <param name="input">English string</param>
         public override void Analyze(string input)
         {
-            if (!IsReady) return;
+            if (!HasStart) return;
 
             // attach spelling correction engine
             var suggestion = symSpell.WordSegmentation(input.ToLowerInvariant(), 2);
@@ -157,6 +158,8 @@ namespace ChordingCoding.Word.English
         public override WordSentiment GetSentimentAndFlush()
         {
             WordSentiment ret = new EnglishWordSentiment("", "", "", "", "", "", "");
+
+            if (!HasStart) return ret;
 
             void GetAggregate(object[] args)
             {

@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 //using Sanford.Multimedia.Midi;
 using NFluidsynth;
+using ChordingCoding.Utility;
 
 namespace ChordingCoding.SFX
 {

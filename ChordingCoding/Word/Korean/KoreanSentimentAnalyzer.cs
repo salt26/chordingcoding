@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Moda.Korean.TwitterKoreanProcessorCS;
+using ChordingCoding.Utility;
 
 namespace ChordingCoding.Word.Korean
 {
@@ -126,7 +127,7 @@ namespace ChordingCoding.Word.Korean
         /// <param name="input">한국어 문자열</param>
         public override void Analyze(string input)
         {
-            if (!IsReady) return;
+            if (!HasStart) return;
 
             string a = Hangul.Assemble(input, true);
             a = TwitterKoreanProcessorCS.Normalize(a);
@@ -179,6 +180,8 @@ namespace ChordingCoding.Word.Korean
             KoreanWordSentiment.IntensityValue i = KoreanWordSentiment.IntensityValue.NULL;
             KoreanWordSentiment.SubjectivityTypeValue st = KoreanWordSentiment.SubjectivityTypeValue.NULL;
             KoreanWordSentiment.SubjectivityPolarityValue sp = KoreanWordSentiment.SubjectivityPolarityValue.NULL;
+
+            if (!HasStart) return new KoreanWordSentiment("", p, i, st, sp);
 
             void GetAggregate(object[] args)
             {

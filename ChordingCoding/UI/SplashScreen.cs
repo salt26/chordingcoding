@@ -21,25 +21,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-namespace ChordingCoding.Word
+using System.Windows.Forms;
+
+namespace ChordingCoding.UI
 {
-    public abstract class SentimentAnalyzer
+    public partial class SplashScreen : Form
     {
-        protected bool IsReady { get; set; } = false;
-        public bool HasStart { get; protected set; } = false;
-
-        public abstract void Initialize();
-        public abstract void Analyze(string input);
-        public abstract WordSentiment GetSentimentAndFlush();
-
-        /// <summary>
-        /// You must call this method after Initialize()
-        /// to start operations properly.
-        /// </summary>
-        public virtual void Start()
+        public SplashScreen()
         {
-            if (IsReady && !HasStart)
-                HasStart = true;
+            InitializeComponent();
         }
     }
 }

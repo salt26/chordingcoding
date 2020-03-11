@@ -26,6 +26,7 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Text;
+using ChordingCoding.Utility;
 using ChordingCoding.SFX;
 using ChordingCoding.Word.English;
 using ChordingCoding.Word.Korean;
@@ -82,10 +83,42 @@ namespace ChordingCoding.UI
         public static IntPtr _keyboardHookID = IntPtr.Zero;
         public static IntPtr _mouseHookID = IntPtr.Zero;
 
+        public static bool IsReady { get; private set; } = false;
+
         private static string wordState = "";
         private static string backspaceState = null;
 
-        public static IntPtr SetLowLevelKeyboardHook(HookProc proc)
+        /// <summary>
+        /// 키보드 및 마우스 입력 이벤트를 감지하도록 합니다.
+        /// </summary>
+        public static void Start()
+        {
+            if (!IsReady)
+            {
+                // 키보드 및 마우스 입력 이벤트를 감지하여 콜백을 호출하도록 합니다.
+                _keyboardHookID = SetLowLevelKeyboardHook(TypingTracker._keyboardProc);
+                _mouseHookID = SetLowLevelMouseHook(TypingTracker._mouseProc);
+                IsReady = true;
+            }
+        }
+
+        /// <summary>
+        /// 키보드 및 마우스 입력 이벤트를 더이상 감지하지 않도록 합니다.
+        /// Start()가 호출된 적이 있는 경우,
+        /// 프로그램이 종료되기 전에 반드시 호출되어야 합니다.
+        /// </summary>
+        public static void Stop()
+        {
+            if (IsReady)
+            {
+                // SetHook에서 잡은 handle을 놓습니다.
+                UnhookWindowsHookEx(_keyboardHookID);
+                UnhookWindowsHookEx(_mouseHookID);
+                IsReady = false;
+            }
+        }
+
+        private static IntPtr SetLowLevelKeyboardHook(HookProc proc)
         {
             using (Process curProcess = Process.GetCurrentProcess())
             using (ProcessModule curModule = curProcess.MainModule)
@@ -95,7 +128,7 @@ namespace ChordingCoding.UI
             }
         }
 
-        public static IntPtr SetLowLevelMouseHook(HookProc proc)
+        private static IntPtr SetLowLevelMouseHook(HookProc proc)
         {
             using (Process curProcess = Process.GetCurrentProcess())
             using (ProcessModule curModule = curProcess.MainModule)
@@ -302,11 +335,11 @@ namespace ChordingCoding.UI
             // TODO 영어와 한글 구분하여 처리
             if (IsIMESetToEnglish())
             {
-                wordState += Util.ToUpperCase(charPressed.ToString(), hasShiftPressed_);
+                wordState += Util.StringWithShift(charPressed.ToString(), hasShiftPressed_);
             }
             else
             {
-                wordState += Hangul.EnglishToKorean(Util.ToUpperCase(charPressed.ToString(), hasShiftPressed_));
+                wordState += Hangul.EnglishToKorean(Util.StringWithShift(charPressed.ToString(), hasShiftPressed_));
             }
         }
 
@@ -353,7 +386,7 @@ namespace ChordingCoding.UI
         /// <returns></returns>
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool UnhookWindowsHookEx(IntPtr hhk);
+        private static extern bool UnhookWindowsHookEx(IntPtr hhk);
 
         /// <summary>
         /// 다음 hook 프로시저에게 전달합니다.
@@ -381,7 +414,7 @@ namespace ChordingCoding.UI
         /// <param name="flags"></param>
         /// <returns></returns>
         [DllImport("user32.dll", CharSet = CharSet.Unicode)]
-        public static extern int ToUnicode(
+        private static extern int ToUnicode(
             uint virtualKeyCode,
             uint scanCode,
             byte[] keyboardState,
@@ -407,7 +440,7 @@ namespace ChordingCoding.UI
         /// </summary>
         /// <returns></returns>
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
-        public static extern IntPtr GetForegroundWindow();
+        private static extern IntPtr GetForegroundWindow();
 
         private const int WM_IME_CONTROL = 643;
 
@@ -478,10 +511,10 @@ namespace ChordingCoding.UI
         /// ChordingCoding의 Form에 포커스가 놓인 동안 한/영 전환이 가능합니다.
         /// 동아시아권(한국, 중국, 일본) 운영체제에서만 작동합니다.
         /// </summary>
-        public static void NewContext()
+        public static void NewIMEContext()
         {
             if (hasNewContext) return;
-            newHwnd = Form1.form1.Handle;
+            newHwnd = MainForm.instance.Handle;
             try
             {
                 newHimc = ImmCreateContext();
@@ -503,7 +536,7 @@ namespace ChordingCoding.UI
         /// 프로그램이 종료되기 전에 반드시 호출되어야 합니다.
         /// 동아시아권(한국, 중국, 일본) 운영체제에서만 작동합니다.
         /// </summary>
-        public static void DestroyContext()
+        public static void DestroyIMEContext()
         {
             if (!hasNewContext) return;
             try

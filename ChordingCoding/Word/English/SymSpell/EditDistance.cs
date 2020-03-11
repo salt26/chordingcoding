@@ -1,7 +1,7 @@
 ﻿using System;
 using SoftWx.Match;
 
-namespace symspell
+namespace SymSpell
 {
     public class EditDistance
     {

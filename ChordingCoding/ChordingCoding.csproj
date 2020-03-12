@@ -301,6 +301,21 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\Logos\logo00.png" />
+    <Content Include="Resources\Logos\logo09.png" />
+    <Content Include="Resources\Logos\logo10.png" />
+    <Content Include="Resources\Logos\logo11.png" />
+    <Content Include="Resources\Logos\logo12.png" />
+    <Content Include="Resources\Logos\logo13.png" />
+    <Content Include="Resources\Logos\logo14.png" />
+    <Content Include="Resources\Logos\logo01.png" />
+    <Content Include="Resources\Logos\logo02.png" />
+    <Content Include="Resources\Logos\logo03.png" />
+    <Content Include="Resources\Logos\logo04.png" />
+    <Content Include="Resources\Logos\logo05.png" />
+    <Content Include="Resources\Logos\logo06.png" />
+    <Content Include="Resources\Logos\logo07.png" />
+    <Content Include="Resources\Logos\logo08.png" />
     <Content Include="Resources\NoteWord.ico" />
     <Content Include="Resources\Dot.png" />
     <Content Include="Resources\Leaf11.png" />

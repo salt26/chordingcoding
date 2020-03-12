@@ -27,9 +27,22 @@ namespace ChordingCoding.UI
 {
     public partial class SplashScreen : Form
     {
+        public static SplashScreen instance = null;
+
         public SplashScreen()
         {
             InitializeComponent();
+            instance = this;
+        }
+
+        public static void Disable()
+        {
+            // TODO
+            if (!(instance is null))
+            {
+                instance.Hide();
+                instance.Enabled = false;
+            }
         }
     }
 }

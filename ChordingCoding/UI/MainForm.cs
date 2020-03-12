@@ -49,7 +49,8 @@ namespace ChordingCoding.UI
         static Dictionary<string, int> _opacity = new Dictionary<string, int>();
         static List<ParticleSystem> particleSystems = new List<ParticleSystem>();
         static ParticleSystem basicParticleSystem = null;
-        static Thread splash;
+        static SplashScreen splash;
+        static Thread splashThread;
 
         //Bitmap bitmap;
         public static MainForm instance;
@@ -99,9 +100,13 @@ namespace ChordingCoding.UI
 
         public MainForm()
         {
-            splash = new Thread(new ThreadStart(() =>Application.Run(new SplashScreen())));
-            splash.Start();
+            splash = new SplashScreen();
+            splashThread = new Thread(new ThreadStart(() => Application.Run(splash)));
+            splashThread.Start();
+            MarshallingUpdateSplashScreen(0);
             InitializeComponent();
+
+            MarshallingUpdateSplashScreen(1);
         }
 
         /// <summary>
@@ -111,15 +116,21 @@ namespace ChordingCoding.UI
         /// <param name="e"></param>
         private void Form1_Load(object sender, EventArgs e)
         {
+            MarshallingUpdateSplashScreen(2);
+
             #region Initialize phase
 
             Form form = (Form)sender;
             form.ShowInTaskbar = false;
             instance = this;
+
+            MarshallingUpdateSplashScreen(3);
             TypingTracker.NewIMEContext();
 
+            MarshallingUpdateSplashScreen(4);
             Theme.Initialize();
 
+            MarshallingUpdateSplashScreen(5);
             bool themeExist = false;
             foreach (Theme t in Theme.AvailableThemes)
             {
@@ -132,6 +143,8 @@ namespace ChordingCoding.UI
                     SetTheme(t);
                 }
             }
+
+            MarshallingUpdateSplashScreen(6);
             /*
              * TODO
              * 테마를 추가했다가 삭제하는 경우를 처리해야 함.
@@ -144,16 +157,21 @@ namespace ChordingCoding.UI
                 SetTheme(Theme.AvailableThemes[0]);
             }
 
+            MarshallingUpdateSplashScreen(7);
             int resolution = (int)Properties.Settings.Default["NoteResolution"];
-            Music.Initialize(Theme.CurrentTheme.SFX.Name, resolution,
-                new ChordingCoding.SFX.Timer.TickDelegate[] { MarshallingUpdateFrame });
 
+            MarshallingUpdateSplashScreen(8);
+            Music.Initialize(Theme.CurrentTheme.SFX.Name, resolution,
+                new SFX.Timer.TickDelegate[] { MarshallingUpdateFrame });
+
+            MarshallingUpdateSplashScreen(9);
             foreach (Theme t in Theme.AvailableThemes)
             {
                 // 이 코드를 위의 foreach문과 합치면 CurrentSFXTheme이 아직 설정되지 않은 상태가 되어 문제가 발생할 수 있음
                 t.SFX.hasAccompanied = (bool)Properties.Settings.Default["Accompaniment" + t.Name];
             }
 
+            MarshallingUpdateSplashScreen(10);
             if (Theme.CurrentTheme.SFX.hasAccompanied)
             {
                 자동반주ToolStripMenuItem.CheckState = CheckState.Checked;
@@ -163,6 +181,7 @@ namespace ChordingCoding.UI
                 자동반주ToolStripMenuItem.CheckState = CheckState.Unchecked;
             }
 
+            MarshallingUpdateSplashScreen(11);
             if (ENABLE_VFX)
             {
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
@@ -197,12 +216,16 @@ namespace ChordingCoding.UI
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
 
+            MarshallingUpdateSplashScreen(12);
             SetNoteResolution(resolution);
+
+            MarshallingUpdateSplashScreen(13);
             ksa = new KoreanSentimentAnalyzer(); // 반드시 Music.Initialize()가 완료된 후에 호출할 것.
+
+            MarshallingUpdateSplashScreen(14);
             esa = new EnglishSentimentAnalyzer(); // 반드시 Music.Initialize()가 완료된 후에 호출할 것.
 
             #endregion
-
 
             #region Start phase
 
@@ -212,7 +235,8 @@ namespace ChordingCoding.UI
             Music.Start();
 
             notifyIcon1.ShowBalloonTip(8);
-            splash.Abort();
+            MarshallingUpdateSplashScreen(15);
+            splashThread.Abort();
 
             IsReady = true;
 
@@ -237,6 +261,55 @@ namespace ChordingCoding.UI
             IsReady = false;
         }
 
+        private void MarshallingUpdateSplashScreen(int step)
+        {
+            if (splash is null) return;
+
+            Bitmap b;
+            switch (step)
+            {
+                case 0: b = Properties.Resources.logo00; break;
+                case 1: b = Properties.Resources.logo01; break;
+                case 2: b = Properties.Resources.logo02; break;
+                case 3: b = Properties.Resources.logo03; break;
+                case 4: b = Properties.Resources.logo04; break;
+                case 5: b = Properties.Resources.logo05; break;
+                case 6: b = Properties.Resources.logo06; break;
+                case 7: b = Properties.Resources.logo07; break;
+                case 8: b = Properties.Resources.logo08; break;
+                case 9: b = Properties.Resources.logo09; break;
+                case 10: b = Properties.Resources.logo10; break;
+                case 11: b = Properties.Resources.logo11; break;
+                case 12: b = Properties.Resources.logo12; break;
+                case 13: b = Properties.Resources.logo13; break;
+                case 14: b = Properties.Resources.logo14; break;
+                default: b = Properties.Resources.logo00; break;
+            }
+            
+            if (splash.InvokeRequired)
+            {
+                if (step > 14)
+                {
+                    splash.Invoke(new EventHandler(delegate
+                    {
+                        splash.Close();
+                    }));
+                }
+                else
+                {
+                    splash.Invoke(new EventHandler(delegate
+                    {
+                        splash.BackgroundImage = b;
+                    }));
+                }
+            }
+            else
+            {
+                if (step > 14) splash.Close();
+                else splash.BackgroundImage = b;
+            }
+        }
+
         /// <summary>
         /// Cross-thread 환경에서 Marshalling을 통해 안전하게 UpdateFrame 메서드를 호출하게 합니다.
         /// </summary>
@@ -244,7 +317,7 @@ namespace ChordingCoding.UI
         {
             if (ENABLE_VFX && IsReady)
             {
-                BeginInvoke(new ChordingCoding.SFX.Timer.TickDelegate(UpdateFrame));
+                BeginInvoke(new SFX.Timer.TickDelegate(UpdateFrame));
             }
         }
 

@@ -27,10 +27,12 @@ using System.Drawing;
 using System.Linq;
 using System.Windows.Forms;
 using System.Threading;
+using System.Text;
 //using Sanford.Multimedia.Midi;
 using System.Runtime.InteropServices;
 using System.Reflection;
 using System.Configuration;
+using System.Media;
 using ChordingCoding.Utility;
 using ChordingCoding.SFX;
 using ChordingCoding.UI.VFX;
@@ -98,11 +100,42 @@ namespace ChordingCoding.UI
         }
         #endregion
 
+        #region 여러 효과음을 동시에 재생하는 코드
+        // https://stackoverflow.com/questions/1285294/play-multiple-sounds-using-soundplayer
+
+        [DllImport("winmm.dll")]
+        static extern Int32 mciSendString(string command, StringBuilder buffer, int bufferSize, IntPtr hwndCallback);
+
+        /// <summary>
+        /// .wav 파일을 재생합니다.
+        /// 동시에 여러 파일을 재생할 수 있습니다.
+        /// </summary>
+        /// <param name="soundFileName"></param>
+        private void PlayOneShot(string soundFileName)
+        {
+            StringBuilder sb = new StringBuilder();
+            mciSendString("open \"" + soundFileName + "\" alias " + soundFileName, sb, 0, IntPtr.Zero);
+            mciSendString("play " + soundFileName + " from 0", sb, 0, IntPtr.Zero);
+        }
+
+        /// <summary>
+        /// PlayOneShot()으로 재생하던 소리를 멈춥니다.
+        /// </summary>
+        /// <param name="soundFileName"></param>
+        private void StopPlaying(string soundFileName)
+        {
+            StringBuilder sb = new StringBuilder();
+            mciSendString("stop " + "Typing2.wav", sb, 0, IntPtr.Zero);
+            mciSendString("close " + "Typing2.wav", sb, 0, IntPtr.Zero);
+        }
+        #endregion
+
         public MainForm()
         {
             splash = new SplashScreen();
             splashThread = new Thread(new ThreadStart(() => Application.Run(splash)));
             splashThread.Start();
+
             MarshallingUpdateSplashScreen(0);
             InitializeComponent();
 
@@ -171,7 +204,6 @@ namespace ChordingCoding.UI
                 t.SFX.hasAccompanied = (bool)Properties.Settings.Default["Accompaniment" + t.Name];
             }
 
-            MarshallingUpdateSplashScreen(10);
             if (Theme.CurrentTheme.SFX.hasAccompanied)
             {
                 자동반주ToolStripMenuItem.CheckState = CheckState.Checked;
@@ -181,7 +213,7 @@ namespace ChordingCoding.UI
                 자동반주ToolStripMenuItem.CheckState = CheckState.Unchecked;
             }
 
-            MarshallingUpdateSplashScreen(11);
+            MarshallingUpdateSplashScreen(10);
             if (ENABLE_VFX)
             {
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
@@ -216,16 +248,18 @@ namespace ChordingCoding.UI
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
 
-            MarshallingUpdateSplashScreen(12);
+            MarshallingUpdateSplashScreen(11);
             SetNoteResolution(resolution);
 
-            MarshallingUpdateSplashScreen(13);
+            MarshallingUpdateSplashScreen(12);
             ksa = new KoreanSentimentAnalyzer(); // 반드시 Music.Initialize()가 완료된 후에 호출할 것.
 
-            MarshallingUpdateSplashScreen(14);
+            MarshallingUpdateSplashScreen(13);
             esa = new EnglishSentimentAnalyzer(); // 반드시 Music.Initialize()가 완료된 후에 호출할 것.
 
             #endregion
+
+            MarshallingUpdateSplashScreen(14);
 
             #region Start phase
 
@@ -285,7 +319,12 @@ namespace ChordingCoding.UI
                 case 14: b = Properties.Resources.logo14; break;
                 default: b = Properties.Resources.logo00; break;
             }
-            
+
+            if (step <= 14 && step > 0)
+            {
+                PlayOneShot("Typing.wav");
+            }
+
             if (splash.InvokeRequired)
             {
                 if (step > 14)

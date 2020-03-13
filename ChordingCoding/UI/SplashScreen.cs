@@ -34,15 +34,5 @@ namespace ChordingCoding.UI
             InitializeComponent();
             instance = this;
         }
-
-        public static void Disable()
-        {
-            // TODO
-            if (!(instance is null))
-            {
-                instance.Hide();
-                instance.Enabled = false;
-            }
-        }
     }
 }

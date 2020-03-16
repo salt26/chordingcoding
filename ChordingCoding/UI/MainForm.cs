@@ -270,6 +270,7 @@ namespace ChordingCoding.UI
 
             notifyIcon1.ShowBalloonTip(8);
             MarshallingUpdateSplashScreen(15);
+            splash.DisposeFont();
             splashThread.Abort();
 
             IsReady = true;

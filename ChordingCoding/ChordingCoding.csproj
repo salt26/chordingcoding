@@ -284,6 +284,7 @@
     <EmbeddedResource Include="UI\SplashScreen.resx">
       <DependentUpon>SplashScreen.cs</DependentUpon>
     </EmbeddedResource>
+    <None Include="Resources\Gultan Bonte.ttf" />
     <None Include="Resources\Typing.wav" />
     <None Include="Word\English\EnglishSentiment.csv" />
     <None Include="Word\Korean\HangulSentiment1.csv" />

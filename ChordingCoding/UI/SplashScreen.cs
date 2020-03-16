@@ -21,6 +21,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+using System;
+using System.Drawing;
+using System.Drawing.Text;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace ChordingCoding.UI
@@ -29,10 +33,38 @@ namespace ChordingCoding.UI
     {
         public static SplashScreen instance = null;
 
+        private static PrivateFontCollection pfc = null;
+        private static IntPtr fontMemory;
+
         public SplashScreen()
         {
             InitializeComponent();
             instance = this;
+            InitializeFont();
+        }
+
+        public void InitializeFont()
+        {
+            // https://stackoverflow.com/questions/1297264/using-custom-fonts-on-a-label-on-winforms
+
+            if (instance is null) return;
+
+            pfc = new PrivateFontCollection();
+            int fontLength = Properties.Resources.Gultan_Bonte.Length;
+            byte[] fontdata = Properties.Resources.Gultan_Bonte;
+
+            fontMemory = Marshal.AllocCoTaskMem(fontLength);
+            Marshal.Copy(fontdata, 0, fontMemory, fontLength);
+            pfc.AddMemoryFont(fontMemory, fontLength);
+
+            instance.versionLabel.Font = new Font(pfc.Families[0], instance.versionLabel.Font.Size);
+        }
+
+        public void DisposeFont()
+        {
+            if (pfc is null) return;
+            pfc.Dispose();
+            Marshal.FreeCoTaskMem(fontMemory);
         }
     }
 }

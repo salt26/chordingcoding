@@ -32,12 +32,12 @@ namespace ChordingCoding.SFX
     /// <summary>
     /// 음표들을 담고 있는 악보 클래스입니다.
     /// </summary>
-    class Score
+    public class Score
     {
         /// <summary>
         /// 음표들을 담을 리스트.
         /// </summary>
-        private List<Note> score = new List<Note>();
+        public List<Note> score = new List<Note>();
 
         /// <summary>
         /// NoteOff()를 호출할 음표들을 저장하는 버퍼.

@@ -23,19 +23,34 @@ SOFTWARE.
 */
 using System;
 using System.Drawing;
+using System.Collections.Generic;
 
 namespace ChordingCoding.SFX
 {
     public class Chord
     {
         public enum Root { C, Db, D, Eb, E, F, Gb, G, Ab, A, Bb, B }
-        public enum Type { Major, minor, sus2, sus4, dim, aug, M7, m7 }
+        public enum Type { Major, minor, sus2, sus4, dim, aug, dom7, m7 }
 
         public Root root;
         public Type type;
         public int octave;  // TODO 이전 화음에서 이어지도록
         private int maxOctave = 8;
         private int minOctave = 5;
+
+        /// <summary>
+        /// 1배음만을 고려한 72가지 화음 템플릿.
+        /// RecognizeChordLabelFromScore()를 use4Harmonics = false로 처음 호출할 때 초기화됩니다.
+        /// 예: C Major는 { 0.334, 0, 0, 0, 0.333, 0, 0, 0.333, 0, 0, 0, 0 }
+        /// </summary>
+        private static Dictionary<Type, Dictionary<Root, double[]>> chordTemplates1 = null;
+
+        /// <summary>
+        /// 4배음까지 고려한 72가지 화음 템플릿.
+        /// RecognizeChordLabelFromScore()를 use4Harmonics = true로 처음 호출할 때 초기화됩니다.
+        /// 예: C Major는 { 0.278, 0, 0.055, 0, 0.278, 0, 0, 0.334, 0, 0, 0, 0.055 }
+        /// </summary>
+        private static Dictionary<Type, Dictionary<Root, double[]>> chordTemplates4 = null;
 
         /// <summary>
         /// 랜덤으로 화음을 초기화합니다.
@@ -78,7 +93,7 @@ namespace ChordingCoding.SFX
                             type = Type.sus4;
                             break;
                         case 14:
-                            type = Type.M7;
+                            type = Type.dom7;
                             break;
                         default:
                             type = Type.m7;
@@ -143,7 +158,7 @@ namespace ChordingCoding.SFX
                         case 8:
                         case 9:
                         case 10:
-                            type = Type.M7;
+                            type = Type.dom7;
                             break;
                         case 11:
                             type = Type.sus2;
@@ -321,7 +336,7 @@ namespace ChordingCoding.SFX
                             break;
                         case 14:
                         case 6:
-                            type = Type.M7;
+                            type = Type.dom7;
                             break;
                         case 15:
                         case 7:
@@ -475,7 +490,7 @@ namespace ChordingCoding.SFX
                         case 8:
                         case 9:
                         case 10:
-                            type = Type.M7;
+                            type = Type.dom7;
                             break;
                         case 11:
                             type = Type.sus2;
@@ -622,7 +637,7 @@ namespace ChordingCoding.SFX
                     switch (c.type)
                     {
                         case Type.Major:
-                        case Type.M7:
+                        case Type.dom7:
                             rand = r.Next(8);
                             switch (rand)
                             {
@@ -896,7 +911,7 @@ namespace ChordingCoding.SFX
             int v = 0;
             int p = (int)root + octave * 12;
             Random r = new Random();
-            if (type != Type.M7 && type != Type.m7)
+            if (type != Type.dom7 && type != Type.m7)
             {
                 switch (r.Next(18))
                 {
@@ -1003,7 +1018,7 @@ namespace ChordingCoding.SFX
         public int[] NotesInChord()
         {
             int[] r;
-            if (type != Type.M7 && type != Type.m7)
+            if (type != Type.dom7 && type != Type.m7)
             {
                 r = new int[3] {  (octave) * 12 + (int)root + TypeToNote(0),
                                   (octave) * 12 + (int)root + TypeToNote(1),
@@ -1030,7 +1045,7 @@ namespace ChordingCoding.SFX
             int[] r;
             if (octaveAddedToMin < 0) octaveAddedToMin = 0;
             int newOctave = SFXTheme.CurrentSFXTheme.MinOctaveInAccompaniment + octaveAddedToMin;
-            if (type != Type.M7 && type != Type.m7)
+            if (type != Type.dom7 && type != Type.m7)
             {
                 if (order < 0)
                 {
@@ -1061,15 +1076,15 @@ namespace ChordingCoding.SFX
 
         private int TypeToNote(int order)
         {
-            if (order < 0 || ((type != Type.M7 && type != Type.m7) && order >= 3 ||
-                (type == Type.M7 || type == Type.m7) && order >= 4)) return -1;
+            if (order < 0 || ((type != Type.dom7 && type != Type.m7) && order >= 3 ||
+                (type == Type.dom7 || type == Type.m7) && order >= 4)) return -1;
             int[] typeToNote;
             switch (type)
             {
                 case Type.Major:
                     typeToNote = new int[3] { 0, 4, 7 };
                     break;
-                case Type.M7:
+                case Type.dom7:
                     typeToNote = new int[4] { 0, 4, 7, 10 };
                     break;
                 case Type.minor:
@@ -1095,6 +1110,150 @@ namespace ChordingCoding.SFX
         }
 
         /// <summary>
+        /// 악보의 음들로부터 화음을 인식합니다.
+        /// 반환되는 화음의 종류는 Major, minor, sus4, dim, aug, dom7, m7입니다.
+        /// 따라서 12개의 Root 음에 대해 총 84가지 화음이 나올 수 있습니다.
+        /// 반환되는 화음의 옥타브는 5로 고정됩니다.
+        /// </summary>
+        /// <param name="score">악보</param>
+        /// <param name="use4Harmonics">false이면 1배음 템플릿 사용(추천), true이면 4배음 템플릿 사용</param>
+        /// <returns>인식한 화음</returns>
+        public static Chord RecognizeChordFromScore(Score score, bool use4Harmonics = false)
+        {
+            // L. Oudre, Y. Grenier, and C. Févotte. Chord Recognition by Fitting Rescaled Chroma Vectors to Chord Templates. IEEE Transactions on Audio, Speech, and Language Processing, vol. 19, no. 7, pp. 2222-2233, 2011.
+            
+            const double e = 0.0000000000000001;  // To avoid numerical instability
+
+            #region Set an appropriate chord template.
+
+            Dictionary<Type, Dictionary<Root, double[]>> template;
+            if (!use4Harmonics)
+            {
+                // Initialize chord template(1 harmonic) at the first time.
+                if (chordTemplates1 == null)
+                {
+                    chordTemplates1 = new Dictionary<Type, Dictionary<Root, double[]>>
+                    {
+                        { Type.Major, new Dictionary<Root, double[]>() },
+                        { Type.minor, new Dictionary<Root, double[]>() },
+                        { Type.sus4, new Dictionary<Root, double[]>() },
+                        { Type.dim, new Dictionary<Root, double[]>() },
+                        { Type.aug, new Dictionary<Root, double[]>() },
+                        { Type.dom7, new Dictionary<Root, double[]>() },
+                        { Type.m7, new Dictionary<Root, double[]>() }
+                    };
+                    chordTemplates1[Type.Major].Add(Root.C, new double[] { 0.334 - 9 * e, e, e, e, 0.333, e, e, 0.333, e, e, e, e });
+                    chordTemplates1[Type.minor].Add(Root.C, new double[] { 0.334 - 9 * e, e, e, 0.333, e, e, e, 0.333, e, e, e, e });
+                    chordTemplates1[Type.sus4].Add(Root.C, new double[] { 0.334 - 9 * e, e, e, e, e, 0.333, e, 0.333, e, e, e, e });
+                    chordTemplates1[Type.dim].Add(Root.C, new double[] { 0.334 - 9 * e, e, e, 0.333, e, e, 0.333, e, e, e, e, e });
+                    chordTemplates1[Type.aug].Add(Root.C, new double[] { 0.334 - 9 * e, e, e, e, 0.333, e, e, e, 0.333, e, e, e });
+                    chordTemplates1[Type.dom7].Add(Root.C, new double[] { 0.25 - 2 * e, e, e, e, 0.25 - 2 * e, e, e, 0.25 - 2 * e, e, e, 0.25 - 2 * e, e });
+                    chordTemplates1[Type.m7].Add(Root.C, new double[] { 0.25 - 2 * e, e, e, 0.25 - 2 * e, e, e, e, 0.25 - 2 * e, e, e, 0.25 - 2 * e, e });
+
+                    foreach (Type t in new Type[] { Type.Major, Type.minor, Type.sus4, Type.dim, Type.aug, Type.dom7, Type.m7 })
+                    {
+                        for (int r = 1; r < 12; r++)
+                        {
+                            double[] temp = new double[12];
+                            for (int i = 0; i < 12; i++)
+                            {
+                                temp[i] = chordTemplates1[t][Root.C][(i - r + 12) % 12];
+                            }
+                            chordTemplates1[t].Add((Root)r, temp);
+                        }
+                    }
+                }
+                template = chordTemplates1;
+            }
+            else
+            {
+                // Initialize chord template(4 harmonics) at the first time.
+                if (chordTemplates4 == null)
+                {
+                    chordTemplates4 = new Dictionary<Type, Dictionary<Root, double[]>>
+                    {
+                        { Type.Major, new Dictionary<Root, double[]>() },
+                        { Type.minor, new Dictionary<Root, double[]>() },
+                        { Type.sus4, new Dictionary<Root, double[]>() },
+                        { Type.dim, new Dictionary<Root, double[]>() },
+                        { Type.aug, new Dictionary<Root, double[]>() },
+                        { Type.dom7, new Dictionary<Root, double[]>() },
+                        { Type.m7, new Dictionary<Root, double[]>() }
+                    };
+                    chordTemplates4[Type.Major].Add(Root.C, new double[] { 0.278, e, 0.055, e, 0.278, e, e, 0.334 - 7 * e, e, e, e, 0.055 });
+                    chordTemplates4[Type.minor].Add(Root.C, new double[] { 0.278, e, 0.055, 0.278, e, e, e, 0.334 - 7 * e, e, e, 0.055, e });
+                    chordTemplates4[Type.sus4].Add(Root.C, new double[] { 0.334 - 8 * e, e, 0.055, e, e, 0.278, e, 0.333, e, e, e, e });
+                    chordTemplates4[Type.dim].Add(Root.C, new double[] { 0.279 - 6 * e, 0.055, e, 0.278, e, e, 0.278, 0.055, e, e, 0.055, e });
+                    chordTemplates4[Type.aug].Add(Root.C, new double[] { 0.279 - 6 * e, e, e, 0.055, 0.278, e, e, 0.055, 0.278, e, e, 0.055 });
+                    chordTemplates4[Type.dom7].Add(Root.C, new double[] { 0.209 - e, e, 0.041, e, 0.209 - e, 0.041, e, 0.25 - 2 * e, e, e, 0.209 - e, 0.041 });
+                    chordTemplates4[Type.m7].Add(Root.C, new double[] { 0.209 - e, e, 0.041, 0.209 - e, e, 0.041, e, 0.25 - 2 * e, e, e, 0.25 - 2 * e, e });
+
+                    foreach (Type t in new Type[] { Type.Major, Type.minor, Type.sus4, Type.dim, Type.aug, Type.dom7, Type.m7 })
+                    {
+                        for (int r = 1; r < 12; r++)
+                        {
+                            double[] temp = new double[12];
+                            for (int i = 0; i < 12; i++)
+                            {
+                                temp[i] = chordTemplates4[t][Root.C][(i - r + 12) % 12];
+                            }
+                            chordTemplates4[t].Add((Root)r, temp);
+                        }
+                    }
+                }
+                template = chordTemplates4;
+            }
+            #endregion
+
+            // Calculate the sum of duration of each pitch class in score.
+            double[] pitchClassProfile = new double[12] { e, e, e, e, e, e, e, e, e, e, e, e };
+            foreach (Note n in score.score)
+            {
+                if (n.Velocity > 0)
+                    pitchClassProfile[n.Pitch % 12] += n.Rhythm;
+            }
+
+            // Normalize the pitch class profile.
+            double sum = 0;
+            for (int i = 0; i < 12; i++)
+            {
+                sum += pitchClassProfile[i];
+            }
+            for (int i = 0; i < 12; i++)
+            {
+                pitchClassProfile[i] /= sum;
+            }
+
+            // Calculate the measure of fit using KL2. (Kullback-Leibler divergence)
+            Root minRoot = Root.G;
+            Type minType = Type.minor;
+            double minDistance = double.MaxValue;
+            foreach (Type t in new Type[] { Type.Major, Type.minor, Type.sus4, Type.dim, Type.aug, Type.dom7, Type.m7 })
+            {
+                for (int r = 0; r < 12; r++)
+                {
+                    double distance = 0;
+                    for (int m = 0; m < 12; m++)
+                    {
+                        double p = template[t][(Root)r][m];
+                        double c = pitchClassProfile[m];
+                        distance += p * Math.Log(p / c) - p + c;
+                    }
+                    //Console.WriteLine(r + "" + t + ": " + distance);
+                    if (distance < minDistance)
+                    {
+                        // choose argmin
+                        minDistance = distance;
+                        minRoot = (Root)r;
+                        minType = t;
+                    }
+                }
+            }
+
+            return new Chord(minRoot, minType, 5);
+        }
+
+        /// <summary>
         /// 화음 chord에 어울리는 색을 찾아서 반환합니다.
         /// </summary>
         /// <param name="chord"></param>
@@ -1112,7 +1271,7 @@ namespace ChordingCoding.SFX
                     s = 0.7f;
                     v = 1f;
                     break;
-                case Chord.Type.M7:
+                case Chord.Type.dom7:
                     s = 0.7f;
                     v = 0.8f;
                     break;

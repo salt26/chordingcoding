@@ -277,6 +277,212 @@ namespace ChordingCoding.SFX
                 Accompaniment.Start();
                 HasStart = true;
                 ThemeChanged();
+
+                #region Chord recognition test
+                
+                int Pitch(Chord.Root root, int octave)
+                {
+                    return (int)root + (octave + 1) * 12;
+                }
+                Score s1 = new Score();
+                s1.AddNote(Pitch(Chord.Root.C, 5), 127, 16, 0, 0, 0);
+                s1.AddNote(Pitch(Chord.Root.G, 5), 127, 16, 0, 0, 0);
+                s1.AddNote(Pitch(Chord.Root.G, 5), 127, 12, 0, 16, 0);
+                s1.AddNote(Pitch(Chord.Root.E, 5), 127, 4, 0, 28, 0);
+                s1.AddNote(Pitch(Chord.Root.G, 5), 127, 8, 0, 32, 0);
+                s1.AddNote(Pitch(Chord.Root.B, 5), 127, 16, 0, 40, 0);
+                s1.AddNote(Pitch(Chord.Root.E, 5), 127, 16, 0, 40, 0);
+                s1.AddNote(Pitch(Chord.Root.A, 5), 127, 8, 0, 56, 0);
+                s1.AddNote(Pitch(Chord.Root.Db, 5), 127, 8, 0, 56, 0);
+
+                s1.AddNote(Pitch(Chord.Root.C, 3), 127, 8, 0, 0, 1);
+                s1.AddNote(Pitch(Chord.Root.G, 3), 127, 8, 0, 8, 1);
+                s1.AddNote(Pitch(Chord.Root.E, 3), 127, 8, 0, 16, 1);
+                s1.AddNote(Pitch(Chord.Root.G, 3), 127, 8, 0, 24, 1);
+                s1.AddNote(Pitch(Chord.Root.C, 3), 127, 8, 0, 32, 1);
+                s1.AddNote(Pitch(Chord.Root.G, 3), 127, 8, 0, 40, 1);
+                s1.AddNote(Pitch(Chord.Root.E, 3), 127, 8, 0, 48, 1);
+                s1.AddNote(Pitch(Chord.Root.A, 3), 127, 8, 0, 56, 1);
+
+                Chord c11 = Chord.RecognizeChordFromScore(s1);
+                Chord c14 = Chord.RecognizeChordFromScore(s1, true);
+                Console.WriteLine("1 harmonic: " + c11.root + "" + c11.type + ", 4 harmonics: " + c14.root + "" + c14.type);
+
+                //
+
+                s1 = new Score();
+                //s1.AddNote(Pitch(Chord.Root.A, 5), 127, 24, 0, 0, 0);
+                //s1.AddNote(Pitch(Chord.Root.Db, 5), 127, 24, 0, 0, 0);
+                s1.AddNote(Pitch(Chord.Root.Bb, 5), 127, 16, 0, 24, 0);
+                s1.AddNote(Pitch(Chord.Root.F, 5), 127, 16, 0, 24, 0);
+                s1.AddNote(Pitch(Chord.Root.Db, 5), 127, 16, 0, 24, 0);
+                s1.AddNote(Pitch(Chord.Root.A, 5), 127, 8, 0, 40, 0);
+                s1.AddNote(Pitch(Chord.Root.G, 5), 127, 8, 0, 48, 0);
+                s1.AddNote(Pitch(Chord.Root.E, 5), 127, 8, 0, 56, 0);
+
+                //s1.AddNote(Pitch(Chord.Root.A, 2), 127, 8, 0, 0, 1);
+                //s1.AddNote(Pitch(Chord.Root.E, 3), 127, 8, 0, 8, 1);
+                //s1.AddNote(Pitch(Chord.Root.A, 2), 127, 8, 0, 16, 1);
+                s1.AddNote(Pitch(Chord.Root.E, 3), 127, 8, 0, 24, 1);
+                s1.AddNote(Pitch(Chord.Root.Db, 3), 127, 8, 0, 32, 1);
+                s1.AddNote(Pitch(Chord.Root.E, 3), 127, 8, 0, 40, 1);
+                s1.AddNote(Pitch(Chord.Root.Db, 3), 127, 8, 0, 48, 1);
+                s1.AddNote(Pitch(Chord.Root.E, 3), 127, 8, 0, 56, 1);
+
+                c11 = Chord.RecognizeChordFromScore(s1);
+                c14 = Chord.RecognizeChordFromScore(s1, true);
+                Console.WriteLine("1 harmonic: " + c11.root + "" + c11.type + ", 4 harmonics: " + c14.root + "" + c14.type);
+
+                //
+                Console.WriteLine();
+
+                s1 = new Score();
+                s1.AddNote(Pitch(Chord.Root.C, 5), 127, 32, 0, 0, 0);
+                s1.AddNote(Pitch(Chord.Root.E, 5), 127, 16, 0, 32, 0);
+                s1.AddNote(Pitch(Chord.Root.G, 5), 127, 16, 0, 48, 0);
+
+                s1.AddNote(Pitch(Chord.Root.C, 4), 127, 8, 0, 0, 1);
+                s1.AddNote(Pitch(Chord.Root.G, 4), 127, 8, 0, 8, 1);
+                s1.AddNote(Pitch(Chord.Root.E, 4), 127, 8, 0, 16, 1);
+                s1.AddNote(Pitch(Chord.Root.G, 4), 127, 8, 0, 24, 1);
+                s1.AddNote(Pitch(Chord.Root.C, 4), 127, 8, 0, 32, 1);
+                s1.AddNote(Pitch(Chord.Root.G, 4), 127, 8, 0, 40, 1);
+                s1.AddNote(Pitch(Chord.Root.E, 4), 127, 8, 0, 48, 1);
+                s1.AddNote(Pitch(Chord.Root.G, 4), 127, 8, 0, 56, 1);
+
+                c11 = Chord.RecognizeChordFromScore(s1);
+                c14 = Chord.RecognizeChordFromScore(s1, true);
+                Console.WriteLine("1 harmonic: " + c11.root + "" + c11.type + ", 4 harmonics: " + c14.root + "" + c14.type);
+
+                s1 = new Score();
+                s1.AddNote(Pitch(Chord.Root.B, 4), 127, 24, 0, 0, 0);
+                s1.AddNote(Pitch(Chord.Root.C, 5), 127, 4, 0, 24, 0);
+                s1.AddNote(Pitch(Chord.Root.D, 5), 127, 4, 0, 28, 0);
+                s1.AddNote(Pitch(Chord.Root.C, 5), 127, 16, 0, 32, 0);
+
+                s1.AddNote(Pitch(Chord.Root.D, 4), 127, 8, 0, 0, 1);
+                s1.AddNote(Pitch(Chord.Root.G, 4), 127, 8, 0, 8, 1);
+                s1.AddNote(Pitch(Chord.Root.F, 4), 127, 8, 0, 16, 1);
+                s1.AddNote(Pitch(Chord.Root.G, 4), 127, 8, 0, 24, 1);
+                s1.AddNote(Pitch(Chord.Root.C, 4), 127, 8, 0, 32, 1);
+                s1.AddNote(Pitch(Chord.Root.G, 4), 127, 8, 0, 40, 1);
+                s1.AddNote(Pitch(Chord.Root.E, 4), 127, 8, 0, 48, 1);
+                s1.AddNote(Pitch(Chord.Root.G, 4), 127, 8, 0, 56, 1);
+
+                c11 = Chord.RecognizeChordFromScore(s1);
+                c14 = Chord.RecognizeChordFromScore(s1, true);
+                Console.WriteLine("1 harmonic: " + c11.root + "" + c11.type + ", 4 harmonics: " + c14.root + "" + c14.type);
+
+                s1 = new Score();
+                s1.AddNote(Pitch(Chord.Root.A, 5), 127, 32, 0, 0, 0);
+                s1.AddNote(Pitch(Chord.Root.G, 5), 127, 16, 0, 32, 0);
+                s1.AddNote(Pitch(Chord.Root.C, 6), 127, 16, 0, 48, 0);
+
+                s1.AddNote(Pitch(Chord.Root.C, 4), 127, 8, 0, 0, 1);
+                s1.AddNote(Pitch(Chord.Root.A, 4), 127, 8, 0, 8, 1);
+                s1.AddNote(Pitch(Chord.Root.F, 4), 127, 8, 0, 16, 1);
+                s1.AddNote(Pitch(Chord.Root.A, 4), 127, 8, 0, 24, 1);
+                s1.AddNote(Pitch(Chord.Root.C, 4), 127, 8, 0, 32, 1);
+                s1.AddNote(Pitch(Chord.Root.G, 4), 127, 8, 0, 40, 1);
+                s1.AddNote(Pitch(Chord.Root.E, 4), 127, 8, 0, 48, 1);
+                s1.AddNote(Pitch(Chord.Root.G, 4), 127, 8, 0, 56, 1);
+
+                c11 = Chord.RecognizeChordFromScore(s1);
+                c14 = Chord.RecognizeChordFromScore(s1, true);
+                Console.WriteLine("1 harmonic: " + c11.root + "" + c11.type + ", 4 harmonics: " + c14.root + "" + c14.type);
+
+                s1 = new Score();
+                s1.AddNote(Pitch(Chord.Root.G, 5), 127, 16, 0, 0, 0);
+                s1.AddNote(Pitch(Chord.Root.F, 5), 127, 4, 0, 16, 0);
+                s1.AddNote(Pitch(Chord.Root.G, 6), 127, 2, 0, 20, 0);
+                s1.AddNote(Pitch(Chord.Root.F, 6), 127, 2, 0, 22, 0);
+                s1.AddNote(Pitch(Chord.Root.E, 6), 127, 4, 0, 24, 0);
+                s1.AddNote(Pitch(Chord.Root.F, 6), 127, 4, 0, 28, 0);
+                s1.AddNote(Pitch(Chord.Root.E, 6), 127, 16, 0, 32, 0);
+
+                s1.AddNote(Pitch(Chord.Root.B, 3), 127, 8, 0, 0, 1);
+                s1.AddNote(Pitch(Chord.Root.G, 4), 127, 8, 0, 8, 1);
+                s1.AddNote(Pitch(Chord.Root.D, 4), 127, 8, 0, 16, 1);
+                s1.AddNote(Pitch(Chord.Root.G, 4), 127, 8, 0, 24, 1);
+                s1.AddNote(Pitch(Chord.Root.C, 4), 127, 8, 0, 32, 1);
+                s1.AddNote(Pitch(Chord.Root.G, 4), 127, 8, 0, 40, 1);
+                s1.AddNote(Pitch(Chord.Root.E, 4), 127, 8, 0, 48, 1);
+                s1.AddNote(Pitch(Chord.Root.G, 4), 127, 8, 0, 56, 1);
+
+                c11 = Chord.RecognizeChordFromScore(s1);
+                c14 = Chord.RecognizeChordFromScore(s1, true);
+                Console.WriteLine("1 harmonic: " + c11.root + "" + c11.type + ", 4 harmonics: " + c14.root + "" + c14.type);
+
+                //
+                Console.WriteLine();
+
+
+                s1 = new Score();
+                s1.AddNote(Pitch(Chord.Root.F, 5), 127, 32, 0, 0, 0);
+                s1.AddNote(Pitch(Chord.Root.Ab, 5), 127, 32, 0, 16, 0);
+                s1.AddNote(Pitch(Chord.Root.Db, 6), 127, 24, 0, 20, 0);
+                s1.AddNote(Pitch(Chord.Root.F, 6), 127, 24, 0, 22, 0);
+
+                s1.AddNote(Pitch(Chord.Root.F, 4), 127, 64, 0, 8, 1);
+                s1.AddNote(Pitch(Chord.Root.Ab, 4), 127, 64, 0, 8, 1);
+
+                c11 = Chord.RecognizeChordFromScore(s1);
+                c14 = Chord.RecognizeChordFromScore(s1, true);
+                Console.WriteLine("1 harmonic: " + c11.root + "" + c11.type + ", 4 harmonics: " + c14.root + "" + c14.type);
+
+                s1 = new Score();
+                s1.AddNote(Pitch(Chord.Root.Db, 6), 127, 8, 0, 20, 0);
+                s1.AddNote(Pitch(Chord.Root.F, 6), 127, 8, 0, 22, 0);
+                s1.AddNote(Pitch(Chord.Root.C, 6), 127, 8, 0, 20, 0);
+                s1.AddNote(Pitch(Chord.Root.Eb, 6), 127, 8, 0, 22, 0);
+                s1.AddNote(Pitch(Chord.Root.Db, 6), 127, 8, 0, 20, 0);
+                s1.AddNote(Pitch(Chord.Root.F, 6), 127, 8, 0, 22, 0);
+                s1.AddNote(Pitch(Chord.Root.C, 6), 127, 48, 0, 20, 0);
+                s1.AddNote(Pitch(Chord.Root.Eb, 6), 127, 48, 0, 22, 0);
+
+                s1.AddNote(Pitch(Chord.Root.Gb, 4), 127, 72, 0, 8, 1);
+                s1.AddNote(Pitch(Chord.Root.A, 4), 127, 72, 0, 8, 1);
+
+                c11 = Chord.RecognizeChordFromScore(s1);
+                c14 = Chord.RecognizeChordFromScore(s1, true);
+                Console.WriteLine("1 harmonic: " + c11.root + "" + c11.type + ", 4 harmonics: " + c14.root + "" + c14.type);
+
+                s1 = new Score();
+                s1.AddNote(Pitch(Chord.Root.C, 6), 127, 8, 0, 20, 0);
+                s1.AddNote(Pitch(Chord.Root.Eb, 6), 127, 8, 0, 22, 0);
+                s1.AddNote(Pitch(Chord.Root.Bb, 5), 127, 8, 0, 20, 0);
+                s1.AddNote(Pitch(Chord.Root.Db, 6), 127, 8, 0, 22, 0);
+                s1.AddNote(Pitch(Chord.Root.C, 6), 127, 8, 0, 20, 0);
+                s1.AddNote(Pitch(Chord.Root.Eb, 6), 127, 8, 0, 22, 0);
+                s1.AddNote(Pitch(Chord.Root.Bb, 5), 127, 12, 0, 20, 0);
+                s1.AddNote(Pitch(Chord.Root.Db, 6), 127, 12, 0, 22, 0);
+                s1.AddNote(Pitch(Chord.Root.F, 6), 127, 24, 0, 22, 0);
+                s1.AddNote(Pitch(Chord.Root.Db, 6), 127, 12, 0, 22, 0);
+
+                s1.AddNote(Pitch(Chord.Root.F, 4), 127, 72, 0, 8, 1);
+                s1.AddNote(Pitch(Chord.Root.Ab, 4), 127, 72, 0, 8, 1);
+
+                c11 = Chord.RecognizeChordFromScore(s1);
+                c14 = Chord.RecognizeChordFromScore(s1, true);
+                Console.WriteLine("1 harmonic: " + c11.root + "" + c11.type + ", 4 harmonics: " + c14.root + "" + c14.type);
+
+                s1 = new Score();
+                s1.AddNote(Pitch(Chord.Root.Db, 6), 127, 8, 0, 22, 0);
+                s1.AddNote(Pitch(Chord.Root.C, 6), 127, 8, 0, 22, 0);
+                s1.AddNote(Pitch(Chord.Root.Ab, 5), 127, 8, 0, 22, 0);
+                s1.AddNote(Pitch(Chord.Root.Db, 6), 127, 8, 0, 22, 0);
+                s1.AddNote(Pitch(Chord.Root.Bb, 5), 127, 8, 0, 22, 0);
+                s1.AddNote(Pitch(Chord.Root.C, 6), 127, 48, 0, 22, 0);
+                s1.AddNote(Pitch(Chord.Root.Ab, 5), 127, 48, 0, 22, 0);
+
+                s1.AddNote(Pitch(Chord.Root.Eb, 4), 127, 72, 0, 8, 1);
+                s1.AddNote(Pitch(Chord.Root.Gb, 4), 127, 72, 0, 8, 1);
+
+                c11 = Chord.RecognizeChordFromScore(s1);
+                c14 = Chord.RecognizeChordFromScore(s1, true);
+                Console.WriteLine("1 harmonic: " + c11.root + "" + c11.type + ", 4 harmonics: " + c14.root + "" + c14.type);
+                
+                #endregion
             }
         }
 

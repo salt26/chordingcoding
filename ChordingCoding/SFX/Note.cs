@@ -28,7 +28,7 @@ namespace ChordingCoding.SFX
     /// <summary>
     /// 음표 클래스입니다.
     /// </summary>
-    class Note
+    public class Note
     {
         /// <summary>
         /// 음 높이(1 ~ 127)를 반환하는 함수 대리자입니다.

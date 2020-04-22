@@ -41,24 +41,32 @@ namespace ChordingCoding.SFX
         /// <summary>
         /// 음표 목록에 있는 한 음표가 직전 음표보다 높은 음을 가지면 1,
         /// 낮은 음을 가지면 -1, 같은 음을 가지거나 첫 번째 음표이면 0을 반환합니다.
-        /// 음표 목록에서 이 음표를 찾지 못한 경우 -2를 반환합니다.
+        /// 음표 목록에서 이 음표를 찾지 못한 경우 예외를 발생시킵니다.
         /// </summary>
         /// <param name="noteInNoteList">음표 목록에 있는 한 음표</param>
         /// <returns></returns>
         public int PitchVariance(RhythmPatternNote noteInNoteList)
         {
             LinkedListNode<RhythmPatternNote> node = noteList.Find(noteInNoteList);
-            if (node == null) return -2;
+            if (node == null)
+            {
+                throw new InvalidOperationException("Error in PitchVariance");
+                //return -2;
+            }
             else
             {
                 if (node.Value.pitchVariance != -2) return node.Value.pitchVariance;
                 else
                 {
+                    int variance;
                     LinkedListNode<RhythmPatternNote> prev = node.Previous;
-                    if (prev == null) return 0;
-                    else if (prev.Value.Cluster < node.Value.Cluster) return 1;
-                    else if (prev.Value.Cluster == node.Value.Cluster) return 0;
-                    else return -1;
+                    if (prev == null) variance = 0;
+                    else if (prev.Value.Cluster < node.Value.Cluster) variance = 1;
+                    else if (prev.Value.Cluster == node.Value.Cluster) variance = 0;
+                    else variance = -1;
+
+                    node.Value.pitchVariance = variance;
+                    return variance;
                 }
             }
         }
@@ -120,6 +128,348 @@ namespace ChordingCoding.SFX
             metadataList[metadataIndex].absolutePitch = -1;
             HasImplemented = false;
         }
+
+        /// <summary>
+        /// 주어진 클러스터 번호의 클러스터 위상 인덱스를 반환합니다.
+        /// 가장 작은 번호의 위상 인덱스는 0입니다.
+        /// 메타데이터 목록에 존재하지 않는 클러스터 번호가 들어온 경우 -1을 반환합니다.
+        /// </summary>
+        /// <returns></returns>
+        public int GetClusterRank(float cluster)
+        {
+            //metadataList.Sort();  // 여기서 이 코드를 실행하지 않아도 버그가 없어야 정상
+            return metadataList.IndexOf(
+                metadataList.Find(e => e.cluster == cluster));
+        }
+
+        /// <summary>
+        /// 주어진 클러스터 위상 인덱스에 삽입할, 적절한 새 클러스터 번호를 반환합니다.
+        /// 삽입 후에 이 인덱스 이후의 기존 클러스터들은 위상이 한 칸씩 뒤로 밀려납니다.
+        /// (주의: 이 메서드는 새 클러스터를 삽입해주지 않습니다.
+        /// 새 클러스터를 삽입하려면 InsertNote() 또는 MoveNote()를 호출하십시오.)
+        /// </summary>
+        /// <param name="clusterRankToInsert">새 클러스터를 삽입할 클러스터 위상 인덱스</param>
+        /// <returns></returns>
+        public float GetNewClusterNumber(int clusterRankToInsert)
+        {
+            if (metadataList.Count == 0)
+            {
+                // 빈 리듬 패턴에 삽입할 음표의 클러스터 번호
+                return 0f;
+            }
+            else if (clusterRankToInsert <= 0)
+            {
+                // 리듬 패턴의 가장 낮은 음으로 삽입할 음표의 클러스터 번호
+                return metadataList[0].cluster - 8f;
+            }
+            else if (clusterRankToInsert >= metadataList.Count)
+            {
+                // 리듬 패턴의 가장 높은 음으로 삽입할 음표의 클러스터 번호
+                return metadataList[metadataList.Count - 1].cluster + 8f;
+            }
+            else
+            {
+                // 리듬 패턴의 연속된 두 음 사이에 삽입할 음표의 클러스터 번호
+                return (metadataList[clusterRankToInsert - 1].cluster +
+                    metadataList[clusterRankToInsert].cluster) / 2f;
+            }
+        }
+
+        /// <summary>
+        /// 리듬 패턴에 음표 하나를 삽입하는 연산을 수행합니다.
+        /// 반환값은 수행한 연산의 비용입니다.
+        /// 같은 OnsetPosition에 여러 음표를 삽입하려 할 경우 삽입 연산이 수행되지 않고 0을 반환합니다.
+        /// (새 음표를 정의할 때 GetNewClusterNumber()를 사용하면 편리합니다.)
+        /// </summary>
+        /// <param name="note">삽입할 새 음표 (note.OnsetPosition 값이 중요)</param>
+        /// <returns></returns>
+        public int InsertNote(RhythmPatternNote note)
+        {
+            if (note == null) return 0;
+
+            LinkedListNode<RhythmPatternNote> afterNote = null;
+            foreach (RhythmPatternNote n in noteList)
+            {
+                // 같은 위치에 여러 음표를 삽입할 수 없음 (단선율만 허용)
+                if (n.OnsetPosition == note.OnsetPosition) return 0;
+                else if (n.OnsetPosition > note.OnsetPosition)
+                {
+                    // 이 음표 바로 앞에 삽입
+                    afterNote = noteList.Find(n);
+                }
+            }
+
+            if (afterNote == null)
+            {
+                // 리듬 패턴이 비어있거나 삽입될 위치가 맨 뒤인 경우 맨 뒤에 삽입
+                noteList.AddLast(note);
+
+                // 메타데이터 편집
+                RhythmPatternMetadata m = metadataList.Find(e => e.cluster == note.Cluster);
+                if (m != null)
+                {
+                    // 이미 같은 클러스터 번호의 음표가 존재하는 경우
+                    m.noteOnsets.Add(note.OnsetPosition);
+                }
+                else
+                {
+                    // 새로운 클러스터 번호를 가진 경우
+                    m = new RhythmPatternMetadata(note.Cluster, note.OnsetPosition);
+                    metadataList.Add(m);
+                    metadataList.Sort();
+                }
+
+                // 삽입된 음표의 음 높이 변화 계산
+                int pv = PitchVariance(note);
+                if (pv == 0)
+                {
+                    // (음표 추가 비용)
+                    return 1;
+                }
+                else
+                {
+                    // 삽입된 음표의 음 높이 변화가 0이 아니므로 비용 추가
+                    // (음표 추가 비용 + 삽입된 음표의 클러스터 위상 변경 비용 + 삽입된 음표의 음 높이 변화 변경 비용)
+                    return 3;
+                }
+            }
+            else
+            {
+                int afterOldPv = PitchVariance(afterNote.Value);
+
+                noteList.AddBefore(afterNote, note);
+
+                // 메타데이터 편집
+                RhythmPatternMetadata m = metadataList.Find(e => e.cluster == note.Cluster);
+                if (m != null)
+                {
+                    // 이미 같은 클러스터 번호의 음표가 존재하는 경우
+                    m.noteOnsets.Add(note.OnsetPosition);
+                }
+                else
+                {
+                    // 새로운 클러스터 번호를 가진 경우 메타데이터 추가 후 정렬
+                    m = new RhythmPatternMetadata(note.Cluster, note.OnsetPosition);
+                    metadataList.Add(m);
+                    metadataList.Sort();
+                }
+
+                // 삽입된 음표 직후의 음표의 음 높이 변화를 다시 계산
+                afterNote.Value.pitchVariance = -2;
+                int afterPv = PitchVariance(afterNote.Value);
+                int beta = 0;
+                if (afterPv != afterOldPv)
+                {
+                    // 직후 음표의 음 높이 변화가 이전과 달라진 경우 비용 추가
+                    // (직후 음표의 음 높이 변화 변경 비용)
+                    beta = 1;
+                }
+
+                // 삽입된 음표의 음 높이 변화 계산
+                int pv = PitchVariance(note);
+                if (pv == 0)
+                {
+                    // (음표 추가 비용)
+                    return 1 + beta;
+                }
+                else
+                {
+                    // 삽입된 음표의 음 높이 변화가 0이 아니므로 비용 추가
+                    // (음표 추가 비용 + 삽입된 음표의 클러스터 위상 변경 비용 + 삽입된 음표의 음 높이 변화 변경 비용 + beta)
+                    return 3 + beta;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 리듬 패턴에서 음표 하나를 제거하는 연산을 수행합니다.
+        /// 반환값은 수행한 연산의 비용입니다.
+        /// 존재하지 않는 음표를 제거하려 할 경우 제거 연산이 수행되지 않고 0을 반환합니다.
+        /// </summary>
+        /// <param name="note">제거할 기존 음표</param>
+        /// <returns></returns>
+        public int DeleteNote(RhythmPatternNote note)
+        {
+            if (note == null) return 0;
+
+            LinkedListNode<RhythmPatternNote> n = noteList.Find(note);
+            if (n == null) return 0;
+
+            // 메타데이터 편집
+            RhythmPatternMetadata m = metadataList.Find(e => e.cluster == note.Cluster);
+            if (m != null)
+            {
+                if (!m.noteOnsets.Remove(note.OnsetPosition))
+                {
+                    Console.WriteLine("Error: RhythmPattern DeleteNote metadata 1");
+                    return 0;
+                }
+                if (m.noteOnsets.Count == 0)
+                {
+                    // 이 클러스터에 해당하는 음표가 모두 제거된 경우 메타데이터 제거
+                    metadataList.Remove(m);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Error: RhythmPattern DeleteNote metadata 2");
+                return 0;
+            }
+
+            int pv = PitchVariance(note);
+            int alpha = 0;
+            if (pv == -1 || pv == 1)
+            {
+                // 제거할 음표의 음 높이 변화가 0이 아니므로 비용 추가
+                // (제거할 음표의 클러스터 위상 변경 비용 + 제거할 음표의 음 높이 변화 변경 비용)
+                alpha = 2;
+            }
+
+            int afterOldPv = -2;
+            LinkedListNode<RhythmPatternNote> next = n.Next;
+            if (next != null)
+            {
+                // 제거할 음표 직후의 음표가 존재하는 경우
+                afterOldPv = PitchVariance(next.Value);
+            }
+
+            noteList.Remove(n);
+
+            int beta = 0;
+            if (afterOldPv != -2)
+            {
+                // 직후 음표의 음 높이 변화를 다시 계산
+                next.Value.pitchVariance = -2;
+                int afterPv = PitchVariance(next.Value);
+                if (afterPv != afterOldPv)
+                {
+                    // 직후 음표의 음 높이 변화가 이전과 달라진 경우 비용 추가
+                    // (직후 음표의 음 높이 변화 변경 비용)
+                    beta = 1;
+                }
+            }
+
+            // (음표 제거 비용 + alpha + beta)
+            return 1 + alpha + beta;
+        }
+
+        /// <summary>
+        /// 리듬 패턴에 있던 음표 하나의 인덱스(음표 목록에서의 상대적 위치)를 유지하면서
+        /// OnsetPosition과 클러스터를 옮기는 연산을 수행합니다.
+        /// 반환값은 수행한 연산의 비용입니다.
+        /// 존재하지 않는 음표를 옮기려고 하거나 새 OnsetPosition이 음표의 인덱스에 영향을 미칠 경우
+        /// 옮기는 연산을 수행하지 않고 0을 반환합니다.
+        /// (새 음표를 정의할 때 GetNewClusterNumber()를 사용하면 편리합니다.)
+        /// </summary>
+        /// <param name="oldNote">옮기는 대상이 될 기존 음표</param>
+        /// <param name="newNote">옮겨질 새 음표</param>
+        /// <returns></returns>
+        public int MoveNote(RhythmPatternNote oldNote, RhythmPatternNote newNote)
+        {
+            if (oldNote == null || newNote == null) return 0;
+            LinkedListNode<RhythmPatternNote> n = noteList.Find(oldNote);
+            if (n == null) return 0;
+
+            if ((n.Previous != null &&
+                newNote.OnsetPosition <= n.Previous.Value.OnsetPosition) ||
+                (n.Next != null &&
+                newNote.OnsetPosition >= n.Next.Value.OnsetPosition))
+            {
+                // 옮긴 결과로 음표의 인덱스가 바뀌는 경우 연산을 수행하지 않음
+                return 0;
+            }
+
+            int oldPv = PitchVariance(oldNote);
+            int oldClusterIndex = GetClusterRank(oldNote.Cluster);
+
+            // 메타데이터 편집
+            // 기존 음표와 새 음표의 클러스터 번호가 서로 같은 경우 건드릴 필요 없음
+            if (oldNote.Cluster != newNote.Cluster)
+            {
+                // 기존 음표에 대한 메타데이터 수정
+                RhythmPatternMetadata m = metadataList.Find(e => e.cluster == oldNote.Cluster);
+                if (m != null)
+                {
+                    if (!m.noteOnsets.Remove(oldNote.OnsetPosition))
+                    {
+                        Console.WriteLine("Error: RhythmPattern MoveNote metadata 1");
+                        return 0;
+                    }
+                    if (m.noteOnsets.Count == 0)
+                    {
+                        // 이 클러스터에 해당하는 음표가 모두 제거된 경우 메타데이터 제거
+                        metadataList.Remove(m);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Error: RhythmPattern MoveNote metadata 2");
+                    return 0;
+                }
+
+                // 새 음표에 대한 메타데이터 수정
+                m = metadataList.Find(e => e.cluster == newNote.Cluster);
+                if (m != null)
+                {
+                    // 이미 같은 클러스터 번호의 음표가 존재하는 경우
+                    m.noteOnsets.Add(newNote.OnsetPosition);
+                }
+                else
+                {
+                    // 새로운 클러스터 번호를 가진 경우 메타데이터 추가 후 정렬
+                    m = new RhythmPatternMetadata(newNote.Cluster, newNote.OnsetPosition);
+                    metadataList.Add(m);
+                    metadataList.Sort();
+                }
+            }
+
+            int gamma = 0;
+            if (oldNote.OnsetPosition != newNote.OnsetPosition)
+            {
+                // (음표 시작 위치 옮기는 비용)
+                gamma = 1;
+            }
+
+            int afterOldPv = -2;
+            if (n.Next != null)
+            {
+                afterOldPv = PitchVariance(n.Next.Value);
+            }
+
+            // 새 음표로 옮김
+            n.Value = newNote;
+
+            int alpha = 0;
+            int newPv = PitchVariance(newNote);
+            if (oldPv != newPv)
+            {
+                // (옮기는 음표의 음 높이 변화 변경 비용)
+                alpha += 1;
+            }
+
+            int newClusterIndex = GetClusterRank(newNote.Cluster);
+            if (oldClusterIndex != newClusterIndex)
+            {
+                // (옮기는 음표의 클러스터 위상 변경 비용)
+                alpha += 1;
+            }
+
+            int beta = 0;
+            if (afterOldPv != -2)
+            {
+                // 직후 음표의 음 높이 변화를 다시 계산
+                n.Next.Value.pitchVariance = -2;
+                int afterPv = PitchVariance(n.Next.Value);
+                if (afterPv != afterOldPv)
+                {
+                    // 직후 음표의 음 높이 변화가 이전과 달라진 경우 비용 추가
+                    // (직후 음표의 음 높이 변화 변경 비용)
+                    beta = 1;
+                }
+            }
+
+            return gamma + alpha + beta;
+        }
     }
 
     /// <summary>
@@ -127,7 +477,7 @@ namespace ChordingCoding.SFX
     /// 리듬 패턴의 음표 목록에 들어갈 구조체입니다.
     /// 음표의 시작 위치 정보와 음 높이 변화 정보를 포함합니다.
     /// </summary>
-    public class RhythmPatternNote
+    public class RhythmPatternNote : IComparable<RhythmPatternNote>
     {
         /// <summary>
         /// 음표의 시작 위치.
@@ -163,9 +513,16 @@ namespace ChordingCoding.SFX
 
         public RhythmPatternNote(int index, float cluster)
         {
-            OnsetPosition = index;
+            if (index >= 0)
+                OnsetPosition = index;
+            else
+                OnsetPosition = 0;
             Cluster = cluster;
             pitchVariance = -2;
+        }
+        public int CompareTo(RhythmPatternNote other)
+        {
+            return this.OnsetPosition.CompareTo(other.OnsetPosition);
         }
     }
 
@@ -175,17 +532,17 @@ namespace ChordingCoding.SFX
     /// 이 클러스터에 할당된 절대적인 음 높이 정보를 포함합니다.
     /// 리듬 패턴을 악보로 구체화(implement)할 때 사용됩니다.
     /// </summary>
-    public class RhythmPatternMetadata
+    public class RhythmPatternMetadata : IComparable<RhythmPatternMetadata>
     {
         /// <summary>
         /// 클러스터 번호
         /// </summary>
-        public int cluster;
+        public float cluster;
 
         /// <summary>
         /// 이 클러스터 번호에 속해 있는 음표들의 시작 위치 목록
         /// </summary>
-        public List<int> noteIndices = new List<int>();
+        public List<int> noteOnsets = new List<int>();
 
         /// <summary>
         /// 이 클러스터에 할당된 절대적인 음 높이.
@@ -194,11 +551,16 @@ namespace ChordingCoding.SFX
         /// </summary>
         public int absolutePitch;
 
-        public RhythmPatternMetadata(int cluster, params int[] noteIndices)
+        public RhythmPatternMetadata(float cluster, params int[] noteOnsets)
         {
             this.cluster = cluster;
-            this.noteIndices = noteIndices.ToList();
+            this.noteOnsets = noteOnsets.ToList();
             absolutePitch = -1;
+        }
+
+        public int CompareTo(RhythmPatternMetadata other)
+        {
+            return this.cluster.CompareTo(other.cluster);
         }
     }
 }

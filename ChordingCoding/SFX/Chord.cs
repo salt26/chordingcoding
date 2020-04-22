@@ -30,7 +30,7 @@ namespace ChordingCoding.SFX
     public class Chord
     {
         public enum Root { C, Db, D, Eb, E, F, Gb, G, Ab, A, Bb, B }
-        public enum Type { Major, minor, sus2, sus4, dim, aug, dom7, m7 }
+        public enum Type { Major, minor, sus2, sus4, dim, aug, dom7, m7, NULL = -1 }
 
         public Root root;
         public Type type;
@@ -95,12 +95,12 @@ namespace ChordingCoding.SFX
                         case 14:
                             type = Type.dom7;
                             break;
-                        default:
+                        default:    // case 0:
                             type = Type.m7;
                             break;
                     }
 
-                    rand = r.Next(15);
+                    rand = r.Next(16);
                     octave = (minOctave + maxOctave) / 2;
                     switch (rand)
                     {
@@ -126,7 +126,7 @@ namespace ChordingCoding.SFX
                         case 14:
                             octave += 1;
                             break;
-                        default:
+                        default:    // case 15:
                             octave += 2;
                             break;
                     }
@@ -170,12 +170,12 @@ namespace ChordingCoding.SFX
                         case 14:
                             type = Type.aug;
                             break;
-                        default:
+                        default:    // case 0:
                             type = Type.dim;
                             break;
                     }
 
-                    rand = r.Next(15);
+                    rand = r.Next(16);
                     octave = (minOctave + maxOctave) / 2;
                     switch (rand)
                     {
@@ -201,7 +201,7 @@ namespace ChordingCoding.SFX
                         case 14:
                             octave += 1;
                             break;
-                        default:
+                        default:    // case 15:
                             octave += 2;
                             break;
                     }
@@ -241,12 +241,12 @@ namespace ChordingCoding.SFX
                         case 14:
                             type = Type.aug;
                             break;
-                        default:
+                        default:    // case 0:
                             type = Type.dim;
                             break;
                     }
 
-                    rand = r.Next(15);
+                    rand = r.Next(16);
                     octave = (minOctave + maxOctave) / 2;
                     switch (rand)
                     {
@@ -272,7 +272,7 @@ namespace ChordingCoding.SFX
                         case 14:
                             octave += 1;
                             break;
-                        default:
+                        default:    // case 15:
                             octave += 2;
                             break;
                     }
@@ -342,8 +342,9 @@ namespace ChordingCoding.SFX
                         case 7:
                             type = Type.m7;
                             break;
-                        default:
-                            type = c.type;
+                        default:    // case 0: case 16:
+                            if (type == Type.NULL) type = Type.Major;
+                            else type = c.type;
                             break;
                     }
 
@@ -366,7 +367,7 @@ namespace ChordingCoding.SFX
                         case 9:
                             root = (Root)(((int)c.root + 5) % 12);
                             break;
-                        case 10:
+                        case 0:
                             if (c.type == Type.Major)
                             {
                                 root = (Root)(((int)c.root - 3) % 12);
@@ -415,7 +416,7 @@ namespace ChordingCoding.SFX
                             break;
                     }
 
-                    rand = r.Next(15);
+                    rand = r.Next(16);
                     octave = c.octave;
                     switch (rand)
                     {
@@ -444,7 +445,7 @@ namespace ChordingCoding.SFX
                             octave += 1;
                             if (octave > maxOctave) octave = maxOctave;
                             break;
-                        default:
+                        default:    // case 15:
                             octave += 1;
                             if (octave > maxOctave) octave = maxOctave - 1;
                             break;
@@ -505,8 +506,9 @@ namespace ChordingCoding.SFX
                         case 15:
                             type = Type.dim;
                             break;
-                        default:
-                            type = c.type;
+                        default:    // case 0: case 16:
+                            if (type == Type.NULL) type = Type.Major;
+                            else type = c.type;
                             break;
                     }
 
@@ -529,7 +531,7 @@ namespace ChordingCoding.SFX
                         case 9:
                             root = (Root)(((int)c.root + 5) % 12);
                             break;
-                        case 10:
+                        case 0:
                             if (c.type == Type.Major)
                             {
                                 root = (Root)(((int)c.root - 3) % 12);
@@ -578,7 +580,7 @@ namespace ChordingCoding.SFX
                             break;
                     }
 
-                    rand = r.Next(15);
+                    rand = r.Next(16);
                     octave = c.octave;
                     switch (rand)
                     {
@@ -607,7 +609,7 @@ namespace ChordingCoding.SFX
                             octave += 1;
                             if (octave > maxOctave) octave = maxOctave;
                             break;
-                        default:
+                        default:    // case 15:
                             octave += 1;
                             if (octave > maxOctave) octave = maxOctave - 1;
                             break;
@@ -842,9 +844,13 @@ namespace ChordingCoding.SFX
                                     break;
                             }
                             break;
+                        default:    // case Type.NULL:
+                            root = c.root;
+                            type = Type.Major;
+                            break;
                     }
 
-                    rand = r.Next(15);
+                    rand = r.Next(16);
                     octave = c.octave;
                     switch (rand)
                     {
@@ -873,7 +879,7 @@ namespace ChordingCoding.SFX
                             octave += 1;
                             if (octave > maxOctave) octave = maxOctave;
                             break;
-                        default:
+                        default:    // case 15:
                             octave += 1;
                             if (octave > maxOctave) octave = maxOctave - 1;
                             break;
@@ -1102,9 +1108,11 @@ namespace ChordingCoding.SFX
                 case Type.aug:
                     typeToNote = new int[3] { 0, 4, 8 };
                     break;
-                default: // case Type.dim:
+                case Type.dim:
                     typeToNote = new int[3] { 0, 3, 6 };
                     break;
+                default: // case Type.NULL:
+                    return 0;
             }
             return typeToNote[order];
         }
@@ -1114,6 +1122,7 @@ namespace ChordingCoding.SFX
         /// 반환되는 화음의 종류는 Major, minor, sus4, dim, aug, dom7, m7입니다.
         /// 따라서 12개의 Root 음에 대해 총 84가지 화음이 나올 수 있습니다.
         /// 반환되는 화음의 옥타브는 5로 고정됩니다.
+        /// 빈 악보가 들어온 경우 화음의 종류가 NULL인 화음이 반환됩니다.
         /// </summary>
         /// <param name="score">악보</param>
         /// <param name="use4Harmonics">false이면 1배음 템플릿 사용(추천), true이면 4배음 템플릿 사용</param>
@@ -1207,10 +1216,21 @@ namespace ChordingCoding.SFX
 
             // Calculate the sum of duration of each pitch class in score.
             double[] pitchClassProfile = new double[12] { e, e, e, e, e, e, e, e, e, e, e, e };
+            bool hasNoNote = true;
             foreach (Note n in score.score)
             {
                 if (n.Velocity > 0)
+                {
                     pitchClassProfile[n.Pitch % 12] += n.Rhythm;
+                    hasNoNote = false;
+                }
+            }
+
+            if (hasNoNote)
+            {
+                // There is no chord in the score.
+                Random r = new Random();
+                return new Chord((Root)r.Next(12), Type.NULL, 5);
             }
 
             // Normalize the pitch class profile.

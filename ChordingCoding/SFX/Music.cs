@@ -279,7 +279,7 @@ namespace ChordingCoding.SFX
                 ThemeChanged();
 
                 #region Chord recognition test
-                
+                /*
                 int Pitch(Chord.Root root, int octave)
                 {
                     return (int)root + (octave + 1) * 12;
@@ -481,8 +481,33 @@ namespace ChordingCoding.SFX
                 c11 = Chord.RecognizeChordFromScore(s1);
                 c14 = Chord.RecognizeChordFromScore(s1, true);
                 Console.WriteLine("1 harmonic: " + c11.root + "" + c11.type + ", 4 harmonics: " + c14.root + "" + c14.type);
-                
+                */
                 #endregion
+
+                RhythmPattern rp = new RhythmPattern();
+                int cost = 0;
+                cost += rp.InsertNote(new RhythmPatternNote(0, 0));
+                Console.WriteLine(cost);
+                cost += rp.InsertNote(new RhythmPatternNote(16, -1));
+                Console.WriteLine(cost);
+                cost += rp.InsertNote(new RhythmPatternNote(32, -2));
+                Console.WriteLine(cost);
+                cost += rp.InsertNote(new RhythmPatternNote(40, -1));
+                Console.WriteLine(cost);
+                cost += rp.InsertNote(new RhythmPatternNote(48, 0));
+                Console.WriteLine(cost);
+                cost += rp.InsertNote(new RhythmPatternNote(56, -4));
+                Console.WriteLine(cost);
+                rp.Print();
+
+                cost = 0;
+                cost += rp.MoveNote(new RhythmPatternNote(56, -4), new RhythmPatternNote(56, 4));
+                Console.WriteLine(cost);
+                cost += rp.MoveNote(new RhythmPatternNote(48, 0), new RhythmPatternNote(48, 3));
+                Console.WriteLine(cost);
+                cost += rp.MoveNote(new RhythmPatternNote(40, -1), new RhythmPatternNote(40, 0));
+                Console.WriteLine(cost);
+                rp.Print();
             }
         }
 

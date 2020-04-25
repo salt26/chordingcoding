@@ -39,6 +39,19 @@ namespace ChordingCoding.SFX
         public bool HasImplemented { get; private set; } = false;
 
         /// <summary>
+        /// 새 리듬 패턴을 생성합니다.
+        /// 처음에 넣을 음표들을 인자로 지정할 수 있습니다.
+        /// </summary>
+        /// <param name="rhythmPatternNotes">리듬 패턴에 넣을 음표들</param>
+        public RhythmPattern(params RhythmPatternNote[] rhythmPatternNotes)
+        {
+            foreach (RhythmPatternNote n in rhythmPatternNotes)
+            {
+                this.InsertNote(n);
+            }
+        }
+
+        /// <summary>
         /// 음표 목록에 있는 한 음표가 직전 음표보다 높은 음을 가지면 1,
         /// 낮은 음을 가지면 -1, 같은 음을 가지거나 첫 번째 음표이면 0을 반환합니다.
         /// 음표 목록에서 이 음표를 찾지 못한 경우 예외를 발생시킵니다.
@@ -61,8 +74,8 @@ namespace ChordingCoding.SFX
                     int variance;
                     LinkedListNode<RhythmPatternNote> prev = node.Previous;
                     if (prev == null) variance = 0;
-                    else if (prev.Value.Cluster < node.Value.Cluster) variance = 1;
-                    else if (prev.Value.Cluster == node.Value.Cluster) variance = 0;
+                    else if (prev.Value.PitchCluster < node.Value.PitchCluster) variance = 1;
+                    else if (prev.Value.PitchCluster == node.Value.PitchCluster) variance = 0;
                     else variance = -1;
 
                     node.Value.pitchVariance = variance;
@@ -81,8 +94,8 @@ namespace ChordingCoding.SFX
         public bool SetAbsolutePitch(float cluster, int pitch)
         {
             if (pitch < 0 || pitch > 127) return false;
-            if (!metadataList.Exists(e => e.cluster == cluster)) return false;
-            int metadataIndex = metadataList.FindIndex(e => e.cluster == cluster);
+            if (!metadataList.Exists(e => e.pitchCluster == cluster)) return false;
+            int metadataIndex = metadataList.FindIndex(e => e.pitchCluster == cluster);
 
             int prevPitch = -1;
             int i;
@@ -122,8 +135,8 @@ namespace ChordingCoding.SFX
         /// <param name="cluster"></param>
         public void ClearAbsolutePitch(float cluster)
         {
-            if (!metadataList.Exists(e => e.cluster == cluster)) return;
-            int metadataIndex = metadataList.FindIndex(e => e.cluster == cluster);
+            if (!metadataList.Exists(e => e.pitchCluster == cluster)) return;
+            int metadataIndex = metadataList.FindIndex(e => e.pitchCluster == cluster);
 
             metadataList[metadataIndex].absolutePitch = -1;
             HasImplemented = false;
@@ -139,7 +152,7 @@ namespace ChordingCoding.SFX
         {
             //metadataList.Sort();  // 여기서 이 코드를 실행하지 않아도 버그가 없어야 정상
             return metadataList.IndexOf(
-                metadataList.Find(e => e.cluster == cluster));
+                metadataList.Find(e => e.pitchCluster == cluster));
         }
 
         /// <summary>
@@ -160,18 +173,18 @@ namespace ChordingCoding.SFX
             else if (clusterRankToInsert <= 0)
             {
                 // 리듬 패턴의 가장 낮은 음으로 삽입할 음표의 클러스터 번호
-                return metadataList[0].cluster - 8f;
+                return metadataList[0].pitchCluster - 8f;
             }
             else if (clusterRankToInsert >= metadataList.Count)
             {
                 // 리듬 패턴의 가장 높은 음으로 삽입할 음표의 클러스터 번호
-                return metadataList[metadataList.Count - 1].cluster + 8f;
+                return metadataList[metadataList.Count - 1].pitchCluster + 8f;
             }
             else
             {
                 // 리듬 패턴의 연속된 두 음 사이에 삽입할 음표의 클러스터 번호
-                return (metadataList[clusterRankToInsert - 1].cluster +
-                    metadataList[clusterRankToInsert].cluster) / 2f;
+                return (metadataList[clusterRankToInsert - 1].pitchCluster +
+                    metadataList[clusterRankToInsert].pitchCluster) / 2f;
             }
         }
 
@@ -205,7 +218,7 @@ namespace ChordingCoding.SFX
                 noteList.AddLast(note);
 
                 // 메타데이터 편집
-                RhythmPatternMetadata m = metadataList.Find(e => e.cluster == note.Cluster);
+                RhythmPatternMetadata m = metadataList.Find(e => e.pitchCluster == note.PitchCluster);
                 if (m != null)
                 {
                     // 이미 같은 클러스터 번호의 음표가 존재하는 경우
@@ -214,7 +227,7 @@ namespace ChordingCoding.SFX
                 else
                 {
                     // 새로운 클러스터 번호를 가진 경우
-                    m = new RhythmPatternMetadata(note.Cluster, note.OnsetPosition);
+                    m = new RhythmPatternMetadata(note.PitchCluster, note.OnsetPosition);
                     metadataList.Add(m);
                     metadataList.Sort();
                 }
@@ -240,7 +253,7 @@ namespace ChordingCoding.SFX
                 noteList.AddBefore(afterNote, note);
 
                 // 메타데이터 편집
-                RhythmPatternMetadata m = metadataList.Find(e => e.cluster == note.Cluster);
+                RhythmPatternMetadata m = metadataList.Find(e => e.pitchCluster == note.PitchCluster);
                 if (m != null)
                 {
                     // 이미 같은 클러스터 번호의 음표가 존재하는 경우
@@ -249,7 +262,7 @@ namespace ChordingCoding.SFX
                 else
                 {
                     // 새로운 클러스터 번호를 가진 경우 메타데이터 추가 후 정렬
-                    m = new RhythmPatternMetadata(note.Cluster, note.OnsetPosition);
+                    m = new RhythmPatternMetadata(note.PitchCluster, note.OnsetPosition);
                     metadataList.Add(m);
                     metadataList.Sort();
                 }
@@ -292,11 +305,19 @@ namespace ChordingCoding.SFX
         {
             if (note == null) return 0;
 
-            LinkedListNode<RhythmPatternNote> n = noteList.Find(note);
+            LinkedListNode<RhythmPatternNote> n = null;
+            foreach (RhythmPatternNote note2 in noteList)
+            {
+                if (note2.Equals(note))
+                {
+                    n = noteList.Find(note);
+                    break;
+                }
+            }
             if (n == null) return 0;
 
             // 메타데이터 편집
-            RhythmPatternMetadata m = metadataList.Find(e => e.cluster == note.Cluster);
+            RhythmPatternMetadata m = metadataList.Find(e => e.pitchCluster == note.PitchCluster);
             if (m != null)
             {
                 if (!m.noteOnsets.Remove(note.OnsetPosition))
@@ -367,7 +388,15 @@ namespace ChordingCoding.SFX
         public int MoveNote(RhythmPatternNote oldNote, RhythmPatternNote newNote)
         {
             if (oldNote == null || newNote == null) return 0;
-            LinkedListNode<RhythmPatternNote> n = noteList.Find(oldNote);
+            LinkedListNode<RhythmPatternNote> n = null;
+            foreach (RhythmPatternNote note in noteList)
+            {
+                if (note.Equals(oldNote))
+                {
+                    n = noteList.Find(oldNote);
+                    break;
+                }
+            }
             if (n == null) return 0;
 
             if ((n.Previous != null &&
@@ -380,14 +409,14 @@ namespace ChordingCoding.SFX
             }
 
             int oldPv = PitchVariance(oldNote);
-            int oldClusterIndex = GetClusterRank(oldNote.Cluster);
+            int oldClusterIndex = GetClusterRank(oldNote.PitchCluster);
 
             // 메타데이터 편집
             // 기존 음표와 새 음표의 클러스터 번호가 서로 같은 경우 건드릴 필요 없음
-            if (oldNote.Cluster != newNote.Cluster)
+            if (oldNote.PitchCluster != newNote.PitchCluster)
             {
                 // 기존 음표에 대한 메타데이터 수정
-                RhythmPatternMetadata m = metadataList.Find(e => e.cluster == oldNote.Cluster);
+                RhythmPatternMetadata m = metadataList.Find(e => e.pitchCluster == oldNote.PitchCluster);
                 if (m != null)
                 {
                     if (!m.noteOnsets.Remove(oldNote.OnsetPosition))
@@ -408,7 +437,7 @@ namespace ChordingCoding.SFX
                 }
 
                 // 새 음표에 대한 메타데이터 수정
-                m = metadataList.Find(e => e.cluster == newNote.Cluster);
+                m = metadataList.Find(e => e.pitchCluster == newNote.PitchCluster);
                 if (m != null)
                 {
                     // 이미 같은 클러스터 번호의 음표가 존재하는 경우
@@ -417,13 +446,14 @@ namespace ChordingCoding.SFX
                 else
                 {
                     // 새로운 클러스터 번호를 가진 경우 메타데이터 추가 후 정렬
-                    m = new RhythmPatternMetadata(newNote.Cluster, newNote.OnsetPosition);
+                    m = new RhythmPatternMetadata(newNote.PitchCluster, newNote.OnsetPosition);
                     metadataList.Add(m);
                     metadataList.Sort();
                 }
             }
 
             int gamma = 0;
+            //Console.WriteLine("Onset: " + oldNote.OnsetPosition + " -> " + newNote.OnsetPosition);
             if (oldNote.OnsetPosition != newNote.OnsetPosition)
             {
                 // (음표 시작 위치 옮기는 비용)
@@ -441,13 +471,15 @@ namespace ChordingCoding.SFX
 
             int alpha = 0;
             int newPv = PitchVariance(newNote);
+            //Console.WriteLine("PitchVariance: " + oldPv + " -> " + newPv);
             if (oldPv != newPv)
             {
                 // (옮기는 음표의 음 높이 변화 변경 비용)
                 alpha += 1;
             }
 
-            int newClusterIndex = GetClusterRank(newNote.Cluster);
+            int newClusterIndex = GetClusterRank(newNote.PitchCluster);
+            //Console.WriteLine("ClusterIndex: " + oldClusterIndex + " -> " + newClusterIndex);
             if (oldClusterIndex != newClusterIndex)
             {
                 // (옮기는 음표의 클러스터 위상 변경 비용)
@@ -460,6 +492,7 @@ namespace ChordingCoding.SFX
                 // 직후 음표의 음 높이 변화를 다시 계산
                 n.Next.Value.pitchVariance = -2;
                 int afterPv = PitchVariance(n.Next.Value);
+                //Console.WriteLine("afterPV: " + afterOldPv + " -> " + afterPv);
                 if (afterPv != afterOldPv)
                 {
                     // 직후 음표의 음 높이 변화가 이전과 달라진 경우 비용 추가
@@ -469,6 +502,47 @@ namespace ChordingCoding.SFX
             }
 
             return gamma + alpha + beta;
+        }
+
+        public void Print()
+        {
+            for (int i = metadataList.Count - 1; i >= 0; i--)
+            {
+                for (int j = 0; j <= noteList.Last().OnsetPosition; j++)
+                {
+                    if (metadataList[i].noteOnsets.Contains(j))
+                    {
+                        bool b = false;
+                        foreach (RhythmPatternNote n in noteList)
+                        {
+                            if (n.PitchCluster == metadataList[i].pitchCluster &&
+                                n.OnsetPosition == j)
+                            {
+                                switch (PitchVariance(n))
+                                {
+                                    case 0:
+                                        Console.Write("0");
+                                        break;
+                                    case 1:
+                                        Console.Write("+");
+                                        break;
+                                    case -1:
+                                        Console.Write("-");
+                                        break;
+                                }
+                                b = true;
+                            }
+                        }
+                        // Check if metadataList and noteList are inconsistent.
+                        if (!b) Console.Write("X");
+                    }
+                    else
+                    {
+                        Console.Write(".");
+                    }
+                }
+                Console.WriteLine();
+            }
         }
     }
 
@@ -497,7 +571,7 @@ namespace ChordingCoding.SFX
         /// 클러스터 번호가 높으면 항상 절대적인 음 높이가 더 높습니다.
         /// 클러스터 번호의 절대적인 값은 의미를 갖지 않습니다.
         /// </summary>
-        public float Cluster
+        public float PitchCluster
         {
             get;
             private set;
@@ -511,18 +585,60 @@ namespace ChordingCoding.SFX
         /// </summary>
         public int pitchVariance;
 
-        public RhythmPatternNote(int index, float cluster)
+        /// <summary>
+        /// 리듬 패턴에 들어갈 음표를 생성합니다.
+        /// </summary>
+        /// <param name="onsetPosition">음표의 시작 위치.
+        /// 한 마디를 32분음표 32개로 쪼갰을 때
+        /// 앞에서부터 몇 번째 위치에 음표의 시작이 나타나는지를 표현합니다.
+        /// 0부터 시작합니다.</param>
+        /// <param name="pitchCluster">클러스터 번호.
+        /// 같은 음 높이를 갖는 음표끼리는 같은 클러스터 번호를 가지며
+        /// 클러스터 번호가 높으면 항상 절대적인 음 높이가 더 높습니다.
+        /// 클러스터 번호의 절대적인 값은 의미를 갖지 않습니다.
+        /// 클러스터 번호를 정할 때
+        /// RhythmPattern.GetNewClusterNumber()를 활용하면 도움이 됩니다.</param>
+        public RhythmPatternNote(int onsetPosition, float pitchCluster)
         {
-            if (index >= 0)
-                OnsetPosition = index;
+            if (onsetPosition >= 0)
+                OnsetPosition = onsetPosition;
             else
                 OnsetPosition = 0;
-            Cluster = cluster;
+            PitchCluster = pitchCluster;
             pitchVariance = -2;
         }
+
+        /// <summary>
+        /// OnsetPosition을 기준으로 다른 리듬 패턴 음표와 비교합니다.
+        /// </summary>
+        /// <param name="other"></param>
+        /// <returns></returns>
         public int CompareTo(RhythmPatternNote other)
         {
             return this.OnsetPosition.CompareTo(other.OnsetPosition);
+        }
+
+        /// <summary>
+        /// 두 리듬 패턴 음표가 같은지 비교합니다.
+        /// OnsetPosition과 PitchCluster의 절대적인 값이 같아야 같은 음표입니다.
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <returns></returns>
+        public override bool Equals(object obj)
+        {
+            if (obj.GetType() == typeof(RhythmPatternNote))
+            {
+                if (this.OnsetPosition == ((RhythmPatternNote)obj).OnsetPosition &&
+                    this.PitchCluster == ((RhythmPatternNote)obj).PitchCluster)
+                    return true;
+                else return false;
+            }
+            else return base.Equals(obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return 31 * OnsetPosition.GetHashCode() + PitchCluster.GetHashCode();
         }
     }
 
@@ -537,7 +653,7 @@ namespace ChordingCoding.SFX
         /// <summary>
         /// 클러스터 번호
         /// </summary>
-        public float cluster;
+        public float pitchCluster;
 
         /// <summary>
         /// 이 클러스터 번호에 속해 있는 음표들의 시작 위치 목록
@@ -551,16 +667,16 @@ namespace ChordingCoding.SFX
         /// </summary>
         public int absolutePitch;
 
-        public RhythmPatternMetadata(float cluster, params int[] noteOnsets)
+        public RhythmPatternMetadata(float pitchCluster, params int[] noteOnsets)
         {
-            this.cluster = cluster;
+            this.pitchCluster = pitchCluster;
             this.noteOnsets = noteOnsets.ToList();
             absolutePitch = -1;
         }
 
         public int CompareTo(RhythmPatternMetadata other)
         {
-            return this.cluster.CompareTo(other.cluster);
+            return this.pitchCluster.CompareTo(other.pitchCluster);
         }
     }
 }

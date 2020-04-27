@@ -200,6 +200,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="SFX\RhythmPattern.cs" />
+    <Compile Include="SFX\Test\SFXTest.cs" />
     <Compile Include="UI\SplashScreen.cs">
       <SubType>Form</SubType>
     </Compile>

@@ -1,8 +1,29 @@
-﻿using System;
+﻿/*
+MIT License
+
+Copyright (c) 2019 salt26
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChordingCoding.SFX
 {
@@ -158,8 +179,10 @@ namespace ChordingCoding.SFX
         /// <summary>
         /// 주어진 클러스터 위상 인덱스에 삽입할, 적절한 새 클러스터 번호를 반환합니다.
         /// 삽입 후에 이 인덱스 이후의 기존 클러스터들은 위상이 한 칸씩 뒤로 밀려납니다.
+        /// 클러스터 번호가 작을수록 낮은 음입니다.
         /// (주의: 이 메서드는 새 클러스터를 삽입해주지 않습니다.
-        /// 새 클러스터를 삽입하려면 InsertNote() 또는 MoveNote()를 호출하십시오.)
+        /// 새 클러스터를 삽입하려면 InsertNote() 또는 MoveNote()를 호출하고,
+        /// 여기에 인자로 넣을 새 음표에 대해 이 메서드를 호출하십시오.)
         /// </summary>
         /// <param name="clusterRankToInsert">새 클러스터를 삽입할 클러스터 위상 인덱스</param>
         /// <returns></returns>
@@ -172,19 +195,54 @@ namespace ChordingCoding.SFX
             }
             else if (clusterRankToInsert <= 0)
             {
-                // 리듬 패턴의 가장 낮은 음으로 삽입할 음표의 클러스터 번호
+                // 리듬 패턴의 어떤 음보다도 더 낮은 음으로 삽입할 음표의 클러스터 번호
                 return metadataList[0].pitchCluster - 8f;
             }
             else if (clusterRankToInsert >= metadataList.Count)
             {
-                // 리듬 패턴의 가장 높은 음으로 삽입할 음표의 클러스터 번호
+                // 리듬 패턴의 어떤 음보다도 더 높은 음으로 삽입할 음표의 클러스터 번호
                 return metadataList[metadataList.Count - 1].pitchCluster + 8f;
             }
             else
             {
-                // 리듬 패턴의 연속된 두 음 사이에 삽입할 음표의 클러스터 번호
+                // 리듬 패턴의 연속된 두 음 사이의 음 높이를 갖도록 삽입할 음표의 클러스터 번호
                 return (metadataList[clusterRankToInsert - 1].pitchCluster +
                     metadataList[clusterRankToInsert].pitchCluster) / 2f;
+            }
+        }
+
+        /// <summary>
+        /// 주어진 클러스터 위상 인덱스를 가진 기존 클러스터 번호를 반환합니다.
+        /// 이 클러스터에 새 음표를 삽입해도
+        /// 다른 클러스터들의 위상에는 영향을 주지 않습니다.
+        /// 클러스터 번호가 작을수록 낮은 음입니다.
+        /// (주의: 이 메서드는 새 클러스터를 삽입해주지 않습니다.
+        /// 새 클러스터를 삽입하려면 InsertNote() 또는 MoveNote()를 호출하고,
+        /// 여기에 인자로 넣을 새 음표에 대해 이 메서드를 호출하십시오.)
+        /// </summary>
+        /// <param name="clusterRank">클러스터 위상 인덱스 (0 이상, 서로 다른 클러스터 개수 미만)</param>
+        /// <returns></returns>
+        public float GetExistingClusterNumber(int clusterRank)
+        {
+            if (metadataList.Count == 0)
+            {
+                // 빈 리듬 패턴에 삽입할 음표의 클러스터 번호
+                return 0f;
+            }
+            else if (clusterRank < 0)
+            {
+                // 리듬 패턴에 있던 가장 낮은 음과 같은 음으로 삽입할 음표의 클러스터 번호
+                return metadataList[0].pitchCluster;
+            }
+            else if (clusterRank >= metadataList.Count)
+            {
+                // 리듬 패턴에 있던 가장 높은 음과 같은 음으로 삽입할 음표의 클러스터 번호
+                return metadataList[metadataList.Count - 1].pitchCluster;
+            }
+            else
+            {
+                // 주어진 클러스터 위상 인덱스를 갖는 클러스터 번호
+                return metadataList[clusterRank].pitchCluster;
             }
         }
 
@@ -192,9 +250,10 @@ namespace ChordingCoding.SFX
         /// 리듬 패턴에 음표 하나를 삽입하는 연산을 수행합니다.
         /// 반환값은 수행한 연산의 비용입니다.
         /// 같은 OnsetPosition에 여러 음표를 삽입하려 할 경우 삽입 연산이 수행되지 않고 0을 반환합니다.
-        /// (새 음표를 정의할 때 GetNewClusterNumber()를 사용하면 편리합니다.)
+        /// (새 음표를 정의할 때 GetNewClusterNumber() 또는
+        /// GetExistingClusterNumber()를 사용하면 편리합니다.)
         /// </summary>
-        /// <param name="note">삽입할 새 음표 (note.OnsetPosition 값이 중요)</param>
+        /// <param name="note">삽입할 새 음표</param>
         /// <returns></returns>
         public int InsertNote(RhythmPatternNote note)
         {
@@ -209,6 +268,7 @@ namespace ChordingCoding.SFX
                 {
                     // 이 음표 바로 앞에 삽입
                     afterNote = noteList.Find(n);
+                    break;
                 }
             }
 
@@ -295,26 +355,41 @@ namespace ChordingCoding.SFX
         }
 
         /// <summary>
+        /// 리듬 패턴에 음표 하나를 삽입하는 연산을 수행합니다.
+        /// 반환값은 수행한 연산의 비용입니다.
+        /// 같은 OnsetPosition에 여러 음표를 삽입하려 할 경우 삽입 연산이 수행되지 않고 0을 반환합니다.
+        /// (새 음표를 정의할 때 GetNewClusterNumber() 또는
+        /// GetExistingClusterNumber()를 사용하면 편리합니다.)
+        /// </summary>
+        /// <param name="noteOnset">삽입할 새 음표의 시작 위치</param>
+        /// <param name="notePitchCluster">삽입할 새 음표의 음 높이 클러스터 번호</param>
+        /// <returns></returns>
+        public int InsertNote(int noteOnset, float notePitchCluster)
+        {
+            return InsertNote(new RhythmPatternNote(noteOnset, notePitchCluster));
+        }
+
+        /// <summary>
         /// 리듬 패턴에서 음표 하나를 제거하는 연산을 수행합니다.
         /// 반환값은 수행한 연산의 비용입니다.
         /// 존재하지 않는 음표를 제거하려 할 경우 제거 연산이 수행되지 않고 0을 반환합니다.
         /// </summary>
-        /// <param name="note">제거할 기존 음표</param>
+        /// <param name="noteOnset">제거할 기존 음표의 시작 위치</param>
         /// <returns></returns>
-        public int DeleteNote(RhythmPatternNote note)
+        public int DeleteNote(int noteOnset)
         {
-            if (note == null) return 0;
-
             LinkedListNode<RhythmPatternNote> n = null;
             foreach (RhythmPatternNote note2 in noteList)
             {
-                if (note2.Equals(note))
+                if (note2.OnsetPosition == noteOnset)
                 {
-                    n = noteList.Find(note);
+                    n = noteList.Find(note2);
                     break;
                 }
             }
             if (n == null) return 0;
+
+            RhythmPatternNote note = n.Value;
 
             // 메타데이터 편집
             RhythmPatternMetadata m = metadataList.Find(e => e.pitchCluster == note.PitchCluster);
@@ -380,24 +455,27 @@ namespace ChordingCoding.SFX
         /// 반환값은 수행한 연산의 비용입니다.
         /// 존재하지 않는 음표를 옮기려고 하거나 새 OnsetPosition이 음표의 인덱스에 영향을 미칠 경우
         /// 옮기는 연산을 수행하지 않고 0을 반환합니다.
-        /// (새 음표를 정의할 때 GetNewClusterNumber()를 사용하면 편리합니다.)
+        /// (새 음표를 정의할 때 GetNewClusterNumber() 또는
+        /// GetExistingClusterNumber()를 사용하면 편리합니다.)
         /// </summary>
-        /// <param name="oldNote">옮기는 대상이 될 기존 음표</param>
+        /// <param name="oldNoteOnset">옮기는 대상이 될 기존 음표의 시작 위치</param>
         /// <param name="newNote">옮겨질 새 음표</param>
         /// <returns></returns>
-        public int MoveNote(RhythmPatternNote oldNote, RhythmPatternNote newNote)
+        public int MoveNote(int oldNoteOnset, RhythmPatternNote newNote)
         {
-            if (oldNote == null || newNote == null) return 0;
+            if (newNote == null) return 0;
             LinkedListNode<RhythmPatternNote> n = null;
             foreach (RhythmPatternNote note in noteList)
             {
-                if (note.Equals(oldNote))
+                if (note.OnsetPosition == oldNoteOnset)
                 {
-                    n = noteList.Find(oldNote);
+                    n = noteList.Find(note);
                     break;
                 }
             }
             if (n == null) return 0;
+
+            RhythmPatternNote oldNote = n.Value;
 
             if ((n.Previous != null &&
                 newNote.OnsetPosition <= n.Previous.Value.OnsetPosition) ||
@@ -413,7 +491,8 @@ namespace ChordingCoding.SFX
 
             // 메타데이터 편집
             // 기존 음표와 새 음표의 클러스터 번호가 서로 같은 경우 건드릴 필요 없음
-            if (oldNote.PitchCluster != newNote.PitchCluster)
+            // -> 서로 같더라도 OnsetPosition이 다르면 건드려주어야 함!
+            if (oldNote.PitchCluster != newNote.PitchCluster || oldNote.OnsetPosition != newNote.OnsetPosition)
             {
                 // 기존 음표에 대한 메타데이터 수정
                 RhythmPatternMetadata m = metadataList.Find(e => e.pitchCluster == oldNote.PitchCluster);
@@ -502,6 +581,24 @@ namespace ChordingCoding.SFX
             }
 
             return gamma + alpha + beta;
+        }
+
+        /// <summary>
+        /// 리듬 패턴에 있던 음표 하나의 인덱스(음표 목록에서의 상대적 위치)를 유지하면서
+        /// OnsetPosition과 클러스터를 옮기는 연산을 수행합니다.
+        /// 반환값은 수행한 연산의 비용입니다.
+        /// 존재하지 않는 음표를 옮기려고 하거나 새 OnsetPosition이 음표의 인덱스에 영향을 미칠 경우
+        /// 옮기는 연산을 수행하지 않고 0을 반환합니다.
+        /// (새 음표를 정의할 때 GetNewClusterNumber() 또는
+        /// GetExistingClusterNumber()를 사용하면 편리합니다.)
+        /// </summary>
+        /// <param name="oldNoteOnset">옮기는 대상이 될 기존 음표의 시작 위치</param>
+        /// <param name="newNoteOnset">옮겨질 새 음표의 시작 위치</param>
+        /// <param name="newNotePitchCluster">옮겨질 새 음표의 음 높이 클러스터 번호</param>
+        /// <returns></returns>
+        public int MoveNote(int oldNoteOnset, int newNoteOnset, float newNotePitchCluster)
+        {
+            return MoveNote(oldNoteOnset, new RhythmPatternNote(newNoteOnset, newNotePitchCluster));
         }
 
         public void Print()

@@ -278,7 +278,7 @@ namespace ChordingCoding.SFX
                 HasStart = true;
                 ThemeChanged();
 
-                //new Test.SFXTest();   // Run some tests.
+                new Test.SFXTest();   // Run some tests.
             }
         }
 

@@ -402,14 +402,15 @@ namespace ChordingCoding.SFX.Test
             Console.WriteLine("RhythmPattern Distance Test");
             RhythmPattern rp = new RhythmPattern();
             int cost = 0;
-            rp.InsertNote(new RhythmPatternNote(0, 0));
+            rp.InsertNote(0, 0);
             rp.InsertNote(16, -1);
-            rp.InsertNote(new RhythmPatternNote(32, -2));
+            rp.InsertNote(32, -2);
             rp.InsertNote(40, -1);
-            rp.InsertNote(new RhythmPatternNote(48, 0));
+            rp.InsertNote(48, 0);
             rp.InsertNote(56, -4);
             rp.Print();
 
+            Console.WriteLine("(1)");
             RhythmPattern rp2 = rp.Copy();
             cost = rp2.MoveNote(56, new RhythmPatternNote(56, 4));
             Console.WriteLine(cost);
@@ -421,7 +422,115 @@ namespace ChordingCoding.SFX.Test
             rp.Print();
             Console.WriteLine();
             rp2.Print();
+            Console.WriteLine("distance: " + rp.Distance(rp2));
 
+            Console.WriteLine("(2)");
+            rp2 = rp.Copy();
+            cost = rp2.MoveNote(48, 48, 3);
+            Console.WriteLine(cost);
+            cost = rp2.MoveNote(40, 36, 1);
+            Console.WriteLine(cost);
+            cost = rp2.MoveNote(16, 16, 3);
+            Console.WriteLine(cost);
+
+            rp.Print();
+            Console.WriteLine();
+            rp2.Print();
+            Console.WriteLine("distance: " + rp.Distance(rp2));
+
+            Console.WriteLine("(3)");
+            rp2 = rp.Copy();
+            cost = rp2.InsertNote(60, -2);
+            Console.WriteLine(cost);
+            cost = rp2.MoveNote(40, 36, 0);
+            Console.WriteLine(cost);
+            cost = rp2.DeleteNote(32);
+            Console.WriteLine(cost);
+            cost = rp2.MoveNote(16, 8, 1);
+            Console.WriteLine(cost);
+
+            rp.Print();
+            Console.WriteLine();
+            rp2.Print();
+            Console.WriteLine("distance: " + rp.Distance(rp2));
+
+            Console.WriteLine("(4)");
+            rp2 = new RhythmPattern(
+                new RhythmPatternNote(0, 0),
+                new RhythmPatternNote(8, -1),
+                new RhythmPatternNote(16, -2),
+                new RhythmPatternNote(20, -1),
+                new RhythmPatternNote(24, 0),
+                new RhythmPatternNote(28, -4)
+                );
+
+            rp.Print();
+            Console.WriteLine();
+            rp2.Print();
+            Console.WriteLine("distance: " + rp.Distance(rp2));
+
+            Console.WriteLine("(4-1)");
+            RhythmPattern rp3 = new RhythmPattern(
+                new RhythmPatternNote(0, 0),
+                new RhythmPatternNote(16, -1),
+                new RhythmPatternNote(32, -2)
+                );
+
+            rp2 = new RhythmPattern(
+                new RhythmPatternNote(0, 0),
+                new RhythmPatternNote(8, -1),
+                new RhythmPatternNote(16, -2)
+                );
+
+            rp3.Print();
+            Console.WriteLine();
+            rp2.Print();
+            Console.WriteLine("distance: " + rp3.Distance(rp2));
+
+            Console.WriteLine("(5)");
+            rp2 = new RhythmPattern(
+                new RhythmPatternNote(0, 0),
+                new RhythmPatternNote(32, -1),
+                new RhythmPatternNote(64, -2),
+                new RhythmPatternNote(80, -1),
+                new RhythmPatternNote(96, 0),
+                new RhythmPatternNote(112, -4)
+                );
+
+            rp.Print();
+            Console.WriteLine();
+            rp2.Print();
+            Console.WriteLine("distance: " + rp.Distance(rp2));
+
+            Console.WriteLine("(6)");
+            rp2 = rp.Copy();
+            cost = rp2.DeleteNote(0);
+            Console.WriteLine(cost);
+            cost = rp2.DeleteNote(40);
+            Console.WriteLine(cost);
+            cost = rp2.MoveNote(48, 52, -4);
+            Console.WriteLine(cost);
+
+            rp.Print();
+            Console.WriteLine();
+            rp2.Print();
+            Console.WriteLine("distance: " + rp.Distance(rp2));
+
+            Console.WriteLine("(7)");
+            rp2 = new RhythmPattern(
+                new RhythmPatternNote(0, 0),
+                new RhythmPatternNote(4, -3),
+                new RhythmPatternNote(8, -1),
+                new RhythmPatternNote(12, -3),
+                new RhythmPatternNote(16, -3),
+                new RhythmPatternNote(20, -1),
+                new RhythmPatternNote(24, -3),
+                new RhythmPatternNote(28, 0)
+                );
+
+            rp.Print();
+            Console.WriteLine();
+            rp2.Print();
             Console.WriteLine("distance: " + rp.Distance(rp2));
         }
     }

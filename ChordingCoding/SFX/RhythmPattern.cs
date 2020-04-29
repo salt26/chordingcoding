@@ -258,6 +258,7 @@ namespace ChordingCoding.SFX
         public int InsertNote(RhythmPatternNote note)
         {
             if (note == null) return int.MaxValue;
+            note = note.Copy();
 
             LinkedListNode<RhythmPatternNote> afterNote = null;
             foreach (RhythmPatternNote n in noteList)
@@ -452,7 +453,7 @@ namespace ChordingCoding.SFX
         /// <summary>
         /// 리듬 패턴에서 마지막 음표 하나를 제거하는 연산을 수행합니다.
         /// 반환값은 수행한 연산의 비용입니다.
-        /// 빈 악보에서 이 연산을 수행하려고 하면 제거 연산이 수행되지 않고 int.MaxValue를 반환합니다.
+        /// 빈 리듬 패턴에서 이 연산을 수행하려고 하면 제거 연산이 수행되지 않고 int.MaxValue를 반환합니다.
         /// </summary>
         /// <returns></returns>
         public int DeleteLastNote()
@@ -476,6 +477,8 @@ namespace ChordingCoding.SFX
         public int MoveNote(int oldNoteOnset, RhythmPatternNote newNote)
         {
             if (newNote == null) return int.MaxValue;
+            newNote = newNote.Copy();
+
             LinkedListNode<RhythmPatternNote> n = null;
             foreach (RhythmPatternNote note in noteList)
             {
@@ -617,7 +620,7 @@ namespace ChordingCoding.SFX
         /// 리듬 패턴에 있던 마지막 음표 하나의 인덱스(음표 목록에서의 상대적 위치)를 유지하면서
         /// OnsetPosition과 클러스터를 옮기는 연산을 수행합니다.
         /// 반환값은 수행한 연산의 비용입니다.
-        /// 빈 악보에서 이 연산을 수행하려고 하거나 새 OnsetPosition이 음표의 인덱스에 영향을 미칠 경우
+        /// 빈 리듬 패턴에서 이 연산을 수행하려고 하거나 새 OnsetPosition이 음표의 인덱스에 영향을 미칠 경우
         /// 옮기는 연산을 수행하지 않고 int.MaxValue를 반환합니다.
         /// (새 음표를 정의할 때 GetNewClusterNumber() 또는
         /// GetExistingClusterNumber()를 사용하면 편리합니다.)
@@ -628,14 +631,14 @@ namespace ChordingCoding.SFX
         public int MoveLastNote(int newNoteOnset, float newNotePitchCluster)
         {
             if (noteList.Last == null) return int.MaxValue;
-            return MoveNote(noteList.Last.Value.OnsetPosition, newNoteOnset, newNotePitchCluster);
+            return MoveNote(noteList.Last.Value.OnsetPosition, new RhythmPatternNote(newNoteOnset, newNotePitchCluster));
         }
 
         /// <summary>
         /// 리듬 패턴에 있던 마지막 음표 하나의 인덱스(음표 목록에서의 상대적 위치)를 유지하면서
         /// OnsetPosition과 클러스터를 옮기는 연산을 수행합니다.
         /// 반환값은 수행한 연산의 비용입니다.
-        /// 빈 악보에서 이 연산을 수행하려고 하거나 새 OnsetPosition이 음표의 인덱스에 영향을 미칠 경우
+        /// 빈 리듬 패턴에서 이 연산을 수행하려고 하거나 새 OnsetPosition이 음표의 인덱스에 영향을 미칠 경우
         /// 옮기는 연산을 수행하지 않고 int.MaxValue를 반환합니다.
         /// (새 음표를 정의할 때 GetNewClusterNumber() 또는
         /// GetExistingClusterNumber()를 사용하면 편리합니다.)
@@ -648,6 +651,10 @@ namespace ChordingCoding.SFX
             return MoveNote(noteList.Last.Value.OnsetPosition, newNote);
         }
 
+        /// <summary>
+        /// 이 리듬 패턴을 보기 좋게 출력합니다.
+        /// 만약 'X'가 출력에 포함된다면 오류가 발생한 것입니다.
+        /// </summary>
         public void Print()
         {
             for (int i = metadataList.Count - 1; i >= 0; i--)
@@ -689,19 +696,29 @@ namespace ChordingCoding.SFX
             }
         }
 
+        /// <summary>
+        /// 두 리듬 패턴 사이의 거리(비유사도)를 계산하여 반환합니다.
+        /// 최소 거리를 구하기 위해 필요한 편집 연산들도 출력합니다.
+        /// 거리는 이 리듬 패턴에 여러 번의 편집 연산(insert, delete, move)을 적용하여
+        /// other 리듬 패턴으로 만들 수 있는 최소 비용으로 정의됩니다.
+        /// </summary>
+        /// <param name="other">다른 리듬 패턴</param>
+        /// <returns></returns>
         public int Distance(RhythmPattern other)
         {
             // Dynamic programming
 
             int lenThis = this.noteList.Count;
             int lenOther = other.noteList.Count;
-            List<List<KeyValuePair<int, string>>> distanceTable = new List<List<KeyValuePair<int, string>>>(lenThis + 1);
+            List<List<DistanceTable>> distanceTable =
+                new List<List<DistanceTable>>(lenThis + 1);
             for (int i = 0; i <= lenThis; i++)
             {
-                List<KeyValuePair<int, string>> temp = new List<KeyValuePair<int, string>>(lenOther + 1);
+                List<DistanceTable> temp =
+                    new List<DistanceTable>(lenOther + 1);
                 for (int j = 0; j <= lenOther; j++)
                 {
-                    temp.Add(new KeyValuePair<int, string>(int.MaxValue, ""));
+                    temp.Add(new DistanceTable(int.MaxValue, "", null, null));
                 }
                 distanceTable.Add(temp);
 
@@ -709,54 +726,90 @@ namespace ChordingCoding.SFX
                 {
                     if (i == 0 && j == 0)
                     {
-                        distanceTable[i][j] = new KeyValuePair<int, string>(0, "");
-                        Console.Write(distanceTable[i][j].Key + "\t");
+                        distanceTable[i][j] = new DistanceTable(0, "", new RhythmPattern(), new RhythmPattern());
+                        Console.Write(distanceTable[i][j].distance + "\t");
                         continue;
                     }
 
-                    List<KeyValuePair<int, string>> costs = new List<KeyValuePair<int, string>>();
-                    if (i > 0) costs.Add(new KeyValuePair<int, string>(
-                        distanceTable[i - 1][j].Key + Copy(this, i - 1).DeleteLastNote(),
-                        "d(" + this.GetNoteByIndex(i - 1).ToString() + ")"));  // delete
-                    if (j > 0) costs.Add(new KeyValuePair<int, string>(
-                        distanceTable[i][j - 1].Key + Copy(other, j - 2).InsertNote(other.GetNoteByIndex(j - 1)),
-                        "i(" + other.GetNoteByIndex(j - 1).ToString() + ")"));  // insert
-                    if (i > 0 && j > 0) costs.Add(new KeyValuePair<int, string>(
-                        distanceTable[i - 1][j - 1].Key + Copy(this, i - 1).MoveLastNote(other.GetNoteByIndex(j - 1)),
-                        "m(" + this.GetNoteByIndex(i - 1).ToString() + " -> " + other.GetNoteByIndex(j - 1).ToString() + ")")); // move
-                    foreach (KeyValuePair<int, string> c in costs)
+                    List<DistanceTable> costs = 
+                        new List<DistanceTable>();
+                    if (i > 0)
+                    {
+                        RhythmPattern rp = distanceTable[i - 1][j].thisRP.Copy();  // Copy(this, i - 1);
+
+                        // DeleteLastNote와 이 음표를 다시 InsertNote하는 것이 비용이 같은지 확인
+                        int costI = rp.InsertNote(this.GetNoteByIndex(i - 1));
+                        if (!rp.noteList.Last.Value.Equals(this.GetNoteByIndex(i - 1)))
+                            Console.WriteLine("Error in Distance(): Inserted note is not the last note!");
+
+                        int costD = rp.Copy().DeleteLastNote();
+                        if (costI != costD)
+                            Console.WriteLine("Error in Distance(): Insert and Delete are not symmetric!");
+
+                        costs.Add(new DistanceTable(
+                            distanceTable[i - 1][j].distance + costD, "d(" + this.GetNoteByIndex(i - 1).ToString() + ")",
+                            rp, distanceTable[i - 1][j].otherRP));  // delete
+                    }
+                    if (j > 0)
+                    {
+                        RhythmPattern rp = distanceTable[i][j - 1].otherRP.Copy();// Copy(other, j - 2);
+
+                        costs.Add(new DistanceTable(
+                            distanceTable[i][j - 1].distance + rp.InsertNote(other.GetNoteByIndex(j - 1)), "i(" + other.GetNoteByIndex(j - 1).ToString() + ")",
+                            distanceTable[i][j - 1].thisRP, rp));  // insert
+                    }
+                    if (i > 0 && j > 0)
+                    {
+                        RhythmPattern rp1 = distanceTable[i - 1][j - 1].thisRP.Copy();  // Copy(this, i - 1);
+                        RhythmPattern rp2 = distanceTable[i - 1][j - 1].otherRP.Copy();
+
+                        rp1.InsertNote(this.GetNoteByIndex(i - 1));
+                        if (!rp1.noteList.Last.Value.Equals(this.GetNoteByIndex(i - 1)))
+                            Console.WriteLine("Error in Distance(): Inserted note is not the last note!");
+
+                        int costM = rp1.Copy().MoveLastNote(other.GetNoteByIndex(j - 1));
+                        rp2.InsertNote(other.GetNoteByIndex(j - 1));
+                        if (!rp2.noteList.Last.Value.Equals(other.GetNoteByIndex(j - 1)))
+                            Console.WriteLine("Error in Distance(): Inserted note is not the last note!");
+
+                        costs.Add(new DistanceTable(
+                            distanceTable[i - 1][j - 1].distance + costM, "m(" + this.GetNoteByIndex(i - 1).ToString() + " -> " +
+                            other.GetNoteByIndex(j - 1).ToString() + ")", rp1, rp2)); // move
+                    }
+
+                    foreach (DistanceTable c in costs)
                     {
                         // Overflow means there is an invalid operation.
-                        if (c.Key < distanceTable[i][j].Key && c.Key >= 0)
+                        if (c.distance < distanceTable[i][j].distance && c.distance >= 0)
                         {
                             distanceTable[i][j] = c;
                         }
                     }
-                    Console.Write(distanceTable[i][j].Key + "\t");
+                    Console.Write(distanceTable[i][j].distance + "\t");  // TODO
                 }
-                Console.WriteLine();
+                Console.WriteLine();                                // TODO
             }
 
             // Print the shortest path.
             for (int i = lenThis, j = lenOther; i > 0 || j > 0;)
             {
-                string s = distanceTable[i][j].Value;
+                string s = distanceTable[i][j].path;
                 Console.Write(s + ": ");
                 if (s.Length > 0)
                 {
                     if (s[0] == 'd')
                     {
-                        Console.Write(distanceTable[i][j].Key - distanceTable[i - 1][j].Key);
+                        Console.Write(distanceTable[i][j].distance - distanceTable[i - 1][j].distance);
                         i--;
                     }
                     else if (s[0] == 'i')
                     {
-                        Console.Write(distanceTable[i][j].Key - distanceTable[i][j - 1].Key);
+                        Console.Write(distanceTable[i][j].distance - distanceTable[i][j - 1].distance);
                         j--;
                     }
                     else // (s[0] == 'm')
                     {
-                        Console.Write(distanceTable[i][j].Key - distanceTable[i - 1][j - 1].Key);
+                        Console.Write(distanceTable[i][j].distance - distanceTable[i - 1][j - 1].distance);
                         i--;
                         j--;
                     }
@@ -764,12 +817,12 @@ namespace ChordingCoding.SFX
                 }
                 else
                 {
-                    Console.WriteLine(distanceTable[i][j].Key);
+                    Console.WriteLine(distanceTable[i][j].distance);
                     break;
                 }
             }
 
-            return distanceTable[lenThis][lenOther].Key;
+            return distanceTable[lenThis][lenOther].distance;
         }
 
         /// <summary>
@@ -792,7 +845,7 @@ namespace ChordingCoding.SFX
             LinkedListNode<RhythmPatternNote> node = original.noteList.First;
             while (i <= index && node != null)
             {
-                rp.InsertNote(node.Value);
+                rp.InsertNote(node.Value.Copy());
                 node = node.Next;
                 i++;
             }
@@ -801,6 +854,7 @@ namespace ChordingCoding.SFX
 
         /// <summary>
         /// 음표 목록에서 인덱스로 음표를 찾습니다.
+        /// 찾는 음표가 없으면 null을 반환합니다.
         /// </summary>
         /// <param name="index">인덱스</param>
         /// <returns></returns>
@@ -815,6 +869,22 @@ namespace ChordingCoding.SFX
             }
             if (node == null) return null;
             return node.Value;
+        }
+
+        private class DistanceTable
+        {
+            public readonly int distance;
+            public readonly string path;
+            public readonly RhythmPattern thisRP;
+            public readonly RhythmPattern otherRP;
+
+            public DistanceTable(int distance, string path, RhythmPattern thisRP, RhythmPattern otherRP)
+            {
+                this.distance = distance;
+                this.path = path;
+                this.thisRP = thisRP;
+                this.otherRP = otherRP;
+            }
         }
     }
 
@@ -878,6 +948,15 @@ namespace ChordingCoding.SFX
                 OnsetPosition = 0;
             PitchCluster = pitchCluster;
             pitchVariance = -2;
+        }
+
+        /// <summary>
+        /// 리듬 패턴 음표를 새로 복제하여 반환합니다.
+        /// </summary>
+        /// <returns></returns>
+        public RhythmPatternNote Copy()
+        {
+            return new RhythmPatternNote(OnsetPosition, PitchCluster);
         }
 
         /// <summary>

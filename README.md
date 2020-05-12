@@ -34,7 +34,7 @@ Windows Forms로 개발된 응용 프로그램으로, 64-bit Windows에서 사�
    * 일반 글자를 입력할 때마다 화음에 맞는 음이 무작위로 생성됩니다.
   
 ## Update Log
-### [v.1.4](https://github.com/salt26/chordingcoding/tree/master) - 20/02/05
+### [v.1.4](https://github.com/salt26/chordingcoding/tree/v.1.4) - 20/02/05
 * 테마 변경 (중세 탐방 -> 중세 유적지)
 * 전반적인 테마 개선
 * 자동 반주가 없던 모든 테마에 자동 반주 추가 (가을 산책, 별 헤는 밤)

@@ -740,22 +740,6 @@ namespace ChordingCoding.SFX
                     List<DistanceTable> costs = new List<DistanceTable>();
                     if (i > 0)  // Delete
                     {
-                        /*
-                        RhythmPattern rp = distanceTable[i - 1][j].thisRP.Copy();  // Copy(this, i - 1);
-
-                        // DeleteLastNote와 이 음표를 다시 InsertNote하는 것이 비용이 같은지 확인
-                        int costI = rp.InsertNote(this.GetNoteByIndex(i - 1));
-                        if (!rp.noteList.Last.Value.Equals(this.GetNoteByIndex(i - 1)))
-                            Console.WriteLine("Error in Distance(): Inserted note is not the last note!");
-
-                        int costD = rp.Copy().DeleteLastNote();
-                        if (costI != costD)
-                            Console.WriteLine("Error in Distance(): Insert and Delete are not symmetric!");
-
-                        costs.Add(new DistanceTable(
-                            distanceTable[i - 1][j].distance + costD, "d(" + this.GetNoteByIndex(i - 1).ToString() + ")",
-                            rp, distanceTable[i - 1][j].otherRP));  // delete
-                        */
                         int k = i - 1;
                         int l = j;
                         DistanceTable previous = distanceTable[k][l];
@@ -775,6 +759,10 @@ namespace ChordingCoding.SFX
                             // 이전 단계(d_k,l)에서 마지막으로 연산된 음표의 연산 직후 상태
                             RhythmPatternNote cAfterOp = new RhythmPatternNote();
 
+                            // 이전 단계(d_k,l)에서 마지막으로 연산된 음표의
+                            // 연산 직전(=직후)에 바로 뒤에 놓인 음표의 상태
+                            RhythmPatternNote cNextBeforeOp = new RhythmPatternNote();
+
                             // 현재 단계(d_i,j)에서 마지막으로 연산될 음표의
                             // 연산 직전(=직후)에 바로 앞에 놓인 음표의 상태
                             RhythmPatternNote dPreviousBeforeOp = new RhythmPatternNote();
@@ -785,11 +773,15 @@ namespace ChordingCoding.SFX
                             // 현재 단계(d_i,j)에서 마지막으로 연산될 음표의 연산 직후 상태
                             RhythmPatternNote dAfterOp = new RhythmPatternNote();
 
+                            // 현재 단계(d_i,j)에서 마지막으로 연산될 음표의
+                            // 연산 직전(=직후)에 바로 뒤에 놓인 음표의 상태
+                            RhythmPatternNote dNextBeforeOp = new RhythmPatternNote();
+
                             RhythmPattern rpTemp;
 
                             if (operations.Count > 0)
                             {
-                                int lastOperation = operations.Last();
+                                int lastOperation = operations.Last();  // 지난 단계에서 마지막으로 수행한 연산
                                 switch (lastOperation)
                                 {
                                     case 1:     // forward delete
@@ -925,13 +917,6 @@ namespace ChordingCoding.SFX
                     }
                     if (j > 0)  // Insert
                     {
-                        /*
-                        RhythmPattern rp = distanceTable[i][j - 1].otherRP.Copy();// Copy(other, j - 2);
-
-                        costs.Add(new DistanceTable(
-                            distanceTable[i][j - 1].distance + rp.InsertNote(other.GetNoteByIndex(j - 1)), "i(" + other.GetNoteByIndex(j - 1).ToString() + ")",
-                            distanceTable[i][j - 1].thisRP, rp));  // insert
-                        */
                         int k = i;
                         int l = j - 1;
                         DistanceTable previous = distanceTable[k][l];
@@ -948,23 +933,6 @@ namespace ChordingCoding.SFX
                     }
                     if (i > 0 && j > 0) // Move
                     {
-                        /*
-                        RhythmPattern rp1 = distanceTable[i - 1][j - 1].thisRP.Copy();  // Copy(this, i - 1);
-                        RhythmPattern rp2 = distanceTable[i - 1][j - 1].otherRP.Copy();
-
-                        rp1.InsertNote(this.GetNoteByIndex(i - 1));
-                        if (!rp1.noteList.Last.Value.Equals(this.GetNoteByIndex(i - 1)))
-                            Console.WriteLine("Error in Distance(): Inserted note is not the last note!");
-
-                        int costM = rp1.Copy().MoveLastNote(other.GetNoteByIndex(j - 1));
-                        rp2.InsertNote(other.GetNoteByIndex(j - 1));
-                        if (!rp2.noteList.Last.Value.Equals(other.GetNoteByIndex(j - 1)))
-                            Console.WriteLine("Error in Distance(): Inserted note is not the last note!");
-
-                        costs.Add(new DistanceTable(
-                            distanceTable[i - 1][j - 1].distance + costM, "m(" + this.GetNoteByIndex(i - 1).ToString() + " -> " +
-                            other.GetNoteByIndex(j - 1).ToString() + ")", rp1, rp2)); // move
-                        */
                         int k = i - 1;
                         int l = j - 1;
                         DistanceTable previous = distanceTable[k][l];

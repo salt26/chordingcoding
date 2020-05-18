@@ -21,6 +21,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+using com.sun.xml.@internal.bind.v2.model.core;
+using javax.xml.transform;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -71,6 +73,12 @@ namespace ChordingCoding.SFX
                 this.InsertNote(n);
             }
         }
+
+        /// <summary>
+        /// 불가능한 편집 연산을 수행한 경우 발생하는 비용입니다.
+        /// 무한대라고 취급하면 됩니다.
+        /// </summary>
+        public const int INVALID_COST = int.MaxValue / 2;
 
         /// <summary>
         /// 음표 목록에 있는 한 음표가 직전 음표보다 높은 음을 가지면 1,
@@ -249,7 +257,7 @@ namespace ChordingCoding.SFX
         /// <summary>
         /// 리듬 패턴에 음표 하나를 삽입하는 연산을 수행합니다.
         /// 반환값은 수행한 연산의 비용입니다.
-        /// 같은 OnsetPosition에 여러 음표를 삽입하려 할 경우 삽입 연산이 수행되지 않고 int.MaxValue / 2를 반환합니다.
+        /// 같은 OnsetPosition에 여러 음표를 삽입하려 할 경우 삽입 연산이 수행되지 않고 INVALID_COST를 반환합니다.
         /// (새 음표를 정의할 때 GetNewClusterNumber() 또는
         /// GetExistingClusterNumber()를 사용하면 편리합니다.)
         /// </summary>
@@ -257,14 +265,14 @@ namespace ChordingCoding.SFX
         /// <returns></returns>
         public int InsertNote(RhythmPatternNote note)
         {
-            if (note == null) return int.MaxValue / 2;
+            if (note == null) return INVALID_COST;
             note = note.Copy();
 
             LinkedListNode<RhythmPatternNote> afterNote = null;
             foreach (RhythmPatternNote n in noteList)
             {
                 // 같은 위치에 여러 음표를 삽입할 수 없음 (단선율만 허용)
-                if (n.OnsetPosition == note.OnsetPosition) return int.MaxValue / 2;
+                if (n.OnsetPosition == note.OnsetPosition) return INVALID_COST;
                 else if (n.OnsetPosition > note.OnsetPosition)
                 {
                     // 이 음표 바로 앞에 삽입
@@ -358,7 +366,7 @@ namespace ChordingCoding.SFX
         /// <summary>
         /// 리듬 패턴에 음표 하나를 삽입하는 연산을 수행합니다.
         /// 반환값은 수행한 연산의 비용입니다.
-        /// 같은 OnsetPosition에 여러 음표를 삽입하려 할 경우 삽입 연산이 수행되지 않고 int.MaxValue / 2를 반환합니다.
+        /// 같은 OnsetPosition에 여러 음표를 삽입하려 할 경우 삽입 연산이 수행되지 않고 INVALID_COST를 반환합니다.
         /// (새 음표를 정의할 때 GetNewClusterNumber() 또는
         /// GetExistingClusterNumber()를 사용하면 편리합니다.)
         /// </summary>
@@ -373,7 +381,7 @@ namespace ChordingCoding.SFX
         /// <summary>
         /// 리듬 패턴에서 음표 하나를 제거하는 연산을 수행합니다.
         /// 반환값은 수행한 연산의 비용입니다.
-        /// 존재하지 않는 음표를 제거하려 할 경우 제거 연산이 수행되지 않고 int.MaxValue / 2를 반환합니다.
+        /// 존재하지 않는 음표를 제거하려 할 경우 제거 연산이 수행되지 않고 INVALID_COST를 반환합니다.
         /// </summary>
         /// <param name="noteOnset">제거할 기존 음표의 시작 위치</param>
         /// <returns></returns>
@@ -388,7 +396,7 @@ namespace ChordingCoding.SFX
                     break;
                 }
             }
-            if (n == null) return int.MaxValue / 2;
+            if (n == null) return INVALID_COST;
 
             RhythmPatternNote note = n.Value;
 
@@ -399,7 +407,7 @@ namespace ChordingCoding.SFX
                 if (!m.noteOnsets.Remove(note.OnsetPosition))
                 {
                     Console.WriteLine("Error: RhythmPattern DeleteNote metadata 1");
-                    return int.MaxValue / 2;
+                    return INVALID_COST;
                 }
                 if (m.noteOnsets.Count == 0)
                 {
@@ -410,7 +418,7 @@ namespace ChordingCoding.SFX
             else
             {
                 Console.WriteLine("Error: RhythmPattern DeleteNote metadata 2");
-                return int.MaxValue / 2;
+                return INVALID_COST;
             }
 
             int pv = PitchVariance(note);
@@ -451,15 +459,16 @@ namespace ChordingCoding.SFX
         }
 
         /// <summary>
-        /// 리듬 패턴에서 마지막 음표 하나를 제거하는 연산을 수행합니다.
+        /// 리듬 패턴에서 음표 하나를 제거하는 연산을 수행합니다.
         /// 반환값은 수행한 연산의 비용입니다.
-        /// 빈 리듬 패턴에서 이 연산을 수행하려고 하면 제거 연산이 수행되지 않고 int.MaxValue / 2를 반환합니다.
+        /// 인자로 넘긴 음표와 시작 위치가 같은 음표를 찾아 제거합니다.
+        /// 존재하지 않는 음표를 제거하려 할 경우 제거 연산이 수행되지 않고 INVALID_COST를 반환합니다.
         /// </summary>
+        /// <param name="note">제거할 기존 음표 (시작 위치만 중요)</param>
         /// <returns></returns>
-        public int DeleteLastNote()
+        public int DeleteNote(RhythmPatternNote note)
         {
-            if (noteList.Last == null) return int.MaxValue / 2;
-            return DeleteNote(noteList.Last.Value.OnsetPosition);
+            return DeleteNote(note.OnsetPosition);
         }
 
         /// <summary>
@@ -467,7 +476,7 @@ namespace ChordingCoding.SFX
         /// OnsetPosition과 클러스터를 옮기는 연산을 수행합니다.
         /// 반환값은 수행한 연산의 비용입니다.
         /// 존재하지 않는 음표를 옮기려고 하거나 새 OnsetPosition이 음표의 인덱스에 영향을 미칠 경우
-        /// 옮기는 연산을 수행하지 않고 int.MaxValue / 2를 반환합니다.
+        /// 옮기는 연산을 수행하지 않고 INVALID_COST를 반환합니다.
         /// (새 음표를 정의할 때 GetNewClusterNumber() 또는
         /// GetExistingClusterNumber()를 사용하면 편리합니다.)
         /// </summary>
@@ -476,7 +485,7 @@ namespace ChordingCoding.SFX
         /// <returns></returns>
         public int MoveNote(int oldNoteOnset, RhythmPatternNote newNote)
         {
-            if (newNote == null) return int.MaxValue / 2;
+            if (newNote == null) return INVALID_COST;
             newNote = newNote.Copy();
 
             LinkedListNode<RhythmPatternNote> n = null;
@@ -488,7 +497,7 @@ namespace ChordingCoding.SFX
                     break;
                 }
             }
-            if (n == null) return int.MaxValue / 2;
+            if (n == null) return INVALID_COST;
 
             RhythmPatternNote oldNote = n.Value;
 
@@ -498,7 +507,7 @@ namespace ChordingCoding.SFX
                 newNote.OnsetPosition >= n.Next.Value.OnsetPosition))
             {
                 // 옮긴 결과로 음표의 인덱스가 바뀌는 경우 연산을 수행하지 않음
-                return int.MaxValue / 2;
+                return INVALID_COST;
             }
 
             int oldPv = PitchVariance(oldNote);
@@ -516,7 +525,7 @@ namespace ChordingCoding.SFX
                     if (!m.noteOnsets.Remove(oldNote.OnsetPosition))
                     {
                         Console.WriteLine("Error: RhythmPattern MoveNote metadata 1");
-                        return int.MaxValue / 2;
+                        return INVALID_COST;
                     }
                     if (m.noteOnsets.Count == 0)
                     {
@@ -527,7 +536,7 @@ namespace ChordingCoding.SFX
                 else
                 {
                     Console.WriteLine("Error: RhythmPattern MoveNote metadata 2");
-                    return int.MaxValue / 2;
+                    return INVALID_COST;
                 }
 
                 // 새 음표에 대한 메타데이터 수정
@@ -603,7 +612,7 @@ namespace ChordingCoding.SFX
         /// OnsetPosition과 클러스터를 옮기는 연산을 수행합니다.
         /// 반환값은 수행한 연산의 비용입니다.
         /// 존재하지 않는 음표를 옮기려고 하거나 새 OnsetPosition이 음표의 인덱스에 영향을 미칠 경우
-        /// 옮기는 연산을 수행하지 않고 int.MaxValue / 2를 반환합니다.
+        /// 옮기는 연산을 수행하지 않고 INVALID_COST를 반환합니다.
         /// (새 음표를 정의할 때 GetNewClusterNumber() 또는
         /// GetExistingClusterNumber()를 사용하면 편리합니다.)
         /// </summary>
@@ -617,38 +626,21 @@ namespace ChordingCoding.SFX
         }
 
         /// <summary>
-        /// 리듬 패턴에 있던 마지막 음표 하나의 인덱스(음표 목록에서의 상대적 위치)를 유지하면서
+        /// 리듬 패턴에 있던 음표 하나의 인덱스(음표 목록에서의 상대적 위치)를 유지하면서
         /// OnsetPosition과 클러스터를 옮기는 연산을 수행합니다.
         /// 반환값은 수행한 연산의 비용입니다.
-        /// 빈 리듬 패턴에서 이 연산을 수행하려고 하거나 새 OnsetPosition이 음표의 인덱스에 영향을 미칠 경우
-        /// 옮기는 연산을 수행하지 않고 int.MaxValue / 2를 반환합니다.
+        /// 인자로 넘긴 oldNote와 시작 위치가 같은 음표를 찾아 옮깁니다.
+        /// 존재하지 않는 음표를 옮기려고 하거나 새 OnsetPosition이 음표의 인덱스에 영향을 미칠 경우
+        /// 옮기는 연산을 수행하지 않고 INVALID_COST를 반환합니다.
         /// (새 음표를 정의할 때 GetNewClusterNumber() 또는
         /// GetExistingClusterNumber()를 사용하면 편리합니다.)
         /// </summary>
-        /// <param name="newNoteOnset">옮겨질 새 음표의 시작 위치</param>
-        /// <param name="newNotePitchCluster">옮겨질 새 음표의 음 높이 클러스터 번호</param>
-        /// <returns></returns>
-        public int MoveLastNote(int newNoteOnset, float newNotePitchCluster)
-        {
-            if (noteList.Last == null) return int.MaxValue / 2;
-            return MoveNote(noteList.Last.Value.OnsetPosition, new RhythmPatternNote(newNoteOnset, newNotePitchCluster));
-        }
-
-        /// <summary>
-        /// 리듬 패턴에 있던 마지막 음표 하나의 인덱스(음표 목록에서의 상대적 위치)를 유지하면서
-        /// OnsetPosition과 클러스터를 옮기는 연산을 수행합니다.
-        /// 반환값은 수행한 연산의 비용입니다.
-        /// 빈 리듬 패턴에서 이 연산을 수행하려고 하거나 새 OnsetPosition이 음표의 인덱스에 영향을 미칠 경우
-        /// 옮기는 연산을 수행하지 않고 int.MaxValue / 2를 반환합니다.
-        /// (새 음표를 정의할 때 GetNewClusterNumber() 또는
-        /// GetExistingClusterNumber()를 사용하면 편리합니다.)
-        /// </summary>
+        /// <param name="oldNote">옮기는 대상이 될 기존 음표 (시작 위치만 중요)</param>
         /// <param name="newNote">옮겨질 새 음표</param>
         /// <returns></returns>
-        public int MoveLastNote(RhythmPatternNote newNote)
+        public int MoveNote(RhythmPatternNote oldNote, RhythmPatternNote newNote)
         {
-            if (noteList.Last == null) return int.MaxValue / 2;
-            return MoveNote(noteList.Last.Value.OnsetPosition, newNote);
+            return MoveNote(oldNote.OnsetPosition, newNote);
         }
 
         /// <summary>
@@ -657,6 +649,13 @@ namespace ChordingCoding.SFX
         /// </summary>
         public void Print()
         {
+            for (int j = 0; j <= noteList.Last().OnsetPosition; j++)
+            {
+                if (j > 0 && j % 10 == 0) Console.Write((j / 10) % 10);
+                else Console.Write(" ");
+            }
+            Console.WriteLine();
+
             for (int i = metadataList.Count - 1; i >= 0; i--)
             {
                 for (int j = 0; j <= noteList.Last().OnsetPosition; j++)
@@ -692,7 +691,7 @@ namespace ChordingCoding.SFX
                         Console.Write(".");
                     }
                 }
-                Console.WriteLine();
+                Console.WriteLine(" " + metadataList[i].pitchCluster);
             }
         }
 
@@ -719,7 +718,7 @@ namespace ChordingCoding.SFX
                     new List<DistanceTable>(lenOther + 1);
                 for (int j = 0; j <= lenOther; j++)
                 {
-                    temp.Add(new DistanceTable(int.MaxValue / 2, null));
+                    temp.Add(new DistanceTable(INVALID_COST, null));
                 }
                 distanceTable.Add(temp);
 
@@ -727,12 +726,11 @@ namespace ChordingCoding.SFX
                 {
                     if (i == 0 && j == 0)
                     {
-                        var dict = new Dictionary<DistanceEnvironment, List<int>>
+                        var list = new List<List<int>>
                         {
-                            // Pitch cluster for non-existing note is float.NaN.
-                            { new DistanceEnvironment(float.NaN, new List<float>(), new List<float>()), new List<int>() }
+                            { new List<int>() }
                         };
-                        distanceTable[i][j] = new DistanceTable(0, dict);
+                        distanceTable[i][j] = new DistanceTable(0, list);
                         Console.Write(distanceTable[i][j].intermediateDistance + "\t");
                         continue;
                     }
@@ -743,41 +741,27 @@ namespace ChordingCoding.SFX
                         int k = i - 1;
                         int l = j;
                         DistanceTable previous = distanceTable[k][l];
+
+                        // 이전 단계(d_k,l)에서 마지막으로 연산된 음표의 연산 직전 상태 C (존재한다면)
+                        RhythmPatternNote C = this.GetNoteByIndex(k - 1);
+
+                        // 이전 단계(d_k,l)에서 마지막으로 연산된 음표의 연산 직후 상태 C* (존재한다면)
+                        RhythmPatternNote CStar = other.GetNoteByIndex(l - 1);
+
+                        // 현재 단계(d_i,j)에서 마지막으로 연산될 음표의 연산 직전 상태 D (존재한다면)
+                        RhythmPatternNote D = this.GetNoteByIndex(i - 1);
+
+                        // 현재 단계(d_i,j)에서 마지막으로 연산될 음표의 연산 직후 상태 D* (존재한다면)
+                        RhythmPatternNote DStar = other.GetNoteByIndex(j - 1);
+
+                        #region forward delete
                         // forward (정방향)
                         foreach (var path in previous.intermediatePaths) // 이전 단계에서 최적이라고 알려진 모든 경로를 고려
                         {
-                            DistanceEnvironment env = path.Key;
-                            List<int> operations = new List<int>(path.Value);
+                            List<int> operations = new List<int>(path);
 
-                            // 이전 단계(d_k,l)에서 마지막으로 연산된 음표의
-                            // 연산 직전(=직후)에 바로 앞에 놓인 음표의 상태
-                            RhythmPatternNote cPreviousBeforeOp = new RhythmPatternNote();
-
-                            // 이전 단계(d_k,l)에서 마지막으로 연산된 음표의 연산 직전 상태
-                            RhythmPatternNote cBeforeOp = new RhythmPatternNote();
-
-                            // 이전 단계(d_k,l)에서 마지막으로 연산된 음표의 연산 직후 상태
-                            RhythmPatternNote cAfterOp = new RhythmPatternNote();
-
-                            // 이전 단계(d_k,l)에서 마지막으로 연산된 음표의
-                            // 연산 직전(=직후)에 바로 뒤에 놓인 음표의 상태
-                            RhythmPatternNote cNextBeforeOp = new RhythmPatternNote();
-
-                            // 현재 단계(d_i,j)에서 마지막으로 연산될 음표의
-                            // 연산 직전(=직후)에 바로 앞에 놓인 음표의 상태
-                            RhythmPatternNote dPreviousBeforeOp = new RhythmPatternNote();
-
-                            // 현재 단계(d_i,j)에서 마지막으로 연산될 음표의 연산 직전 상태
-                            RhythmPatternNote dBeforeOp = this.GetNoteByIndex(i - 1);
-
-                            // 현재 단계(d_i,j)에서 마지막으로 연산될 음표의 연산 직후 상태
-                            RhythmPatternNote dAfterOp = new RhythmPatternNote();
-
-                            // 현재 단계(d_i,j)에서 마지막으로 연산될 음표의
-                            // 연산 직전(=직후)에 바로 뒤에 놓인 음표의 상태
-                            RhythmPatternNote dNextBeforeOp = new RhythmPatternNote();
-
-                            RhythmPattern rpTemp;
+                            RhythmPattern rpTemp1, rpTemp2;
+                            int cCost = INVALID_COST, dCost = INVALID_COST;
 
                             if (operations.Count > 0)
                             {
@@ -785,168 +769,692 @@ namespace ChordingCoding.SFX
                                 switch (lastOperation)
                                 {
                                     case 1:     // forward delete
-                                        cBeforeOp = this.GetNoteByIndex(k - 1);
-                                        rpTemp = Copy(other, l - 1);
-                                        if (rpTemp.InsertNote(cBeforeOp) != int.MaxValue / 2)
+                                        rpTemp1 = Copy(other, j - 1);
+                                        if (rpTemp1.InsertNote(D) != INVALID_COST)
                                         {
-                                            LinkedListNode<RhythmPatternNote> lln = rpTemp.noteList.Find(cBeforeOp).Previous;
-                                            if (lln != null) cPreviousBeforeOp = lln.Value;
-                                            else cPreviousBeforeOp = new RhythmPatternNote();
-                                        }
-                                        else
-                                        {
-                                            // invalid operation performing order
-                                            Console.WriteLine("Warning: Invalid operation performing order in Distance()");
-                                            cPreviousBeforeOp = new RhythmPatternNote();
+                                            if (rpTemp1.InsertNote(C) != INVALID_COST)
+                                            {
+                                                // C에 Delete를 연산하기 직전의 리듬 패턴 환경 복원
+                                                // rpTemp1: A*..B*CD
+
+                                                // C에 연산 적용
+                                                cCost = rpTemp1.DeleteNote(C);
+
+                                                // D에 Delete를 연산하기 직전의 리듬 패턴 환경 복원
+                                                // rpTemp1: A*..B*(C*)D
+
+                                                // D에 연산 적용
+                                                dCost = rpTemp1.DeleteNote(D);
+                                            }
                                         }
                                         break;
                                     case -1:    // backward delete
-                                        cPreviousBeforeOp = this.GetNoteByIndex(k - 2);
-                                        cBeforeOp = this.GetNoteByIndex(k - 1);
+                                        rpTemp1 = Copy(this, i - 1);
+                                        // C에 Delete를 연산하기 직전의 리듬 패턴 환경 복원
+                                        // rpTemp1: A..BCD
+
+                                        // C에 연산 적용
+                                        cCost = rpTemp1.DeleteNote(C);
+
+                                        rpTemp2 = Copy(other, j - 1);
+                                        if (rpTemp2.InsertNote(D) != INVALID_COST)
+                                        {
+                                            // D에 Delete를 연산하기 직전의 리듬 패턴 환경 복원
+                                            // rpTemp2: A*..B*(C*)D
+
+                                            // D에 연산 적용
+                                            dCost = rpTemp2.DeleteNote(D);
+                                        }
                                         break;
                                     case 2:     // forward insert
-                                        cPreviousBeforeOp = other.GetNoteByIndex(l - 2);
-                                        cAfterOp = other.GetNoteByIndex(l - 1);
+                                        rpTemp1 = Copy(other, j - 1);
+                                        if (rpTemp1.InsertNote(D) != INVALID_COST)
+                                        {
+                                            if (rpTemp1.DeleteNote(CStar) != INVALID_COST)
+                                            {
+                                                cCost = rpTemp1.InsertNote(CStar);
+                                                dCost = rpTemp1.DeleteNote(D);
+                                            }
+                                        }
                                         break;
                                     case -2:    // backward insert
-                                        cAfterOp = other.GetNoteByIndex(l - 1);
-                                        rpTemp = Copy(this, k - 1);
-                                        if (rpTemp.InsertNote(cAfterOp) != int.MaxValue / 2)
+                                        rpTemp1 = Copy(this, i - 1);
+                                        cCost = rpTemp1.InsertNote(CStar);
+
+                                        rpTemp2 = Copy(other, j - 1);
+                                        if (rpTemp2.InsertNote(D) != INVALID_COST)
                                         {
-                                            LinkedListNode<RhythmPatternNote> lln = rpTemp.noteList.Find(cAfterOp).Previous;
-                                            if (lln != null) cPreviousBeforeOp = lln.Value;
-                                            else cPreviousBeforeOp = new RhythmPatternNote();
-                                        }
-                                        else
-                                        {
-                                            // invalid operation performing order
-                                            Console.WriteLine("Warning: Invalid operation performing order in Distance()");
-                                            cPreviousBeforeOp = new RhythmPatternNote();
+                                            dCost = rpTemp2.DeleteNote(D);
                                         }
                                         break;
                                     case 3:     // forward move
-                                        cPreviousBeforeOp = other.GetNoteByIndex(l - 2);
-                                        cBeforeOp = this.GetNoteByIndex(k - 1);
-                                        cAfterOp = other.GetNoteByIndex(l - 1);
+                                        rpTemp1 = Copy(other, j - 1);
+                                        if (rpTemp1.InsertNote(D) != INVALID_COST)
+                                        {
+                                            if (rpTemp1.MoveNote(CStar, C) != INVALID_COST)
+                                            {
+                                                cCost = rpTemp1.MoveNote(C, CStar);
+                                                dCost = rpTemp1.DeleteNote(D);
+                                            }
+                                        }
                                         break;
                                     case -3:    // backward move
-                                        cPreviousBeforeOp = this.GetNoteByIndex(k - 2);
-                                        cBeforeOp = this.GetNoteByIndex(k - 1);
-                                        cAfterOp = other.GetNoteByIndex(l - 1);
+                                        rpTemp1 = Copy(this, i - 1);
+                                        cCost = rpTemp1.MoveNote(C, CStar);
+
+                                        rpTemp2 = Copy(other, j - 1);
+                                        if (rpTemp2.InsertNote(D) != INVALID_COST)
+                                        {
+                                            dCost = rpTemp2.DeleteNote(D);
+                                        }
                                         break;
                                 }
-                            }
-
-                            // forward delete (current operation)
-                            rpTemp = Copy(other, j - 1);
-                            if (rpTemp.InsertNote(dBeforeOp) != int.MaxValue / 2)
-                            {
-                                LinkedListNode<RhythmPatternNote> lln = rpTemp.noteList.Find(dBeforeOp).Previous;
-                                if (lln != null) dPreviousBeforeOp = lln.Value;
-                                else dPreviousBeforeOp = new RhythmPatternNote();
-
-                                if (!float.IsNaN(env.lastPreviousPitchClusterBeforeOp) &&
-                                    !float.IsNaN(cPreviousBeforeOp.PitchCluster) &&
-                                    env.lastPreviousPitchClusterBeforeOp != cPreviousBeforeOp.PitchCluster)
-                                {
-                                    Console.WriteLine("Error: lastPreviousPitchCluster are differ!");
-                                }
-
-                                // TODO C?D에 연산 적용 (첫 연산인 경우 안 해도 됨)
-                                int cCost = 0;
-                                if (operations.Count > 0)
-                                {
-                                    // TODO dBeforeOp가 cBeforeOp의 바로 뒤에 놓인 음표가 아닐 수 있음
-                                    cCost = CalculateCost(cBeforeOp.OnsetPosition, cBeforeOp.PitchCluster,
-                                        cPreviousBeforeOp.OnsetPosition, cPreviousBeforeOp.PitchCluster,
-                                        dBeforeOp.OnsetPosition, dBeforeOp.PitchCluster,
-                                        cAfterOp.OnsetPosition, cAfterOp.PitchCluster,
-                                        env.pitchClusterListBeforeOp, env.pitchClusterListAfterOp);
-                                }
-
-                                // TODO D'에 연산 적용
-                                int dCost = 0;
-                                dCost = rpTemp.DeleteNote(dBeforeOp.OnsetPosition);
-
-                                List<float> dPCLBeforeOp = other.GetPitchClusterList();
-                                dPCLBeforeOp.Add(dBeforeOp.PitchCluster);
-                                List<float> dPCLAfterOp = other.GetPitchClusterList();
-
-                                // TODO dBeforeOp가 맨 마지막 음표가 아닐 수 있음
-                                // 목표 리듬 패턴(0 ~ j-1)에 D만 연산 적용 전 음표로 삽입되어 있는 상태에서 D 뒤의 음표를 찾아야 함
-                                if (dCost != CalculateCost(dBeforeOp.OnsetPosition, dBeforeOp.PitchCluster,
-                                    dPreviousBeforeOp.OnsetPosition, dPreviousBeforeOp.PitchCluster,
-                                    _, _,
-                                    dAfterOp.OnsetPosition, dAfterOp.PitchCluster,
-                                    dPCLBeforeOp, dPCLAfterOp
-                                    ))
-                                {
-                                    Console.WriteLine("Error: The cost of CalculateCost() and DeleteNote() are differ!");
-                                }
-
-                                operations.Add(1);  // forward delete operation
-                                costs.Add(new DistanceTable(_,
-                                    new Dictionary<DistanceEnvironment, List<int>> {
-                                    { new DistanceEnvironment(_, new List<float>(), new List<float>()),
-                                        operations }
-                                    }));
                             }
                             else
                             {
-                                // invalid operation
+                                // D에 적용하는 연산이 첫 연산인 경우
+                                cCost = 0;
+
+                                rpTemp2 = Copy(other, j - 1);
+                                if (rpTemp2.InsertNote(D) != INVALID_COST)
+                                {
+                                    dCost = rpTemp2.DeleteNote(D);
+                                }
+                            }
+
+                            if (cCost != INVALID_COST && dCost != INVALID_COST)
+                            {
+                                operations.Add(1);  // forward delete
+                                costs.Add(new DistanceTable(previous.intermediateDistance + cCost,
+                                    new List<List<int>>() { new List<int>(operations) },
+                                    previous.intermediateDistance + cCost + dCost,
+                                    new List<int>(operations)));
                             }
                         }
+                        #endregion
 
-
+                        #region backward delete
                         // backward (역방향)
-                        if (!(previous.intermediatePaths.Values.Count == 1 &&
-                            previous.intermediatePaths.Values.ToList()[0].Count == 0))
+                        if (!(previous.intermediatePaths.Count == 1 &&
+                            previous.intermediatePaths[0].Count == 0))
                         {
                             // This is not the first operation.
 
                             foreach (var path in previous.intermediatePaths)
                             {
-                                DistanceEnvironment env = path.Key;
-                                List<int> operations = path.Value;
+                                List<int> operations = new List<int>(path);
 
-                                // TODO D에 연산 적용
+                                RhythmPattern rpTemp1, rpTemp2;
+                                int cCost = INVALID_COST, dCost = INVALID_COST;
 
-                                // TODO C?D^에 연산 적용
+                                if (operations.Count > 0)
+                                {
+                                    int lastOperation = operations.Last();  // 지난 단계에서 마지막으로 수행한 연산
+                                    switch (lastOperation)
+                                    {
+                                        case 1:     // forward delete
+                                            rpTemp2 = Copy(this, i - 1);
+                                            // D에 Delete를 연산하기 직전의 리듬 패턴 환경 복원
+                                            // rpTemp2: A..BCD
+
+                                            // D에 연산 적용
+                                            dCost = rpTemp2.DeleteNote(D);
+
+                                            rpTemp1 = Copy(other, j - 1);
+                                            if (rpTemp1.InsertNote(C) != INVALID_COST)
+                                            {
+                                                // C에 Delete를 연산하기 직전의 리듬 패턴 환경 복원
+                                                // rpTemp1: A*..B*C(D*)
+
+                                                // C에 연산 적용
+                                                cCost = rpTemp1.DeleteNote(C);
+                                            }
+                                            break;
+                                        case -1:    // backward delete
+                                            rpTemp2 = Copy(this, i - 1);
+                                            // D에 Delete를 연산하기 직전의 리듬 패턴 환경 복원
+                                            // rpTemp2: A..BCD
+
+                                            // D에 연산 적용
+                                            dCost = rpTemp2.DeleteNote(D);
+
+                                            // C에 Delete를 연산하기 직전의 리듬 패턴 환경 복원
+                                            // rpTemp2: A..BC(D*)
+
+                                            // C에 연산 적용
+                                            cCost = rpTemp2.DeleteNote(C);
+                                            break;
+                                        case 2:     // forward insert
+                                            rpTemp2 = Copy(this, i - 1);
+                                            dCost = rpTemp2.DeleteNote(D);
+
+                                            rpTemp1 = Copy(other, j - 1);
+                                            if (rpTemp1.DeleteNote(CStar) != INVALID_COST)
+                                            {
+                                                cCost = rpTemp1.InsertNote(CStar);
+                                            }
+                                            break;
+                                        case -2:    // backward insert
+                                            rpTemp2 = Copy(this, i - 1);
+
+                                            dCost = rpTemp2.DeleteNote(D);
+                                            cCost = rpTemp2.InsertNote(CStar);
+                                            break;
+                                        case 3:     // forward move
+                                            rpTemp2 = Copy(this, i - 1);
+                                            dCost = rpTemp2.DeleteNote(D);
+
+                                            rpTemp1 = Copy(other, j - 1);
+                                            if (rpTemp1.MoveNote(CStar, C) != INVALID_COST)
+                                            {
+                                                cCost = rpTemp1.MoveNote(C, CStar);
+                                            }
+                                            break;
+                                        case -3:    // backward move
+                                            rpTemp2 = Copy(this, i - 1);
+
+                                            dCost = rpTemp2.DeleteNote(D);
+                                            cCost = rpTemp2.MoveNote(C, CStar);
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine("RhythmPattern Distance() Error: How it is possible?");
+                                }
+
+                                if (cCost != INVALID_COST && dCost != INVALID_COST)
+                                {
+                                    operations.Add(-1);  // backward delete
+                                    costs.Add(new DistanceTable(previous.intermediateDistance + cCost,
+                                        new List<List<int>>() { new List<int>(operations) },
+                                        previous.intermediateDistance + cCost + dCost,
+                                        new List<int>(operations)));
+                                }
                             }
                         }
+                        #endregion
                     }
                     if (j > 0)  // Insert
                     {
                         int k = i;
                         int l = j - 1;
                         DistanceTable previous = distanceTable[k][l];
+
+                        // 이전 단계(d_k,l)에서 마지막으로 연산된 음표의 연산 직전 상태 C (존재한다면)
+                        RhythmPatternNote C = this.GetNoteByIndex(k - 1);
+
+                        // 이전 단계(d_k,l)에서 마지막으로 연산된 음표의 연산 직후 상태 C* (존재한다면)
+                        RhythmPatternNote CStar = other.GetNoteByIndex(l - 1);
+
+                        // 현재 단계(d_i,j)에서 마지막으로 연산될 음표의 연산 직전 상태 D (존재한다면)
+                        RhythmPatternNote D = this.GetNoteByIndex(i - 1);
+
+                        // 현재 단계(d_i,j)에서 마지막으로 연산될 음표의 연산 직후 상태 D* (존재한다면)
+                        RhythmPatternNote DStar = other.GetNoteByIndex(j - 1);
+
+                        #region forward insert
                         // forward (정방향)
+                        foreach (var path in previous.intermediatePaths) // 이전 단계에서 최적이라고 알려진 모든 경로를 고려
+                        {
+                            List<int> operations = new List<int>(path);
 
+                            RhythmPattern rpTemp1, rpTemp2;
+                            int cCost = INVALID_COST, dCost = INVALID_COST;
 
+                            if (operations.Count > 0)
+                            {
+                                int lastOperation = operations.Last();  // 지난 단계에서 마지막으로 수행한 연산
+                                switch (lastOperation)
+                                {
+                                    case 1:     // forward delete
+                                        rpTemp1 = Copy(other, j - 1);
+                                        if (rpTemp1.DeleteNote(DStar) != INVALID_COST)
+                                        {
+                                            if (rpTemp1.InsertNote(C) != INVALID_COST)
+                                            {
+                                                // C에 Delete를 연산하기 직전의 리듬 패턴 환경 복원
+                                                // rpTemp1: A*..B*C(D)
+
+                                                // C에 연산 적용
+                                                cCost = rpTemp1.DeleteNote(C);
+
+                                                // D에 Insert를 연산하기 직전의 리듬 패턴 환경 복원
+                                                // rpTemp1: A*..B*(C*)(D)
+
+                                                // D에 연산 적용
+                                                dCost = rpTemp1.InsertNote(DStar);
+                                            }
+                                        }
+                                        break;
+                                    case -1:    // backward delete
+                                        rpTemp1 = Copy(this, i - 1);
+                                        // C에 Delete를 연산하기 직전의 리듬 패턴 환경 복원
+                                        // rpTemp1: A..BC(D)
+
+                                        // C에 연산 적용
+                                        cCost = rpTemp1.DeleteNote(C);
+
+                                        rpTemp2 = Copy(other, j - 1);
+                                        if (rpTemp2.DeleteNote(DStar) != INVALID_COST)
+                                        {
+                                            // D에 Insert를 연산하기 직전의 리듬 패턴 환경 복원
+                                            // rpTemp2: A*..B*(C*)(D)
+
+                                            // D에 연산 적용
+                                            dCost = rpTemp2.InsertNote(DStar);
+                                        }
+                                        break;
+                                    case 2:     // forward insert
+                                        rpTemp1 = Copy(other, j - 1);
+                                        if (rpTemp1.DeleteNote(DStar) != INVALID_COST)
+                                        {
+                                            if (rpTemp1.DeleteNote(CStar) != INVALID_COST)
+                                            {
+                                                cCost = rpTemp1.InsertNote(CStar);
+                                                dCost = rpTemp1.InsertNote(DStar);
+                                            }
+                                        }
+                                        break;
+                                    case -2:    // backward insert
+                                        rpTemp1 = Copy(this, i - 1);
+                                        cCost = rpTemp1.InsertNote(CStar);
+
+                                        rpTemp2 = Copy(other, j - 1);
+                                        if (rpTemp2.DeleteNote(DStar) != INVALID_COST)
+                                        {
+                                            dCost = rpTemp2.InsertNote(DStar);
+                                        }
+                                        break;
+                                    case 3:     // forward move
+                                        rpTemp1 = Copy(other, j - 1);
+                                        if (rpTemp1.DeleteNote(DStar) != INVALID_COST)
+                                        {
+                                            if (rpTemp1.MoveNote(CStar, C) != INVALID_COST)
+                                            {
+                                                cCost = rpTemp1.MoveNote(C, CStar);
+                                                dCost = rpTemp1.InsertNote(DStar);
+                                            }
+                                        }
+                                        break;
+                                    case -3:    // backward move
+                                        rpTemp1 = Copy(this, i - 1);
+                                        cCost = rpTemp1.MoveNote(C, CStar);
+
+                                        rpTemp2 = Copy(other, j - 1);
+                                        if (rpTemp2.DeleteNote(DStar) != INVALID_COST)
+                                        {
+                                            dCost = rpTemp2.InsertNote(DStar);
+                                        }
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                // D에 적용하는 연산이 첫 연산인 경우
+                                cCost = 0;
+
+                                rpTemp2 = Copy(other, j - 1);
+                                if (rpTemp2.DeleteNote(DStar) != INVALID_COST)
+                                {
+                                    dCost = rpTemp2.InsertNote(DStar);
+                                }
+                            }
+
+                            if (cCost != INVALID_COST && dCost != INVALID_COST)
+                            {
+                                operations.Add(2);  // forward insert
+                                costs.Add(new DistanceTable(previous.intermediateDistance + cCost,
+                                    new List<List<int>>() { new List<int>(operations) },
+                                    previous.intermediateDistance + cCost + dCost,
+                                    new List<int>(operations)));
+                            }
+                        }
+                        #endregion
+
+                        #region backward insert
                         // backward (역방향)
-                        if (!(previous.intermediatePaths.Values.Count == 1 &&
-                            previous.intermediatePaths.Values.ToList()[0].Count == 0))
+                        if (!(previous.intermediatePaths.Count == 1 &&
+                            previous.intermediatePaths[0].Count == 0))
                         {
                             // This is not the first operation.
 
+                            foreach (var path in previous.intermediatePaths)
+                            {
+                                List<int> operations = new List<int>(path);
+
+                                RhythmPattern rpTemp1, rpTemp2;
+                                int cCost = INVALID_COST, dCost = INVALID_COST;
+
+                                if (operations.Count > 0)
+                                {
+                                    int lastOperation = operations.Last();  // 지난 단계에서 마지막으로 수행한 연산
+                                    switch (lastOperation)
+                                    {
+                                        case 1:     // forward delete
+                                            rpTemp2 = Copy(this, i - 1);
+                                            // D에 Insert를 연산하기 직전의 리듬 패턴 환경 복원
+                                            // rpTemp2: A..BC(D)
+
+                                            // D에 연산 적용
+                                            dCost = rpTemp2.InsertNote(DStar);
+
+                                            rpTemp1 = Copy(other, j - 1);
+                                            if (rpTemp1.InsertNote(C) != INVALID_COST)
+                                            {
+                                                // C에 Delete를 연산하기 직전의 리듬 패턴 환경 복원
+                                                // rpTemp1: A*..B*CD*
+
+                                                // C에 연산 적용
+                                                cCost = rpTemp1.DeleteNote(C);
+                                            }
+                                            break;
+                                        case -1:    // backward delete
+                                            rpTemp2 = Copy(this, i - 1);
+                                            // D에 Insert를 연산하기 직전의 리듬 패턴 환경 복원
+                                            // rpTemp2: A..BC(D)
+
+                                            // D에 연산 적용
+                                            dCost = rpTemp2.InsertNote(DStar);
+
+                                            // C에 Delete를 연산하기 직전의 리듬 패턴 환경 복원
+                                            // rpTemp2: A..BCD*
+
+                                            // C에 연산 적용
+                                            cCost = rpTemp2.DeleteNote(C);
+                                            break;
+                                        case 2:     // forward insert
+                                            rpTemp2 = Copy(this, i - 1);
+                                            dCost = rpTemp2.InsertNote(DStar);
+
+                                            rpTemp1 = Copy(other, j - 1);
+                                            if (rpTemp1.DeleteNote(CStar) != INVALID_COST)
+                                            {
+                                                cCost = rpTemp1.InsertNote(CStar);
+                                            }
+                                            break;
+                                        case -2:    // backward insert
+                                            rpTemp2 = Copy(this, i - 1);
+
+                                            dCost = rpTemp2.InsertNote(DStar);
+                                            cCost = rpTemp2.InsertNote(CStar);
+                                            break;
+                                        case 3:     // forward move
+                                            rpTemp2 = Copy(this, i - 1);
+                                            dCost = rpTemp2.InsertNote(DStar);
+
+                                            rpTemp1 = Copy(other, j - 1);
+                                            if (rpTemp1.MoveNote(CStar, C) != INVALID_COST)
+                                            {
+                                                cCost = rpTemp1.MoveNote(C, CStar);
+                                            }
+                                            break;
+                                        case -3:    // backward move
+                                            rpTemp2 = Copy(this, i - 1);
+
+                                            dCost = rpTemp2.InsertNote(DStar);
+                                            cCost = rpTemp2.MoveNote(C, CStar);
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine("RhythmPattern Distance() Error: How it is possible?");
+                                }
+
+                                if (cCost != INVALID_COST && dCost != INVALID_COST)
+                                {
+                                    operations.Add(-2);  // backward insert
+                                    costs.Add(new DistanceTable(previous.intermediateDistance + cCost,
+                                        new List<List<int>>() { new List<int>(operations) },
+                                        previous.intermediateDistance + cCost + dCost,
+                                        new List<int>(operations)));
+                                }
+                            }
                         }
+                        #endregion
                     }
                     if (i > 0 && j > 0) // Move
                     {
                         int k = i - 1;
                         int l = j - 1;
                         DistanceTable previous = distanceTable[k][l];
+
+                        // 이전 단계(d_k,l)에서 마지막으로 연산된 음표의 연산 직전 상태 C (존재한다면)
+                        RhythmPatternNote C = this.GetNoteByIndex(k - 1);
+
+                        // 이전 단계(d_k,l)에서 마지막으로 연산된 음표의 연산 직후 상태 C* (존재한다면)
+                        RhythmPatternNote CStar = other.GetNoteByIndex(l - 1);
+
+                        // 현재 단계(d_i,j)에서 마지막으로 연산될 음표의 연산 직전 상태 D (존재한다면)
+                        RhythmPatternNote D = this.GetNoteByIndex(i - 1);
+
+                        // 현재 단계(d_i,j)에서 마지막으로 연산될 음표의 연산 직후 상태 D* (존재한다면)
+                        RhythmPatternNote DStar = other.GetNoteByIndex(j - 1);
+
+                        #region forward move
                         // forward (정방향)
+                        foreach (var path in previous.intermediatePaths) // 이전 단계에서 최적이라고 알려진 모든 경로를 고려
+                        {
+                            List<int> operations = new List<int>(path);
 
+                            RhythmPattern rpTemp1, rpTemp2;
+                            int cCost = INVALID_COST, dCost = INVALID_COST;
 
+                            if (operations.Count > 0)
+                            {
+                                int lastOperation = operations.Last();  // 지난 단계에서 마지막으로 수행한 연산
+                                switch (lastOperation)
+                                {
+                                    case 1:     // forward delete
+                                        rpTemp1 = Copy(other, j - 1);
+                                        if (rpTemp1.MoveNote(DStar, D) != INVALID_COST)
+                                        {
+                                            if (rpTemp1.InsertNote(C) != INVALID_COST)
+                                            {
+                                                // C에 Delete를 연산하기 직전의 리듬 패턴 환경 복원
+                                                // rpTemp1: A*..B*CD
+
+                                                // C에 연산 적용
+                                                cCost = rpTemp1.DeleteNote(C);
+
+                                                // D에 Move를 연산하기 직전의 리듬 패턴 환경 복원
+                                                // rpTemp1: A*..B*(C*)D
+
+                                                // D에 연산 적용
+                                                dCost = rpTemp1.MoveNote(D, DStar);
+                                            }
+                                        }
+                                        break;
+                                    case -1:    // backward delete
+                                        rpTemp1 = Copy(this, i - 1);
+                                        // C에 Delete를 연산하기 직전의 리듬 패턴 환경 복원
+                                        // rpTemp1: A..BCD
+
+                                        // C에 연산 적용
+                                        cCost = rpTemp1.DeleteNote(C);
+
+                                        rpTemp2 = Copy(other, j - 1);
+                                        if (rpTemp2.MoveNote(DStar, D) != INVALID_COST)
+                                        {
+                                            // D에 Move를 연산하기 직전의 리듬 패턴 환경 복원
+                                            // rpTemp2: A*..B*(C*)D
+
+                                            // D에 연산 적용
+                                            dCost = rpTemp2.MoveNote(D, DStar);
+                                        }
+                                        break;
+                                    case 2:     // forward insert
+                                        rpTemp1 = Copy(other, j - 1);
+                                        if (rpTemp1.MoveNote(DStar, D) != INVALID_COST)
+                                        {
+                                            if (rpTemp1.DeleteNote(CStar) != INVALID_COST)
+                                            {
+                                                cCost = rpTemp1.InsertNote(CStar);
+                                                dCost = rpTemp1.MoveNote(D, DStar);
+                                            }
+                                        }
+                                        break;
+                                    case -2:    // backward insert
+                                        rpTemp1 = Copy(this, i - 1);
+                                        cCost = rpTemp1.InsertNote(CStar);
+
+                                        rpTemp2 = Copy(other, j - 1);
+                                        if (rpTemp2.MoveNote(DStar, D) != INVALID_COST)
+                                        {
+                                            dCost = rpTemp2.MoveNote(D, DStar);
+                                        }
+                                        break;
+                                    case 3:     // forward move
+                                        rpTemp1 = Copy(other, j - 1);
+                                        if (rpTemp1.MoveNote(DStar, D) != INVALID_COST)
+                                        {
+                                            if (rpTemp1.MoveNote(CStar, C) != INVALID_COST)
+                                            {
+                                                cCost = rpTemp1.MoveNote(C, CStar);
+                                                dCost = rpTemp1.MoveNote(D, DStar);
+                                            }
+                                        }
+                                        break;
+                                    case -3:    // backward move
+                                        rpTemp1 = Copy(this, i - 1);
+                                        cCost = rpTemp1.MoveNote(C, CStar);
+
+                                        rpTemp2 = Copy(other, j - 1);
+                                        if (rpTemp2.MoveNote(DStar, D) != INVALID_COST)
+                                        {
+                                            dCost = rpTemp2.MoveNote(D, DStar);
+                                        }
+                                        break;
+                                }
+                            }
+                            else
+                            {
+                                // D에 적용하는 연산이 첫 연산인 경우
+                                cCost = 0;
+
+                                rpTemp2 = Copy(other, j - 1);
+                                if (rpTemp2.MoveNote(DStar, D) != INVALID_COST)
+                                {
+                                    dCost = rpTemp2.MoveNote(D, DStar);
+                                }
+                            }
+
+                            if (cCost != INVALID_COST && dCost != INVALID_COST)
+                            {
+                                operations.Add(3);  // forward move
+                                costs.Add(new DistanceTable(previous.intermediateDistance + cCost,
+                                    new List<List<int>>() { new List<int>(operations) },
+                                    previous.intermediateDistance + cCost + dCost,
+                                    new List<int>(operations)));
+                            }
+                        }
+                        #endregion
+
+                        #region backward move
                         // backward (역방향)
-                        if (!(previous.intermediatePaths.Values.Count == 1 &&
-                            previous.intermediatePaths.Values.ToList()[0].Count == 0))
+                        if (!(previous.intermediatePaths.Count == 1 &&
+                            previous.intermediatePaths[0].Count == 0))
                         {
                             // This is not the first operation.
 
+                            foreach (var path in previous.intermediatePaths)
+                            {
+                                List<int> operations = new List<int>(path);
+
+                                RhythmPattern rpTemp1, rpTemp2;
+                                int cCost = INVALID_COST, dCost = INVALID_COST;
+
+                                if (operations.Count > 0)
+                                {
+                                    int lastOperation = operations.Last();  // 지난 단계에서 마지막으로 수행한 연산
+                                    switch (lastOperation)
+                                    {
+                                        case 1:     // forward delete
+                                            rpTemp2 = Copy(this, i - 1);
+                                            // D에 Move를 연산하기 직전의 리듬 패턴 환경 복원
+                                            // rpTemp2: A..BCD
+
+                                            // D에 연산 적용
+                                            dCost = rpTemp2.MoveNote(D, DStar);
+
+                                            rpTemp1 = Copy(other, j - 1);
+                                            if (rpTemp1.InsertNote(C) != INVALID_COST)
+                                            {
+                                                // C에 Delete를 연산하기 직전의 리듬 패턴 환경 복원
+                                                // rpTemp1: A*..B*CD*
+
+                                                // C에 연산 적용
+                                                cCost = rpTemp1.DeleteNote(C);
+                                            }
+                                            break;
+                                        case -1:    // backward delete
+                                            rpTemp2 = Copy(this, i - 1);
+                                            // D에 Move를 연산하기 직전의 리듬 패턴 환경 복원
+                                            // rpTemp2: A..BCD
+
+                                            // D에 연산 적용
+                                            dCost = rpTemp2.MoveNote(D, DStar);
+
+                                            // C에 Delete를 연산하기 직전의 리듬 패턴 환경 복원
+                                            // rpTemp2: A..BCD*
+
+                                            // C에 연산 적용
+                                            cCost = rpTemp2.DeleteNote(C);
+                                            break;
+                                        case 2:     // forward insert
+                                            rpTemp2 = Copy(this, i - 1);
+                                            dCost = rpTemp2.MoveNote(D, DStar);
+
+                                            rpTemp1 = Copy(other, j - 1);
+                                            if (rpTemp1.DeleteNote(CStar) != INVALID_COST)
+                                            {
+                                                cCost = rpTemp1.InsertNote(CStar);
+                                            }
+                                            break;
+                                        case -2:    // backward insert
+                                            rpTemp2 = Copy(this, i - 1);
+
+                                            dCost = rpTemp2.MoveNote(D, DStar);
+                                            cCost = rpTemp2.InsertNote(CStar);
+                                            break;
+                                        case 3:     // forward move
+                                            rpTemp2 = Copy(this, i - 1);
+                                            dCost = rpTemp2.MoveNote(D, DStar);
+
+                                            rpTemp1 = Copy(other, j - 1);
+                                            if (rpTemp1.MoveNote(CStar, C) != INVALID_COST)
+                                            {
+                                                cCost = rpTemp1.MoveNote(C, CStar);
+                                            }
+                                            break;
+                                        case -3:    // backward move
+                                            rpTemp2 = Copy(this, i - 1);
+
+                                            dCost = rpTemp2.MoveNote(D, DStar);
+                                            cCost = rpTemp2.MoveNote(C, CStar);
+                                            break;
+                                    }
+                                }
+                                else
+                                {
+                                    Console.WriteLine("RhythmPattern Distance() Error: How it is possible?");
+                                }
+
+                                if (cCost != INVALID_COST && dCost != INVALID_COST)
+                                {
+                                    operations.Add(-3);  // backward move
+                                    costs.Add(new DistanceTable(previous.intermediateDistance + cCost,
+                                        new List<List<int>>() { new List<int>(operations) },
+                                        previous.intermediateDistance + cCost + dCost,
+                                        new List<int>(operations)));
+                                }
+                            }
                         }
+                        #endregion
                     }
+
+                    distanceTable[i][j] = new DistanceTable(INVALID_COST, new List<List<int>>(), INVALID_COST, null);
 
                     // TODO 최솟값을 가지는 모든 c들(argmin)을 구해서 하나의 DistanceTable로 만들어야 한다.
                     // 최솟값은 iDistance로 저장되고, 각 경로들은 Dictionary로 묶여서 iPaths로 저장된다. 
@@ -959,45 +1467,171 @@ namespace ChordingCoding.SFX
                             distanceTable[i][j] = c;
                         }
                         */
+                        // Overflow means there is an invalid operation.
+                        if (c.intermediateDistance < distanceTable[i][j].intermediateDistance &&
+                            c.intermediateDistance >= 0)
+                        {
+                            distanceTable[i][j].intermediateDistance = c.intermediateDistance;
+                            distanceTable[i][j].intermediatePaths = c.intermediatePaths;
+                        }
+                        else if (c.intermediateDistance == distanceTable[i][j].intermediateDistance &&
+                            c.intermediateDistance >= 0)
+                        {
+                            distanceTable[i][j].intermediatePaths.Add(c.intermediatePaths[0]);
+                        }
+
+                        if (i == lenThis && j == lenOther &&
+                            c.finalDistance < distanceTable[i][j].finalDistance &&
+                            c.finalDistance >= 0)
+                        {
+                            distanceTable[i][j].finalDistance = c.finalDistance;
+                            distanceTable[i][j].finalPath = c.finalPath;
+                        }
                     }
                     Console.Write(distanceTable[i][j].intermediateDistance + "\t");  // TODO
                 }
                 Console.WriteLine();                                // TODO
             }
 
-            // Print the shortest path.
-            for (int i = lenThis, j = lenOther; i > 0 || j > 0;)
+            //Console.WriteLine("final distance: " + distanceTable[lenThis][lenOther].finalDistance);
+
+            LinkedList<OperationInfo> resultPath = new LinkedList<OperationInfo>();
+
+            int i2 = 0, j2 = 0;
+            for (int k = 0; k < distanceTable[lenThis][lenOther].finalPath.Count; k++)
             {
-                string s = distanceTable[i][j].path;
-                Console.Write(s + ": ");
-                if (s.Length > 0)
+                int op = distanceTable[lenThis][lenOther].finalPath[k];
+                Console.Write(op + " ");
+
+                bool prevOpSign = true; // (k - 1)번째 연산의 방향이 정방향이면 true, 역방향이면 false
+                if (k > 0) prevOpSign = distanceTable[lenThis][lenOther].finalPath[k - 1] > 0;
+
+                OperationInfo info = new OperationInfo(op,
+                    new RhythmPatternNote(), new RhythmPatternNote(), INVALID_COST);
+                switch (op)
                 {
-                    if (s[0] == 'd')
-                    {
-                        Console.Write(distanceTable[i][j].distance - distanceTable[i - 1][j].distance);
-                        i--;
-                    }
-                    else if (s[0] == 'i')
-                    {
-                        Console.Write(distanceTable[i][j].distance - distanceTable[i][j - 1].distance);
-                        j--;
-                    }
-                    else // (s[0] == 'm')
-                    {
-                        Console.Write(distanceTable[i][j].distance - distanceTable[i - 1][j - 1].distance);
-                        i--;
-                        j--;
-                    }
-                    Console.WriteLine();
-                }
-                else
-                {
-                    Console.WriteLine(distanceTable[i][j].distance);
-                    break;
+                    case 1:     // forward delete
+                        i2++;
+                        info.noteBeforeOp = this.GetNoteByIndex(i2 - 1);
+                        if (k > 0)
+                        {
+                            if (prevOpSign)
+                                resultPath.Last.Value.cost = distanceTable[i2][j2].intermediateDistance -
+                                    distanceTable[i2 - 1][j2].intermediateDistance;
+                            else
+                                resultPath.First.Value.cost = distanceTable[i2][j2].intermediateDistance -
+                                    distanceTable[i2 - 1][j2].intermediateDistance;
+                        }
+                        resultPath.AddLast(info);
+                        break;
+                    case -1:    // backward delete
+                        i2++;
+                        info.noteBeforeOp = this.GetNoteByIndex(i2 - 1);
+                        if (k > 0)
+                        {
+                            if (prevOpSign)
+                                resultPath.Last.Value.cost = distanceTable[i2][j2].intermediateDistance -
+                                    distanceTable[i2 - 1][j2].intermediateDistance;
+                            else
+                                resultPath.First.Value.cost = distanceTable[i2][j2].intermediateDistance -
+                                    distanceTable[i2 - 1][j2].intermediateDistance;
+                        }
+                        resultPath.AddFirst(info);
+                        break;
+                    case 2:     // forward insert
+                        j2++;
+                        info.noteAfterOp = other.GetNoteByIndex(j2 - 1);
+                        if (k > 0)
+                        {
+                            if (prevOpSign)
+                                resultPath.Last.Value.cost = distanceTable[i2][j2].intermediateDistance -
+                                    distanceTable[i2][j2 - 1].intermediateDistance;
+                            else
+                                resultPath.First.Value.cost = distanceTable[i2][j2].intermediateDistance -
+                                    distanceTable[i2][j2 - 1].intermediateDistance;
+                        }
+                        resultPath.AddLast(info);
+                        break;
+                    case -2:    // backward insert
+                        j2++;
+                        info.noteAfterOp = other.GetNoteByIndex(j2 - 1);
+                        if (k > 0)
+                        {
+                            if (prevOpSign)
+                                resultPath.Last.Value.cost = distanceTable[i2][j2].intermediateDistance -
+                                    distanceTable[i2][j2 - 1].intermediateDistance;
+                            else
+                                resultPath.First.Value.cost = distanceTable[i2][j2].intermediateDistance -
+                                    distanceTable[i2][j2 - 1].intermediateDistance;
+                        }
+                        resultPath.AddFirst(info);
+                        break;
+                    case 3:     // forward move
+                        i2++;
+                        j2++;
+                        info.noteBeforeOp = this.GetNoteByIndex(i2 - 1);
+                        info.noteAfterOp = other.GetNoteByIndex(j2 - 1);
+                        if (k > 0)
+                        {
+                            if (prevOpSign)
+                                resultPath.Last.Value.cost = distanceTable[i2][j2].intermediateDistance -
+                                    distanceTable[i2 - 1][j2 - 1].intermediateDistance;
+                            else
+                                resultPath.First.Value.cost = distanceTable[i2][j2].intermediateDistance -
+                                    distanceTable[i2 - 1][j2 - 1].intermediateDistance;
+                        }
+                        resultPath.AddLast(info);
+                        break;
+                    case -3:    // backward move
+                        i2++;
+                        j2++;
+                        info.noteBeforeOp = this.GetNoteByIndex(i2 - 1);
+                        info.noteAfterOp = other.GetNoteByIndex(j2 - 1);
+                        if (k > 0)
+                        {
+                            if (prevOpSign)
+                                resultPath.Last.Value.cost = distanceTable[i2][j2].intermediateDistance -
+                                    distanceTable[i2 - 1][j2 - 1].intermediateDistance;
+                            else
+                                resultPath.First.Value.cost = distanceTable[i2][j2].intermediateDistance -
+                                    distanceTable[i2 - 1][j2 - 1].intermediateDistance;
+                        }
+                        resultPath.AddFirst(info);
+                        break;
                 }
             }
+            if (distanceTable[lenThis][lenOther].finalPath.Last() > 0)
+            {
+                resultPath.Last.Value.cost = distanceTable[lenThis][lenOther].finalDistance -
+                    distanceTable[lenThis][lenOther].intermediateDistance;
+            }
+            else
+            {
+                resultPath.First.Value.cost = distanceTable[lenThis][lenOther].finalDistance -
+                    distanceTable[lenThis][lenOther].intermediateDistance;
+            }
+            Console.WriteLine();
 
-            return distanceTable[lenThis][lenOther].distance;
+            RhythmPattern rpForTest = this.Copy();
+            foreach (OperationInfo o in resultPath)
+            {
+                o.Print();
+                switch (o.type)
+                {
+                    case OperationInfo.Type.Delete:
+                        Console.WriteLine("d: " + rpForTest.DeleteNote(o.noteBeforeOp));
+                        break;
+                    case OperationInfo.Type.Insert:
+                        Console.WriteLine("i: " + rpForTest.InsertNote(o.noteAfterOp));
+                        break;
+                    case OperationInfo.Type.Move:
+                        Console.WriteLine("m: " + rpForTest.MoveNote(o.noteBeforeOp, o.noteAfterOp));
+                        break;
+                }
+            }
+            rpForTest.Print();
+
+            return distanceTable[lenThis][lenOther].finalDistance;
         }
 
         /// <summary>
@@ -1062,160 +1696,6 @@ namespace ChordingCoding.SFX
         }
 
         /// <summary>
-        /// Distance() 안에서 사용될 연산 비용 계산 함수입니다.
-        /// 실제로 Delete, Insert, Move를 적용한 비용과 같은 결과가 나옵니다.
-        /// Onset 인자는 없는 음표의 경우 -1로 넣습니다.
-        /// PC(클러스터 번호) 인자는 없는 음표의 경우 float.NaN으로 넣습니다.
-        /// </summary>
-        /// <param name="targetNoteOnsetBeforeOp">연산을 적용하는 음표의 연산 직전 Onset</param>
-        /// <param name="targetNotePCBeforeOp">연산을 적용하는 음표의 연산 직전 클러스터 번호</param>
-        /// <param name="previousNoteOnsetBeforeOp">직전 음표의 연산 직전(=직후) Onset</param>
-        /// <param name="previousNotePCBeforeOp">직전 음표의 연산 직전(=직후) 클러스터 번호</param>
-        /// <param name="nextNoteOnsetBeforeOp">직후 음표의 연산 직전(=직후) Onset</param>
-        /// <param name="nextNotePCBeforeOp">직후 음표의 연산 직전(=직후) 클러스터 번호</param>
-        /// <param name="targetNoteOnsetAfterOp">연산을 적용하는 음표의 연산 직후 Onset</param>
-        /// <param name="targetNotePCAfterOp">연산을 적용하는 음표의 연산 직후 클러스터 번호</param>
-        /// <param name="pitchClusterListBeforeOp">연산 적용 직전 리듬 패턴에 존재하는 모든 클러스터 번호의 목록</param>
-        /// <param name="pitchClusterListAfterOp">연산 적용 직후 리듬 패턴에 존재하는 모든 클러스터 번호의 목록</param>
-        // PV(음 높이 변화) 인자는 없는 음표의 경우 0으로 취급합니다.
-        private static int CalculateCost(int targetNoteOnsetBeforeOp, float targetNotePCBeforeOp,
-            int previousNoteOnsetBeforeOp, float previousNotePCBeforeOp,
-            int nextNoteOnsetBeforeOp, float nextNotePCBeforeOp,
-            int targetNoteOnsetAfterOp, float targetNotePCAfterOp,
-            List<float> pitchClusterListBeforeOp, List<float> pitchClusterListAfterOp)
-        {
-            int cost = 0;
-            int operationType;
-            int targetNotePVBeforeOp = -2, targetNotePVAfterOp = -2;
-
-            if (targetNoteOnsetAfterOp < 0 || float.IsNaN(targetNotePCAfterOp))
-            {
-                operationType = 1; // Delete
-                targetNoteOnsetAfterOp = -1;
-                targetNotePCAfterOp = float.NaN;
-                targetNotePVAfterOp = 0;
-                if (targetNoteOnsetBeforeOp < 0 || float.IsNaN(targetNotePCBeforeOp))
-                    throw new ArgumentException();
-            }
-            else if (targetNoteOnsetBeforeOp < 0 || float.IsNaN(targetNotePCBeforeOp))
-            {
-                operationType = 2; // Insert
-                targetNoteOnsetBeforeOp = -1;
-                targetNotePCBeforeOp = float.NaN;
-                targetNotePVBeforeOp = 0;
-            }
-            else
-                operationType = 3; // Move
-
-            #region Onset cost
-            if (targetNoteOnsetBeforeOp != -1 &&
-                (targetNoteOnsetBeforeOp <= previousNoteOnsetBeforeOp ||
-                (nextNoteOnsetBeforeOp != -1 && targetNoteOnsetBeforeOp >= nextNoteOnsetBeforeOp)))
-                return int.MaxValue / 2;
-            else if (targetNoteOnsetAfterOp != -1 &&
-                (targetNoteOnsetAfterOp <= previousNoteOnsetBeforeOp ||
-                (nextNoteOnsetBeforeOp != -1 && targetNoteOnsetAfterOp >= nextNoteOnsetBeforeOp)))
-                return int.MaxValue / 2;
-            else if (targetNoteOnsetBeforeOp != targetNoteOnsetAfterOp)
-                cost += 1;
-            #endregion
-
-            #region target Pitch Variance cost
-            if (float.IsNaN(previousNotePCBeforeOp))
-            {
-                targetNotePVBeforeOp = 0;
-                targetNotePVAfterOp = 0;
-            }
-            else 
-            {
-                if (operationType == 1 || operationType == 3)
-                {
-                    // Delete or Move
-                    if (previousNotePCBeforeOp < targetNotePCBeforeOp) targetNotePVBeforeOp = 1;
-                    else if (previousNotePCBeforeOp == targetNotePCBeforeOp) targetNotePVBeforeOp = 0;
-                    else targetNotePVBeforeOp = -1;
-                    targetNotePVAfterOp = 0;
-                }
-
-                if (operationType == 2 || operationType == 3)
-                {
-                    // Insert or Move
-                    targetNotePVBeforeOp = 0;
-                    if (previousNotePCBeforeOp < targetNotePCAfterOp) targetNotePVAfterOp = 1;
-                    else if (previousNotePCBeforeOp == targetNotePCAfterOp) targetNotePVAfterOp = 0;
-                    else targetNotePVAfterOp = -1;
-                }
-            }
-
-            if (targetNotePVBeforeOp == -2 || targetNotePVAfterOp == -2)
-                throw new InvalidOperationException();
-
-            if (targetNotePVBeforeOp != targetNotePVAfterOp)
-                cost += 1;
-            #endregion
-
-            #region Cluster Rank cost
-            pitchClusterListBeforeOp = pitchClusterListBeforeOp.Distinct().ToList();
-            pitchClusterListBeforeOp.Sort();
-            pitchClusterListAfterOp = pitchClusterListAfterOp.Distinct().ToList();
-            pitchClusterListAfterOp.Sort();
-
-            int rankBeforeOp = -1, rankAfterOp = -1;
-
-            if ((operationType == 1 && targetNotePVBeforeOp != 0) ||
-                (operationType == 2 && targetNotePVAfterOp != 0))
-            {
-                // Delete or Insert
-                cost += 1;
-            }
-            if (operationType == 3)
-            {
-                // Move
-                rankBeforeOp = pitchClusterListBeforeOp.IndexOf(targetNotePCBeforeOp);
-                rankAfterOp = pitchClusterListAfterOp.IndexOf(targetNotePCAfterOp);
-
-                if (rankBeforeOp == -1 || rankAfterOp == -1)
-                    throw new ArgumentException();
-                if (rankBeforeOp != rankAfterOp)
-                    cost += 1;
-            }
-            #endregion
-
-            #region next Pitch Variance cost
-            int nextNotePVBeforeOp = -2, nextNotePVAfterOp = -2;
-
-            if (!float.IsNaN(nextNotePCBeforeOp))
-            {
-                if (operationType == 1 || operationType == 3)
-                {
-                    // Delete or Move
-                    if (targetNotePCBeforeOp < nextNotePCBeforeOp) nextNotePVBeforeOp = 1;
-                    else if (targetNotePCBeforeOp == nextNotePCBeforeOp) nextNotePVBeforeOp = 0;
-                    else nextNotePVBeforeOp = -1;
-                    nextNotePVAfterOp = 0;
-                }
-
-                if (operationType == 2 || operationType == 3)
-                {
-                    // Insert or Move
-                    nextNotePVBeforeOp = 0;
-                    if (targetNotePCAfterOp < nextNotePCBeforeOp) nextNotePVAfterOp = 1;
-                    else if (targetNotePCAfterOp == nextNotePCBeforeOp) nextNotePVAfterOp = 0;
-                    else nextNotePVAfterOp = -1;
-                }
-
-                if (nextNotePVBeforeOp == -2 || nextNotePVAfterOp == -2)
-                    throw new InvalidOperationException();
-
-                if (nextNotePVBeforeOp != nextNotePVAfterOp)
-                    cost += 1;
-            }
-            #endregion
-
-            return cost;
-        }
-
-        /// <summary>
         /// 리듬 패턴 거리 계산 시 이전의 최적 연산 비용
         /// 계산 정보를 저장하는 구조체입니다.
         /// 원래 리듬 패턴의 맨 앞에서부터 i개의 음표를
@@ -1224,32 +1704,19 @@ namespace ChordingCoding.SFX
         /// </summary>
         private class DistanceTable
         {
-            /*
-            public readonly int distance;
-            public readonly string path;
-            public readonly RhythmPattern thisRP;
-            public readonly RhythmPattern otherRP;
-
-            public DistanceTable(int distance, string path, RhythmPattern thisRP, RhythmPattern otherRP)
-            {
-                this.distance = distance;
-                this.path = path;
-                this.thisRP = thisRP;
-                this.otherRP = otherRP;
-            }
-            */
             /// <summary>
             /// 다음 연산 비용을 계산할 때 필요한 연산 비용 합의 최적
             /// </summary>
-            public readonly int intermediateDistance;
+            public int intermediateDistance { get; set; }
 
             /// <summary>
-            /// 다음 연산 비용을 계산할 때 필요한, 현재 마지막 음표의 연산이 이루어진 환경(Key)과 최적 경로(Value).
+            /// 다음 연산 비용을 계산할 때 필요한 최적 경로들의 목록.
+            /// 같은 최적 비용을 갖는 서로 다른 경로를 모두 보관합니다.
             /// 최적 경로는 지금까지 적용한 연산 종류와 순서를 나타낸 int 목록인데, 목록 안의 값은
             /// 정방향 Delete이면 1, 정방향 Insert이면 2, 정방향 Move이면 3,
             /// 역방향 Delete이면 -1, 역방향 Insert이면 -2, 역방향 Move이면 -3을 가집니다.
             /// </summary>
-            public readonly Dictionary<DistanceEnvironment, List<int>> intermediatePaths;
+            public List<List<int>> intermediatePaths { get; set; }
             // 최적 경로(int 목록)의 첫 번째 값은 항상 양수 (첫 번째 연산이라 순서를 정의할 수 없음)
             // 정방향: 이전 연산들을 먼저 모두 수행한 후에 마지막 음표의 연산을 수행하는 순서
             // 역방향: 마지막 음표의 연산을 가장 먼저 수행한 후에 이전 연산들을 모두 수행하는 순서
@@ -1258,7 +1725,7 @@ namespace ChordingCoding.SFX
             /// 최종 거리.
             /// 목표 리듬 패턴에 도달하기까지 필요한 연산 비용 합의 최적.
             /// </summary>
-            public readonly int finalDistance;
+            public int finalDistance { get; set; }
 
             /// <summary>
             /// 최종 경로.
@@ -1266,14 +1733,14 @@ namespace ChordingCoding.SFX
             /// 목록 안의 값은 정방향 Delete이면 1, 정방향 Insert이면 2, 정방향 Move이면 3,
             /// 역방향 Delete이면 -1, 역방향 Insert이면 -2, 역방향 Move이면 -3을 가집니다.
             /// </summary>
-            public readonly List<int> finalPath;
+            public List<int> finalPath { get; set; }
 
             /// <summary>
             /// 중간 결과를 저장할 때 사용합니다.
             /// </summary>
             /// <param name="iDistance"></param>
             /// <param name="iPaths"></param>
-            public DistanceTable(int iDistance, Dictionary<DistanceEnvironment, List<int>> iPaths)
+            public DistanceTable(int iDistance, List<List<int>> iPaths)
             {
                 this.intermediateDistance = iDistance;
                 this.intermediatePaths = iPaths;
@@ -1286,7 +1753,7 @@ namespace ChordingCoding.SFX
             /// <param name="iPaths"></param>
             /// <param name="fDistance"></param>
             /// <param name="fPath"></param>
-            public DistanceTable(int iDistance, Dictionary<DistanceEnvironment, List<int>> iPaths,
+            public DistanceTable(int iDistance, List<List<int>> iPaths,
                 int fDistance, List<int> fPath)
             {
                 this.intermediateDistance = iDistance;
@@ -1297,37 +1764,174 @@ namespace ChordingCoding.SFX
         }
 
         /// <summary>
-        /// 리듬 패턴 거리 계산 시 이전에 연산 비용을 계산했던 환경을
-        /// 그대로 계승하여 나중에 재사용하기 위해 필요한 정보를 담는 구조체입니다.
+        /// 리듬 패턴 편집 연산의 종류와
+        /// 연산을 적용한 음표에 대한 정보를 담는 구조체입니다.
         /// </summary>
-        private class DistanceEnvironment
+        public class OperationInfo
         {
-            /// <summary>
-            /// d_i,j에서 마지막 연산이 수행되는 음표의 직전 음표의 연산 직전(=직후) 클러스터 번호
-            /// </summary>
-            public readonly float lastPreviousPitchClusterBeforeOp;
+            public enum Type { Invalid = 0, Delete = 1, Insert = 2, Move = 3 }
 
             /// <summary>
-            /// d_i,j에서 마지막 연산이 수행되는 음표의 연산 직전 리듬 패턴의 클러스터 번호 목록
-            /// (중복된 클러스터 번호가 없어야 함)
+            /// 편집 연산 종류
             /// </summary>
-            public readonly List<float> pitchClusterListBeforeOp;
+            public Type type;
 
             /// <summary>
-            /// d_i,j에서 마지막 연산이 수행되는 음표의 연산 직후 리듬 패턴의 클러스터 번호 목록
-            /// (중복된 클러스터 번호가 없어야 함)
+            /// 연산을 적용한 음표의 연산 직전 상태.
+            /// Insert 연산에서는 없는 음표를 나타내는 new RhythmPatternNote()가 됩니다.
             /// </summary>
-            public readonly List<float> pitchClusterListAfterOp;
+            public RhythmPatternNote noteBeforeOp;
 
-            public DistanceEnvironment(float lastPrevPCBeforeOp,
-                List<float> PCBeforeOp, List<float> PCAfterOp)
+            /// <summary>
+            /// 연산을 적용한 음표의 연산 직후 상태.
+            /// Delete 연산에서는 없는 음표를 나타내는 new RhythmPatternNote()가 됩니다.
+            /// </summary>
+            public RhythmPatternNote noteAfterOp;
+
+            /// <summary>
+            /// 편집 연산을 수행한 비용.
+            /// 이 구조체의 다른 필드의 값이 모두 같아도 
+            /// 어떤 리듬 패턴에서 연산을 적용했는지에 따라 비용이 다를 수 있습니다.
+            /// </summary>
+            public int cost;
+
+            public OperationInfo(Type operationType,
+                RhythmPatternNote noteBeforeOp, RhythmPatternNote noteAfterOp,
+                int cost)
             {
-                lastPreviousPitchClusterBeforeOp = lastPrevPCBeforeOp;
-                pitchClusterListBeforeOp = PCBeforeOp;
-                pitchClusterListAfterOp = PCAfterOp;
+                switch (operationType)
+                {
+                    case Type.Delete:
+                        this.type = Type.Delete;
+                        this.noteBeforeOp = noteBeforeOp.Copy();
+                        this.noteAfterOp = new RhythmPatternNote();
+                        this.cost = cost;
+                        break;
+                    case Type.Insert:
+                        this.type = Type.Insert;
+                        this.noteBeforeOp = new RhythmPatternNote();
+                        this.noteAfterOp = noteAfterOp.Copy();
+                        this.cost = cost;
+                        break;
+                    case Type.Move:
+                        this.type = Type.Move;
+                        this.noteBeforeOp = noteBeforeOp.Copy();
+                        this.noteAfterOp = noteAfterOp.Copy();
+                        this.cost = cost;
+                        break;
+                    default:
+                        this.type = Type.Invalid;
+                        this.noteBeforeOp = new RhythmPatternNote();
+                        this.noteAfterOp = new RhythmPatternNote();
+                        this.cost = INVALID_COST;
+                        break;
+                }
+            }
 
-                pitchClusterListBeforeOp.Sort();
-                pitchClusterListAfterOp.Sort();
+            public OperationInfo(string operationType,
+                RhythmPatternNote noteBeforeOp, RhythmPatternNote noteAfterOp,
+                int cost)
+            {
+                switch (operationType.ToLowerInvariant())
+                {
+                    case "delete":
+                        this.type = Type.Delete;
+                        this.noteBeforeOp = noteBeforeOp.Copy();
+                        this.noteAfterOp = new RhythmPatternNote();
+                        this.cost = cost;
+                        break;
+                    case "insert":
+                        this.type = Type.Insert;
+                        this.noteBeforeOp = new RhythmPatternNote();
+                        this.noteAfterOp = noteAfterOp.Copy();
+                        this.cost = cost;
+                        break;
+                    case "move":
+                        this.type = Type.Move;
+                        this.noteBeforeOp = noteBeforeOp.Copy();
+                        this.noteAfterOp = noteAfterOp.Copy();
+                        this.cost = cost;
+                        break;
+                    default:
+                        this.type = Type.Invalid;
+                        this.noteBeforeOp = new RhythmPatternNote();
+                        this.noteAfterOp = new RhythmPatternNote();
+                        this.cost = INVALID_COST;
+                        break;
+                }
+            }
+
+            public OperationInfo(int operationCode,
+                RhythmPatternNote noteBeforeOp, RhythmPatternNote noteAfterOp,
+                int cost)
+            {
+                switch (operationCode)
+                {
+                    case 1:
+                    case -1:
+                        this.type = Type.Delete;
+                        this.noteBeforeOp = noteBeforeOp.Copy();
+                        this.noteAfterOp = new RhythmPatternNote();
+                        this.cost = cost;
+                        break;
+                    case 2:
+                    case -2:
+                        this.type = Type.Insert;
+                        this.noteBeforeOp = new RhythmPatternNote();
+                        this.noteAfterOp = noteAfterOp.Copy();
+                        this.cost = cost;
+                        break;
+                    case 3:
+                    case -3:
+                        this.type = Type.Move;
+                        this.noteBeforeOp = noteBeforeOp.Copy();
+                        this.noteAfterOp = noteAfterOp.Copy();
+                        this.cost = cost;
+                        break;
+                    default:
+                        this.type = Type.Invalid;
+                        this.noteBeforeOp = new RhythmPatternNote();
+                        this.noteAfterOp = new RhythmPatternNote();
+                        this.cost = INVALID_COST;
+                        break;
+                }
+            }
+
+            public void Print()
+            {
+                string s = type.ToString();
+                if (type == Type.Invalid)
+                {
+                    s += "(): " + INVALID_COST;
+                    Console.WriteLine(s);
+                    return;
+                }
+                s += "([";
+                if (noteBeforeOp.OnsetPosition != -1)
+                {
+                    s += noteBeforeOp.OnsetPosition + ", " + noteBeforeOp.PitchCluster;
+                    if (noteAfterOp.OnsetPosition != -1)
+                    {
+                        s += "] -> [";
+                        s += noteAfterOp.OnsetPosition + ", " + noteAfterOp.PitchCluster;
+                        s += "]): " + cost;
+                        Console.WriteLine(s);
+                        return;
+                    }
+                    else
+                    {
+                        s += "]): " + cost;
+                        Console.WriteLine(s);
+                        return;
+                    }
+                }
+                else
+                {
+                    s += noteAfterOp.OnsetPosition + ", " + noteAfterOp.PitchCluster;
+                    s += "]): " + cost;
+                    Console.WriteLine(s);
+                    return;
+                }
             }
         }
     }

@@ -400,6 +400,19 @@ namespace ChordingCoding.SFX.Test
         private void RhythmPatternDistanceTest()
         {
             Console.WriteLine("RhythmPattern Distance Test");
+            /*
+            RhythmPattern rp = new RhythmPattern();
+            int cost = 0;
+            rp.Print();
+
+            Console.WriteLine("(01)");
+            RhythmPattern rp2 = rp.Copy();
+            rp2.InsertNote(4, 0);
+            rp2.Print();
+            Console.WriteLine("distance(->): " + rp.Distance(rp2));
+            Console.WriteLine("distance(<-): " + rp2.Distance(rp));
+            */
+
             RhythmPattern rp = new RhythmPattern();
             int cost = 0;
             rp.InsertNote(0, 0);
@@ -423,6 +436,7 @@ namespace ChordingCoding.SFX.Test
             Console.WriteLine();
             rp2.Print();
             Console.WriteLine("distance: " + rp.Distance(rp2));
+            /*
 
             Console.WriteLine("(2)");
             rp2 = rp.Copy();
@@ -532,6 +546,7 @@ namespace ChordingCoding.SFX.Test
             Console.WriteLine();
             rp2.Print();
             Console.WriteLine("distance: " + rp.Distance(rp2));
+            */
         }
     }
 }

@@ -672,6 +672,11 @@ namespace ChordingCoding.SFX
         /// </summary>
         public void Print()
         {
+            if (noteList == null || noteList.Count == 0)
+            {
+                Console.WriteLine("Empty RhythmPattern");
+                return;
+            }
             for (int j = 0; j <= noteList.Last().OnsetPosition; j++)
             {
                 if (j > 0 && j % 10 == 0) Console.Write((j / 10) % 10);
@@ -735,6 +740,8 @@ namespace ChordingCoding.SFX
             List<List<DistanceTable>> distanceTable =
                 new List<List<DistanceTable>>(lenThis + 1);
 
+            // 우선 4가지 연산(forward delete, backward insert, forward move, backward move)만 가지고
+            // distanceTable 초기화 (시간 복잡도 O(n^2))
             for (int i = 0; i <= lenThis; i++)
             {
                 List<DistanceTable> temp =
@@ -754,7 +761,7 @@ namespace ChordingCoding.SFX
                             { new List<int>() }
                         };
                         distanceTable[i][j] = new DistanceTable(0, list, 0, new List<int>(), 0);
-                        Console.Write(distanceTable[i][j].intermediateDistance + "\t");
+                        Console.Write(distanceTable[i][j].intermediateDistance + "\t");     // TODO
                         continue;
                     }
 
@@ -852,6 +859,8 @@ namespace ChordingCoding.SFX
                                     pass = true;
                                 }
                             }
+                            //currentOp.Print(false);
+                            //Console.WriteLine(dCost);
                             // dCost는 현재 단계(d_i,j)에서 마지막으로 수행할 연산의 비용이 된다.
 
                             if (!pass)
@@ -946,7 +955,287 @@ namespace ChordingCoding.SFX
                                         new List<List<int>>() { new List<int>(operations) },
                                         previous.intermediateDistance + cCost + dCost,
                                         new List<int>(operations),
-                                        dCost));
+                                        dCost,
+                                        false));
+                                }
+                            }
+                        }
+                    }
+                    #endregion
+
+                    #region 현재 단계의 연산 결과(d_i,j) 기록
+
+                    distanceTable[i][j] = new DistanceTable(INVALID_COST, new List<List<int>>(), INVALID_COST, null);
+                    //Console.WriteLine();
+                    //Console.WriteLine();
+                    //Console.WriteLine("costs.Count = " + costs.Count);
+
+                    // 최솟값을 가지는 모든 c들(argmin)을 구해서 하나의 DistanceTable로 만든다.
+                    // 최솟값은 iDistance로 저장되고, 각 경로들은 Dictionary로 묶여서 iPaths로 저장된다. 
+                    foreach (DistanceTable c in costs)
+                    {
+                        // Overflow means there is an invalid operation.
+                        if (c.intermediateDistance < distanceTable[i][j].intermediateDistance &&
+                            c.intermediateDistance >= 0 &&
+                            c.intermediateDistance < INVALID_COST)
+                        {
+                            distanceTable[i][j].intermediateDistance = c.intermediateDistance;
+                            distanceTable[i][j].intermediatePaths = c.intermediatePaths;
+                            distanceTable[i][j].finalDistance = c.finalDistance;
+                            distanceTable[i][j].finalPath = c.finalPath;
+                            distanceTable[i][j].lastOperationCost = c.lastOperationCost;
+                        }
+                        else if (c.intermediateDistance == distanceTable[i][j].intermediateDistance &&
+                            c.intermediateDistance >= 0 &&
+                            c.intermediateDistance < INVALID_COST)
+                        {
+                            distanceTable[i][j].intermediatePaths.Add(c.intermediatePaths[0]);
+                            distanceTable[i][j].finalDistance = c.finalDistance;
+                            distanceTable[i][j].finalPath = c.finalPath;
+                            distanceTable[i][j].lastOperationCost = c.lastOperationCost;
+                        }
+
+                        if (i == lenThis && j == lenOther &&
+                            c.finalDistance < distanceTable[i][j].finalDistance &&
+                            c.finalDistance >= 0)
+                        {
+                            distanceTable[i][j].intermediateDistance = c.intermediateDistance;
+                            distanceTable[i][j].intermediatePaths = c.intermediatePaths;
+                            distanceTable[i][j].finalDistance = c.finalDistance;
+                            distanceTable[i][j].finalPath = c.finalPath;
+                            distanceTable[i][j].lastOperationCost = c.lastOperationCost;
+                        }
+                    }
+                    Console.Write(distanceTable[i][j].intermediateDistance + "\t");  // TODO
+                    #endregion
+                }
+                Console.WriteLine();                                // TODO
+            }
+
+            // 위에서 4가지 연산만으로 계산한 distanceTable의 스냅샷 저장
+            List<List<DistanceTable>> oldDistanceTable =
+                new List<List<DistanceTable>>(lenThis + 1);
+            for (int i = 0; i <= lenThis; i++)
+            {
+                List<DistanceTable> temp =
+                    new List<DistanceTable>(lenOther + 1);
+                for (int j = 0; j <= lenOther; j++)
+                {
+                    DistanceTable dt = distanceTable[i][j];
+                    temp.Add(new DistanceTable(dt.intermediateDistance, null, dt.finalDistance, null, dt.lastOperationCost, dt.isLastOpBDOrFI));
+                }
+                oldDistanceTable.Add(temp);
+            }
+
+            // 이번에는 6가지 연산 모두를 가지고
+            // distanceTable 다시 계산 (시간 복잡도 O(2^n))
+            for (int i = 0; i <= lenThis; i++)
+            { 
+                for (int j = 0; j <= lenOther; j++)
+                {
+                    if (i == 0 && j == 0)
+                    {
+                        var list = new List<List<int>>
+                        {
+                            { new List<int>() }
+                        };
+                        distanceTable[i][j] = new DistanceTable(0, list, 0, new List<int>(), 0);
+                        Console.Write(distanceTable[i][j].intermediateDistance + "\t");     // TODO
+                        continue;
+                    }
+
+                    List<DistanceTable> costs = new List<DistanceTable>();
+
+                    #region forward delete, backward insert, forward move, backward move
+
+                    // 현재 단계(d_i,j)에서 이 연산들을 새로 수행하게 되면
+                    // 이전 단계의 연산들을 다시 수행하는 순간에
+                    // 리듬 패턴(환경)의 맨 마지막에 이전 단계에 없던 새로운 음표가 생기기 때문에
+                    // 이전 단계에서 계산했던 몇몇 연산들(직후 음표가 없는 환경에서 수행한 연산들)의
+                    // 비용을 다시 계산해야 한다.
+                    List<int> operationCases = new List<int>
+                    {
+                        1,  // forward delete
+                        -2, // backward insert
+                        3,  // forward move
+                        -3  // backward move
+                    };
+
+                    foreach (int operationCase in operationCases)
+                    {
+                        // 해당 연산을 수행할 수 없는 경우 배제
+                        if ((operationCase == 1 || operationCase == 3 ||
+                            operationCase == -3) && i <= 0) continue;
+                        if ((operationCase == -2 || operationCase == 3 ||
+                            operationCase == -3) && j <= 0) continue;
+
+                        // 현재 단계(d_i,j)에서 수행할 연산 정보 정의
+                        OperationInfo currentOp = new OperationInfo(operationCase, this.GetNoteByIndex(i - 1), other.GetNoteByIndex(j - 1));
+
+                        // 현재 단계(d_i,j)에서 수행할 연산이 정방향(forward)이면 true, 역방향(backward)이면 false
+                        bool isCurrentOpForward = operationCase > 0;
+                        int k, l;
+
+                        switch (operationCase)
+                        {
+                            case 1:
+                            case -1:    // cannot occur
+                                k = i - 1;
+                                l = j;
+                                break;
+                            case 2:     // cannot occur
+                            case -2:
+                                k = i;
+                                l = j - 1;
+                                break;
+                            case 3:
+                            case -3:
+                            default:
+                                k = i - 1;
+                                l = j - 1;
+                                break;
+                        }
+                        // 이전 단계(d_k,l)
+                        DistanceTable previous = distanceTable[k][l];
+
+                        // Backward operation cannot be the first operation.
+                        if (operationCase < 0 && previous.intermediatePaths.Count == 1 &&
+                            previous.intermediatePaths[0].Count == 0) continue;
+
+                        // 이전 단계에서 최적이라고 알려진 모든 경로를 고려
+                        foreach (var path in previous.intermediatePaths)
+                        {
+                            List<int> operations = new List<int>(path);
+
+                            RhythmPattern backwardRP, forwardRP;
+                            int cCost, dCost = INVALID_COST;
+                            List<OperationInfo> backwardOps = new List<OperationInfo>();
+                            List<OperationInfo> forwardOps = new List<OperationInfo>();
+                            k = i;
+                            l = j;
+                            bool pass = false;
+
+                            // 1. 지금 수행할 연산이 수행 가능한 연산인지 확인하고 비용 계산
+                            if (isCurrentOpForward)
+                            {
+                                forwardRP = Copy(other, j - 1);
+                                if (forwardRP.PerformOperation(currentOp.Inverse()) == INVALID_COST)
+                                {
+                                    pass = true;
+                                }
+                                dCost = forwardRP.PerformOperation(currentOp);
+                                if (dCost == INVALID_COST)
+                                {
+                                    pass = true;
+                                }
+                            }
+                            else
+                            {
+                                backwardRP = Copy(this, i - 1);
+                                dCost = backwardRP.PerformOperation(currentOp);
+                                if (dCost == INVALID_COST)
+                                {
+                                    pass = true;
+                                }
+                            }
+                            //currentOp.Print(false);
+                            //Console.WriteLine(dCost);
+                            // dCost는 현재 단계(d_i,j)에서 마지막으로 수행할 연산의 비용이 된다.
+
+                            if (!pass)
+                            {
+                                // 2. 지난 연산들 중 다시 수행해야 하는 연산들을 찾아, 다시 수행할 순서대로 정렬
+
+                                // 지금 수행할 연산도 operations에 추가
+                                operations.Add(operationCase);
+
+                                for (int m = operations.Count - 1; m >= 0; m--)
+                                {
+                                    int op = operations[m];
+                                    if (op < 0)
+                                    {
+                                        // 역방향 연산
+                                        backwardOps.Add(new OperationInfo(op, this.GetNoteByIndex(k - 1), other.GetNoteByIndex(l - 1)));
+                                        switch (op)
+                                        {
+                                            case -1:
+                                                k--;
+                                                break;
+                                            case -2:
+                                                l--;
+                                                break;
+                                            case -3:
+                                                k--;
+                                                l--;
+                                                break;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // 정방향 연산
+                                        forwardOps.Insert(0, new OperationInfo(op, this.GetNoteByIndex(k - 1), other.GetNoteByIndex(l - 1)));
+                                        switch (op)
+                                        {
+                                            case 1:
+                                                k--;
+                                                break;
+                                            case 2:
+                                                l--;
+                                                break;
+                                            case 3:
+                                                k--;
+                                                l--;
+                                                break;
+                                        }
+                                    }
+
+                                    if (!(op == -1 || op == 2))
+                                    {
+                                        // 이 연산이 역방향 delete도 아니고 정방향 insert도 아닌 경우
+                                        // 여기까지만 비용을 재계산하면 됨 (더 전의 연산들을 확인하지 않아도 됨)
+                                        break;
+                                    }
+                                }
+
+                                // 3. 연산을 적용하는 순간의 리듬 패턴 환경 재구성
+                                backwardRP = Copy(this, i - 1);
+                                forwardRP = Copy(other, j - 1);
+                                for (int m = forwardOps.Count - 1; m >= 0; m--)
+                                {
+                                    // 목표 리듬 패턴 상태에서 정방향 연산들의 역연산들을 취함
+                                    if (forwardRP.PerformOperation(forwardOps[m].Inverse()) == INVALID_COST)
+                                    {
+                                        Console.WriteLine("RhythmPattern Distance() Error: How it is possible?");
+                                    }
+                                }
+
+                                // 4. 연산 비용 재계산
+                                cCost = 0;
+                                for (int m = 0; m < backwardOps.Count; m++)
+                                {
+                                    cCost += backwardRP.PerformOperation(backwardOps[m]);
+                                    if (cCost < 0 || cCost >= INVALID_COST) cCost = INVALID_COST;
+                                }
+                                for (int m = 0; m < forwardOps.Count; m++)
+                                {
+                                    cCost += forwardRP.PerformOperation(forwardOps[m]);
+                                    if (cCost < 0 || cCost >= INVALID_COST) cCost = INVALID_COST;
+                                }
+                                cCost -= dCost;
+                                if (cCost < 0 || cCost >= INVALID_COST) cCost = INVALID_COST;
+
+                                // cCost는 현재 단계(d_i,j)에서 마지막으로 수행할 연산을 제외하고
+                                // 다시 수행해야 할 이전 연산들의 비용의 합이 된다.
+
+                                // 5. 최적 비용 계산을 위해 지금 계산한 비용 기록
+                                if (cCost != INVALID_COST && dCost != INVALID_COST)
+                                {
+                                    costs.Add(new DistanceTable(previous.intermediateDistance + cCost,
+                                        new List<List<int>>() { new List<int>(operations) },
+                                        previous.intermediateDistance + cCost + dCost,
+                                        new List<int>(operations),
+                                        dCost,
+                                        false));
                                 }
                             }
                         }
@@ -1034,7 +1323,8 @@ namespace ChordingCoding.SFX
                                     new List<List<int>>() { new List<int>(operations) },
                                     previous.finalDistance + dCost,
                                     new List<int>(operations),
-                                    dCost));
+                                    dCost,
+                                    true));
                             }
                         }
                     }
@@ -1043,34 +1333,67 @@ namespace ChordingCoding.SFX
                     #region 현재 단계의 연산 결과(d_i,j) 기록
 
                     distanceTable[i][j] = new DistanceTable(INVALID_COST, new List<List<int>>(), INVALID_COST, null);
+                    //Console.WriteLine();
+                    //Console.WriteLine();
+                    //Console.WriteLine("costs.Count = " + costs.Count);
 
                     // 최솟값을 가지는 모든 c들(argmin)을 구해서 하나의 DistanceTable로 만든다.
                     // 최솟값은 iDistance로 저장되고, 각 경로들은 Dictionary로 묶여서 iPaths로 저장된다. 
                     foreach (DistanceTable c in costs)
                     {
                         // Overflow means there is an invalid operation.
-                        if (c.intermediateDistance < distanceTable[i][j].intermediateDistance &&
-                            c.intermediateDistance >= 0)
+
+                        if (!c.isLastOpBDOrFI)
                         {
-                            distanceTable[i][j].intermediateDistance = c.intermediateDistance;
-                            distanceTable[i][j].intermediatePaths = c.intermediatePaths;
+                            if (c.intermediateDistance < distanceTable[i][j].intermediateDistance &&
+                                c.intermediateDistance >= 0 &&
+                                c.intermediateDistance < INVALID_COST)
+                            {
+                                distanceTable[i][j].intermediateDistance = c.intermediateDistance;
+                                distanceTable[i][j].intermediatePaths = c.intermediatePaths;
+                                distanceTable[i][j].finalDistance = c.finalDistance;
+                                distanceTable[i][j].finalPath = c.finalPath;
+                                distanceTable[i][j].lastOperationCost = c.lastOperationCost;
+                            }
+                            else if (c.intermediateDistance == distanceTable[i][j].intermediateDistance &&
+                                c.intermediateDistance >= 0 &&
+                                c.intermediateDistance < INVALID_COST)
+                            {
+                                distanceTable[i][j].intermediatePaths.Add(c.intermediatePaths[0]);
+                                distanceTable[i][j].finalDistance = c.finalDistance;
+                                distanceTable[i][j].finalPath = c.finalPath;
+                                distanceTable[i][j].lastOperationCost = c.lastOperationCost;
+                            }
                         }
-                        else if (c.intermediateDistance == distanceTable[i][j].intermediateDistance &&
-                            c.intermediateDistance >= 0)
+                        else
                         {
-                            distanceTable[i][j].intermediatePaths.Add(c.intermediatePaths[0]);
+                            // TODO 마지막에 수행한 연산이 정방향 insert 또는 역방향 delete인 경우,
+                            // 어떻게 계산 결과를 가지치기하거나 반영할지 생각해서 구현
+                            if (c.intermediateDistance <= distanceTable[i][j].intermediateDistance &&
+                                c.finalDistance <= oldDistanceTable[i][j].finalDistance &&
+                                c.intermediateDistance >= 0 &&
+                                c.intermediateDistance < INVALID_COST &&)
+                            {
+                                distanceTable[i][j].tempPaths.Add(c.intermediatePaths[0]);
+                                distanceTable[i][j].tempDistance = c.intermediateDistance;
+                                distanceTable[i][j].finalDistance = c.finalDistance;
+                                distanceTable[i][j].finalPath = c.finalPath;
+                                distanceTable[i][j].lastOperationCost = c.lastOperationCost;
+                            }
                         }
 
                         if (i == lenThis && j == lenOther &&
                             c.finalDistance < distanceTable[i][j].finalDistance &&
                             c.finalDistance >= 0)
                         {
+                            distanceTable[i][j].intermediateDistance = c.intermediateDistance;
+                            distanceTable[i][j].intermediatePaths = c.intermediatePaths;
                             distanceTable[i][j].finalDistance = c.finalDistance;
                             distanceTable[i][j].finalPath = c.finalPath;
                             distanceTable[i][j].lastOperationCost = c.lastOperationCost;
                         }
                     }
-                    Console.Write(distanceTable[i][j].lastOperationCost + "\t");  // TODO
+                    Console.Write(distanceTable[i][j].intermediateDistance + "\t");  // TODO
                     #endregion
                 }
                 Console.WriteLine();                                // TODO
@@ -1251,6 +1574,7 @@ namespace ChordingCoding.SFX
             return node.Value;
         }
 
+        /*
         private List<float> GetPitchClusterList()
         {
             List<float> ret = new List<float>();
@@ -1263,6 +1587,7 @@ namespace ChordingCoding.SFX
             ret.Sort();
             return ret;
         }
+        */
 
         /// <summary>
         /// 리듬 패턴 거리 계산 시 이전의 최적 연산 비용
@@ -1309,10 +1634,20 @@ namespace ChordingCoding.SFX
             /// </summary>
             public List<int> finalPath { get; set; }
 
+            public int tempDistance { get; set; }
+            public List<List<int>> tempPaths { get; set; }
+
             /// <summary>
             /// d_i,j의 마지막 음표에 대해 수행한 연산의 비용
             /// </summary>
             public int lastOperationCost = INVALID_COST;
+
+            /// <summary>
+            /// d_i,j의 마지막 음표에 대해 수행한 연산이
+            /// 역방향 Delete이거나 정방향 Insert이면 true,
+            /// 그 외의 연산이면 false를 가집니다.
+            /// </summary>
+            public bool isLastOpBDOrFI = false;
 
             /// <summary>
             /// 최종 결과를 저장할 때 사용합니다.
@@ -1322,13 +1657,15 @@ namespace ChordingCoding.SFX
             /// <param name="fDistance"></param>
             /// <param name="fPath"></param>
             public DistanceTable(int iDistance, List<List<int>> iPaths,
-                int fDistance, List<int> fPath, int lastOperationCost = INVALID_COST)
+                int fDistance, List<int> fPath,
+                int lastOperationCost = INVALID_COST, bool isLastOpBDOrFI = false)
             {
                 this.intermediateDistance = iDistance;
                 this.intermediatePaths = iPaths;
                 this.finalDistance = fDistance;
                 this.finalPath = fPath;
                 this.lastOperationCost = lastOperationCost;
+                this.isLastOpBDOrFI = isLastOpBDOrFI;
             }
         }
 
@@ -1488,12 +1825,13 @@ namespace ChordingCoding.SFX
             /// <summary>
             /// 이 연산을 콘솔에 보기 좋게 출력합니다.
             /// </summary>
-            public void Print()
+            public void Print(bool printCost = true)
             {
                 string s = type.ToString();
                 if (type == Type.Invalid)
                 {
-                    s += "(): " + INVALID_COST;
+                    s += "()";
+                    if (printCost) s += ": " + INVALID_COST;
                     Console.WriteLine(s);
                     return;
                 }
@@ -1505,13 +1843,15 @@ namespace ChordingCoding.SFX
                     {
                         s += "] -> [";
                         s += noteAfterOp.OnsetPosition + ", " + noteAfterOp.PitchCluster;
-                        s += "]): " + cost;
+                        s += "])";
+                        if (printCost) s += ": " + cost;
                         Console.WriteLine(s);
                         return;
                     }
                     else
                     {
-                        s += "]): " + cost;
+                        s += "])";
+                        if (printCost) s += ": " + cost;
                         Console.WriteLine(s);
                         return;
                     }
@@ -1519,7 +1859,8 @@ namespace ChordingCoding.SFX
                 else
                 {
                     s += noteAfterOp.OnsetPosition + ", " + noteAfterOp.PitchCluster;
-                    s += "]): " + cost;
+                    s += "])";
+                    if (printCost) s += ": " + cost;
                     Console.WriteLine(s);
                     return;
                 }

@@ -756,9 +756,9 @@ namespace ChordingCoding.SFX
                 {
                     if (i == 0 && j == 0)
                     {
-                        var list = new List<List<int>>
+                        var list = new List<KeyValuePair<List<int>, int>>
                         {
-                            { new List<int>() }
+                            { new KeyValuePair<List<int>, int> (new List<int>(), 0) }
                         };
                         distanceTable[i][j] = new DistanceTable(0, list, 0, new List<int>(), 0);
                         Console.Write(distanceTable[i][j].intermediateDistance + "\t");     // TODO
@@ -820,13 +820,13 @@ namespace ChordingCoding.SFX
                         DistanceTable previous = distanceTable[k][l];
 
                         // Backward operation cannot be the first operation.
-                        if (operationCase < 0 && previous.intermediatePaths.Count == 1 &&
-                            previous.intermediatePaths[0].Count == 0) continue;
+                        if (operationCase < 0 && previous.fixedPaths.Count == 1 &&
+                            previous.fixedPaths[0].Key.Count == 0) continue;
 
                         // 이전 단계에서 최적이라고 알려진 모든 경로를 고려
-                        foreach (var path in previous.intermediatePaths) 
+                        foreach (var path in previous.fixedPaths) 
                         {
-                            List<int> operations = new List<int>(path);
+                            List<int> operations = new List<int>(path.Key);
 
                             RhythmPattern backwardRP, forwardRP;
                             int cCost, dCost = INVALID_COST;
@@ -951,9 +951,10 @@ namespace ChordingCoding.SFX
                                 // 5. 최적 비용 계산을 위해 지금 계산한 비용 기록
                                 if (cCost != INVALID_COST && dCost != INVALID_COST)
                                 {
-                                    costs.Add(new DistanceTable(previous.intermediateDistance + cCost,
-                                        new List<List<int>>() { new List<int>(operations) },
-                                        previous.intermediateDistance + cCost + dCost,
+                                    costs.Add(new DistanceTable(previous.fixedDistance + cCost,
+                                        new List<KeyValuePair<List<int>, int>>() { new KeyValuePair<List<int>, int>
+                                            (new List<int>(operations), previous.fixedDistance + cCost) },
+                                        previous.fixedDistance + cCost + dCost,
                                         new List<int>(operations),
                                         dCost,
                                         false));
@@ -965,7 +966,7 @@ namespace ChordingCoding.SFX
 
                     #region 현재 단계의 연산 결과(d_i,j) 기록
 
-                    distanceTable[i][j] = new DistanceTable(INVALID_COST, new List<List<int>>(), INVALID_COST, null);
+                    distanceTable[i][j] = new DistanceTable(INVALID_COST, new List<KeyValuePair<List<int>, int>>(), INVALID_COST, null);
                     //Console.WriteLine();
                     //Console.WriteLine();
                     //Console.WriteLine("costs.Count = " + costs.Count);
@@ -975,21 +976,22 @@ namespace ChordingCoding.SFX
                     foreach (DistanceTable c in costs)
                     {
                         // Overflow means there is an invalid operation.
-                        if (c.intermediateDistance < distanceTable[i][j].intermediateDistance &&
-                            c.intermediateDistance >= 0 &&
-                            c.intermediateDistance < INVALID_COST)
+                        if (c.fixedDistance < distanceTable[i][j].fixedDistance &&
+                            c.fixedDistance >= 0 &&
+                            c.fixedDistance < INVALID_COST)
                         {
-                            distanceTable[i][j].intermediateDistance = c.intermediateDistance;
-                            distanceTable[i][j].intermediatePaths = c.intermediatePaths;
+                            distanceTable[i][j].fixedDistance = c.fixedDistance;
+                            distanceTable[i][j].fixedPaths = c.fixedPaths;
+                            distanceTable[i][j].intermediateDistance = c.fixedDistance;
                             distanceTable[i][j].finalDistance = c.finalDistance;
                             distanceTable[i][j].finalPath = c.finalPath;
                             distanceTable[i][j].lastOperationCost = c.lastOperationCost;
                         }
-                        else if (c.intermediateDistance == distanceTable[i][j].intermediateDistance &&
-                            c.intermediateDistance >= 0 &&
-                            c.intermediateDistance < INVALID_COST)
+                        else if (c.fixedDistance == distanceTable[i][j].fixedDistance &&
+                            c.fixedDistance >= 0 &&
+                            c.fixedDistance < INVALID_COST)
                         {
-                            distanceTable[i][j].intermediatePaths.Add(c.intermediatePaths[0]);
+                            distanceTable[i][j].fixedPaths.Add(c.fixedPaths[0]);
                             distanceTable[i][j].finalDistance = c.finalDistance;
                             distanceTable[i][j].finalPath = c.finalPath;
                             distanceTable[i][j].lastOperationCost = c.lastOperationCost;
@@ -999,8 +1001,9 @@ namespace ChordingCoding.SFX
                             c.finalDistance < distanceTable[i][j].finalDistance &&
                             c.finalDistance >= 0)
                         {
-                            distanceTable[i][j].intermediateDistance = c.intermediateDistance;
-                            distanceTable[i][j].intermediatePaths = c.intermediatePaths;
+                            distanceTable[i][j].fixedDistance = c.fixedDistance;
+                            distanceTable[i][j].fixedPaths = c.fixedPaths;
+                            distanceTable[i][j].intermediateDistance = c.fixedDistance;
                             distanceTable[i][j].finalDistance = c.finalDistance;
                             distanceTable[i][j].finalPath = c.finalPath;
                             distanceTable[i][j].lastOperationCost = c.lastOperationCost;
@@ -1022,10 +1025,12 @@ namespace ChordingCoding.SFX
                 for (int j = 0; j <= lenOther; j++)
                 {
                     DistanceTable dt = distanceTable[i][j];
-                    temp.Add(new DistanceTable(dt.intermediateDistance, null, dt.finalDistance, null, dt.lastOperationCost, dt.isLastOpBDOrFI));
+                    temp.Add(new DistanceTable(dt.fixedDistance, null, dt.finalDistance, dt.finalPath, dt.lastOperationCost, dt.isLastOpBDOrFI));
                 }
                 oldDistanceTable.Add(temp);
             }
+
+            Console.WriteLine("---------------------------------------------------------------------------");
 
             // 이번에는 6가지 연산 모두를 가지고
             // distanceTable 다시 계산 (시간 복잡도 O(2^n))
@@ -1035,11 +1040,11 @@ namespace ChordingCoding.SFX
                 {
                     if (i == 0 && j == 0)
                     {
-                        var list = new List<List<int>>
+                        var list = new List<KeyValuePair<List<int>, int>>
                         {
-                            { new List<int>() }
+                            { new KeyValuePair<List<int>, int> (new List<int>(), 0) }
                         };
-                        distanceTable[i][j] = new DistanceTable(0, list, 0, new List<int>(), 0);
+                        distanceTable[i][j] = new DistanceTable(0, list, 0, 0, new List<int>(), 0);
                         Console.Write(distanceTable[i][j].intermediateDistance + "\t");     // TODO
                         continue;
                     }
@@ -1099,13 +1104,13 @@ namespace ChordingCoding.SFX
                         DistanceTable previous = distanceTable[k][l];
 
                         // Backward operation cannot be the first operation.
-                        if (operationCase < 0 && previous.intermediatePaths.Count == 1 &&
-                            previous.intermediatePaths[0].Count == 0) continue;
+                        if (operationCase < 0 && previous.fixedPaths.Count == 1 &&
+                            previous.fixedPaths[0].Key.Count == 0) continue;
 
                         // 이전 단계에서 최적이라고 알려진 모든 경로를 고려
-                        foreach (var path in previous.intermediatePaths)
+                        foreach (var path in previous.fixedPaths)
                         {
-                            List<int> operations = new List<int>(path);
+                            List<int> operations = new List<int>(path.Key);
 
                             RhythmPattern backwardRP, forwardRP;
                             int cCost, dCost = INVALID_COST;
@@ -1230,9 +1235,12 @@ namespace ChordingCoding.SFX
                                 // 5. 최적 비용 계산을 위해 지금 계산한 비용 기록
                                 if (cCost != INVALID_COST && dCost != INVALID_COST)
                                 {
-                                    costs.Add(new DistanceTable(previous.intermediateDistance + cCost,
-                                        new List<List<int>>() { new List<int>(operations) },
-                                        previous.intermediateDistance + cCost + dCost,
+                                    // fixedDistance와 intermediateDistance가 서로 같음!
+                                    costs.Add(new DistanceTable(previous.fixedDistance + cCost,
+                                        new List<KeyValuePair<List<int>, int>>() { new KeyValuePair<List<int>, int>
+                                            (new List<int>(operations), previous.fixedDistance + cCost) },
+                                        previous.fixedDistance + cCost,
+                                        previous.fixedDistance + cCost + dCost,
                                         new List<int>(operations),
                                         dCost,
                                         false));
@@ -1289,12 +1297,12 @@ namespace ChordingCoding.SFX
                         DistanceTable previous = distanceTable[k][l];
 
                         // Backward operation cannot be the first operation.
-                        if (operationCase < 0 && previous.intermediatePaths.Count == 1 &&
-                            previous.intermediatePaths[0].Count == 0) continue;
+                        if (operationCase < 0 && previous.fixedPaths.Count == 1 &&
+                            previous.fixedPaths[0].Key.Count == 0) continue;
 
-                        foreach (var path in previous.intermediatePaths)
+                        foreach (var path in previous.fixedPaths)
                         {
-                            List<int> operations = new List<int>(path);
+                            List<int> operations = new List<int>(path.Key);
 
                             RhythmPattern tempRP;
                             int dCost = INVALID_COST;
@@ -1318,9 +1326,12 @@ namespace ChordingCoding.SFX
                             // 2. 최적 비용 계산을 위해 지금 계산한 비용 기록
                             if (dCost != INVALID_COST)
                             {
+                                // fixedDistance와 intermediateDistance가 서로 다름!
                                 operations.Add(operationCase);
-                                costs.Add(new DistanceTable(previous.intermediateDistance,
-                                    new List<List<int>>() { new List<int>(operations) },
+                                costs.Add(new DistanceTable(previous.fixedDistance,
+                                    new List<KeyValuePair<List<int>, int>>() { new KeyValuePair<List<int>, int>
+                                        (new List<int>(operations), previous.fixedDistance) },
+                                    previous.finalDistance,
                                     previous.finalDistance + dCost,
                                     new List<int>(operations),
                                     dCost,
@@ -1332,7 +1343,8 @@ namespace ChordingCoding.SFX
 
                     #region 현재 단계의 연산 결과(d_i,j) 기록
 
-                    distanceTable[i][j] = new DistanceTable(INVALID_COST, new List<List<int>>(), INVALID_COST, null);
+                    distanceTable[i][j] = new DistanceTable(INVALID_COST, new List<KeyValuePair<List<int>, int>>(), INVALID_COST,
+                        oldDistanceTable[i][j].finalDistance, oldDistanceTable[i][j].finalPath);
                     //Console.WriteLine();
                     //Console.WriteLine();
                     //Console.WriteLine("costs.Count = " + costs.Count);
@@ -1343,51 +1355,23 @@ namespace ChordingCoding.SFX
                     {
                         // Overflow means there is an invalid operation.
 
-                        if (!c.isLastOpBDOrFI)
+                        if (c.intermediateDistance <= oldDistanceTable[i][j].fixedDistance &&
+                            c.fixedDistance >= 0 &&
+                            c.fixedDistance < INVALID_COST)
                         {
-                            if (c.intermediateDistance < distanceTable[i][j].intermediateDistance &&
-                                c.intermediateDistance >= 0 &&
-                                c.intermediateDistance < INVALID_COST)
-                            {
-                                distanceTable[i][j].intermediateDistance = c.intermediateDistance;
-                                distanceTable[i][j].intermediatePaths = c.intermediatePaths;
-                                distanceTable[i][j].finalDistance = c.finalDistance;
-                                distanceTable[i][j].finalPath = c.finalPath;
-                                distanceTable[i][j].lastOperationCost = c.lastOperationCost;
-                            }
-                            else if (c.intermediateDistance == distanceTable[i][j].intermediateDistance &&
-                                c.intermediateDistance >= 0 &&
-                                c.intermediateDistance < INVALID_COST)
-                            {
-                                distanceTable[i][j].intermediatePaths.Add(c.intermediatePaths[0]);
-                                distanceTable[i][j].finalDistance = c.finalDistance;
-                                distanceTable[i][j].finalPath = c.finalPath;
-                                distanceTable[i][j].lastOperationCost = c.lastOperationCost;
-                            }
-                        }
-                        else
-                        {
-                            // TODO 마지막에 수행한 연산이 정방향 insert 또는 역방향 delete인 경우,
-                            // 어떻게 계산 결과를 가지치기하거나 반영할지 생각해서 구현
-                            if (c.intermediateDistance <= distanceTable[i][j].intermediateDistance &&
-                                c.finalDistance <= oldDistanceTable[i][j].finalDistance &&
-                                c.intermediateDistance >= 0 &&
-                                c.intermediateDistance < INVALID_COST &&)
-                            {
-                                distanceTable[i][j].tempPaths.Add(c.intermediatePaths[0]);
-                                distanceTable[i][j].tempDistance = c.intermediateDistance;
-                                distanceTable[i][j].finalDistance = c.finalDistance;
-                                distanceTable[i][j].finalPath = c.finalPath;
-                                distanceTable[i][j].lastOperationCost = c.lastOperationCost;
-                            }
+                            distanceTable[i][j].fixedPaths.Add(c.fixedPaths[0]);
+                            distanceTable[i][j].intermediateDistance = c.intermediateDistance;
+                            distanceTable[i][j].finalDistance = c.finalDistance;
+                            distanceTable[i][j].finalPath = c.finalPath;
+                            distanceTable[i][j].lastOperationCost = c.lastOperationCost;
                         }
 
                         if (i == lenThis && j == lenOther &&
                             c.finalDistance < distanceTable[i][j].finalDistance &&
                             c.finalDistance >= 0)
                         {
-                            distanceTable[i][j].intermediateDistance = c.intermediateDistance;
-                            distanceTable[i][j].intermediatePaths = c.intermediatePaths;
+                            distanceTable[i][j].fixedDistance = c.fixedDistance;
+                            distanceTable[i][j].fixedPaths = c.fixedPaths;
                             distanceTable[i][j].finalDistance = c.finalDistance;
                             distanceTable[i][j].finalPath = c.finalPath;
                             distanceTable[i][j].lastOperationCost = c.lastOperationCost;
@@ -1604,16 +1588,16 @@ namespace ChordingCoding.SFX
             /// 연산들의 비용의 합입니다.
             /// 따라서 한 번 최적 값이 계산된 후에는 절대로 바뀔 일이 없습니다.
             /// </summary>
-            public int intermediateDistance { get; set; }
+            public int fixedDistance { get; set; }
 
             /// <summary>
-            /// 다음 연산 비용을 계산할 때 필요한 최적 경로들의 목록.
-            /// 같은 최적 비용을 갖는 서로 다른 경로를 모두 보관합니다.
-            /// 최적 경로는 지금까지 적용한 연산 종류와 순서를 나타낸 int 목록인데, 목록 안의 값은
+            /// (다음 연산 비용을 계산할 때 필요한 최적 경로 후보, 이 경로의 fixedDistance)들의 목록.
+            /// 알려진 최적 비용보다 작은 intermediateDistance를 갖는 서로 다른 경로를 모두 보관합니다.
+            /// 최적 경로 후보는 지금까지 적용한 연산 종류와 순서를 나타낸 int 목록인데, 목록 안의 값은
             /// 정방향 Delete이면 1, 정방향 Insert이면 2, 정방향 Move이면 3,
             /// 역방향 Delete이면 -1, 역방향 Insert이면 -2, 역방향 Move이면 -3을 가집니다.
             /// </summary>
-            public List<List<int>> intermediatePaths { get; set; }
+            public List<KeyValuePair<List<int>, int>> fixedPaths { get; set; }
             // 최적 경로(int 목록)의 첫 번째 값은 항상 양수 (첫 번째 연산이라 순서를 정의할 수 없음)
             // 정방향: 이전 연산들을 먼저 모두 수행한 후에 마지막 음표의 연산을 수행하는 순서
             // 역방향: 마지막 음표의 연산을 가장 먼저 수행한 후에 이전 연산들을 모두 수행하는 순서
@@ -1634,8 +1618,12 @@ namespace ChordingCoding.SFX
             /// </summary>
             public List<int> finalPath { get; set; }
 
-            public int tempDistance { get; set; }
-            public List<List<int>> tempPaths { get; set; }
+            /// <summary>
+            /// 연산 과정에서 필요한 중간 거리.
+            /// 연산을 적용하는 순간에 직후 음표가 존재하는지와 무관하게
+            /// d_i,j의 마지막 음표를 제외한 모든 음표에 적용하는 연산 비용의 합의 최적입니다.
+            /// </summary>
+            public int intermediateDistance { get; set; }
 
             /// <summary>
             /// d_i,j의 마지막 음표에 대해 수행한 연산의 비용
@@ -1651,19 +1639,43 @@ namespace ChordingCoding.SFX
 
             /// <summary>
             /// 최종 결과를 저장할 때 사용합니다.
+            /// 특히 정방향 insert와 역방향 delete를 고려하지 않을 때 사용합니다.
             /// </summary>
-            /// <param name="iDistance"></param>
-            /// <param name="iPaths"></param>
-            /// <param name="fDistance"></param>
-            /// <param name="fPath"></param>
-            public DistanceTable(int iDistance, List<List<int>> iPaths,
-                int fDistance, List<int> fPath,
+            /// <param name="fixedDistance"></param>
+            /// <param name="fixedPaths"></param>
+            /// <param name="finalDistance"></param>
+            /// <param name="finalPath"></param>
+            public DistanceTable(int fixedDistance, List<KeyValuePair<List<int>, int>> fixedPaths,
+                int finalDistance, List<int> finalPath,
                 int lastOperationCost = INVALID_COST, bool isLastOpBDOrFI = false)
             {
-                this.intermediateDistance = iDistance;
-                this.intermediatePaths = iPaths;
-                this.finalDistance = fDistance;
-                this.finalPath = fPath;
+                this.fixedDistance = fixedDistance;
+                this.fixedPaths = fixedPaths;
+                this.intermediateDistance = fixedDistance;
+                this.finalDistance = finalDistance;
+                this.finalPath = finalPath;
+                this.lastOperationCost = lastOperationCost;
+                this.isLastOpBDOrFI = isLastOpBDOrFI;
+            }
+
+            /// <summary>
+            /// 최종 결과를 저장할 때 사용합니다.
+            /// 특히 모든 연산을 고려할 때 사용합니다.
+            /// </summary>
+            /// <param name="fixedDistance"></param>
+            /// <param name="fixedPaths"></param>
+            /// <param name="finalDistance"></param>
+            /// <param name="finalPath"></param>
+            public DistanceTable(int fixedDistance, List<KeyValuePair<List<int>, int>> fixedPaths,
+                int intermediateDistance,
+                int finalDistance, List<int> finalPath,
+                int lastOperationCost = INVALID_COST, bool isLastOpBDOrFI = false)
+            {
+                this.fixedDistance = fixedDistance;
+                this.fixedPaths = fixedPaths;
+                this.intermediateDistance = intermediateDistance;
+                this.finalDistance = finalDistance;
+                this.finalPath = finalPath;
                 this.lastOperationCost = lastOperationCost;
                 this.isLastOpBDOrFI = isLastOpBDOrFI;
             }

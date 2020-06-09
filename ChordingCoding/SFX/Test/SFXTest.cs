@@ -37,9 +37,8 @@ namespace ChordingCoding.SFX.Test
         public SFXTest()
         {
             //ChordRecognitionTest();
-            //RhythmPatternEditTest();
-            //RhythmPatternEditTest2();
-            RhythmPatternDistanceTest();
+            RhythmPatternEditTest();
+            //RhythmPatternDistanceTest();
         }
 
         private void ChordRecognitionTest()
@@ -252,318 +251,281 @@ namespace ChordingCoding.SFX.Test
         private void RhythmPatternEditTest()
         {
             Console.WriteLine("RhythmPattern Edit Test");
-            RhythmPattern rp = new RhythmPattern();
+            RhythmPattern rp = new RhythmPattern(0);
             int cost = 0;
-            cost += rp.InsertNote(new RhythmPatternNote(0, 0));
+            cost += rp.InsertNote(rp.noteList.Count, new RhythmPatternNote(16, 0));
             Console.WriteLine(cost);
-            cost += rp.InsertNote(16, -1);
+            cost += rp.InsertNote(rp.noteList.Count, 16, -1);
             Console.WriteLine(cost);
-            cost += rp.InsertNote(new RhythmPatternNote(32, -2));
+            cost += rp.InsertNote(rp.noteList.Count, new RhythmPatternNote(8, -2));
             Console.WriteLine(cost);
-            cost += rp.InsertNote(40, -1);
+            cost += rp.InsertNote(rp.noteList.Count, 8, -1);
             Console.WriteLine(cost);
-            cost += rp.InsertNote(new RhythmPatternNote(48, 0));
+            cost += rp.InsertNote(rp.noteList.Count, new RhythmPatternNote(8, 0));
             Console.WriteLine(cost);
-            cost += rp.InsertNote(56, -4);
+            cost += rp.InsertNote(rp.noteList.Count, 8, -4);
             Console.WriteLine(cost);
             rp.Print();
 
             cost = 0;
-            cost += rp.MoveNote(56, new RhythmPatternNote(56, 4));
+            cost += rp.ReplaceNote(5, new RhythmPatternNote(8, 4));
             Console.WriteLine(cost);
-            cost += rp.MoveNote(48, 48, 3);
+            cost += rp.ReplaceNote(4, 8, 3);
             Console.WriteLine(cost);
-            cost += rp.MoveNote(40, new RhythmPatternNote(40, 0));
+            cost += rp.ReplaceNote(3, new RhythmPatternNote(8, 0));
             Console.WriteLine(cost);
             rp.Print();
 
             Console.WriteLine("(1)");
             // 음표와 음표 사이에 삽입
-            cost = rp.InsertNote(new RhythmPatternNote(24, rp.GetNewClusterNumber(1)));
+            cost = rp.InsertNote(2, new RhythmPatternNote(16, rp.GetNewClusterNumber(1)));
             Console.WriteLine(cost);
             rp.Print();
 
             Console.WriteLine("(2)");
-            // 이미 음표가 있는 위치에 삽입
-            cost = rp.InsertNote(new RhythmPatternNote(24, rp.GetNewClusterNumber(3)));
+            // 잘못된 인덱스에 삽입
+            cost = rp.InsertNote(10, new RhythmPatternNote(24, rp.GetNewClusterNumber(3)));
             Console.WriteLine(cost);
             rp.Print();
 
             Console.WriteLine("(3)");
-            // 인덱스는 유지하고 onset을 바꾸는 옮기기
-            cost = rp.MoveNote(0, new RhythmPatternNote(8, rp.GetNewClusterNumber(0)));
+            // 인덱스는 유지하고 길이를 바꾸는 교체 (맨 앞 음표라서 클러스터 순위 변경 비용이 없음)
+            cost = rp.ReplaceNote(0, new RhythmPatternNote(4, rp.GetNewClusterNumber(0)));
             Console.WriteLine(cost);
             rp.Print();
 
             Console.WriteLine("(4)");
             // 맨 앞에 삽입
-            cost = rp.InsertNote(new RhythmPatternNote(0, 1));
+            cost = rp.InsertNote(0, new RhythmPatternNote(4, 1));
             Console.WriteLine(cost);
             rp.Print();
 
             Console.WriteLine("(5)");
             // 직전 음과 같은 음 높이를 갖는 음표 삽입
-            cost = rp.InsertNote(new RhythmPatternNote(4, 1));
+            cost = rp.InsertNote(1, new RhythmPatternNote(4, 1));
             Console.WriteLine(cost);
             rp.Print();
 
             Console.WriteLine("(6)");
-            // 인덱스를 넘어서서 옮기기
-            cost = rp.MoveNote(0, new RhythmPatternNote(7, 0));
+            // 없는 음표로 교체
+            cost = rp.ReplaceNote(0, new RhythmPatternNote(0, 0));
             Console.WriteLine(cost);
             rp.Print();
 
             Console.WriteLine("(7)");
-            // 없는 음표를 옮기기 1
-            cost = rp.MoveNote(0, new RhythmPatternNote(1, 3));
+            // 없는 음표를 교체 1
+            cost = rp.ReplaceNote(-1, new RhythmPatternNote(1, 3));
             Console.WriteLine(cost);
             rp.Print();
 
             Console.WriteLine("(8)");
-            // 없는 음표를 옮기기 2
-            cost = rp.MoveNote(1, new RhythmPatternNote(1, 3));
+            // 없는 음표를 교체 2
+            cost = rp.ReplaceNote(10, new RhythmPatternNote(1, 3));
             Console.WriteLine(cost);
             rp.Print();
 
             Console.WriteLine("(9)");
-            // 같은 음표로 옮기기
-            cost = rp.MoveNote(0, new RhythmPatternNote(0, 1));
+            // 같은 음표로 교체
+            cost = rp.ReplaceNote(0, new RhythmPatternNote(4, 1));
             Console.WriteLine(cost);
             rp.Print();
 
             Console.WriteLine("(10)");
-            // Onset과 음 높이를 모두 바꾸도록 옮기기 1
-            cost = rp.MoveNote(0, new RhythmPatternNote(1, 3));
+            // 길이와 음 높이를 모두 바꾸도록 교체 1 (맨 앞 음표라서 클러스터 순위 변경 비용이 없음)
+            cost = rp.ReplaceNote(0, new RhythmPatternNote(1, 3));
             Console.WriteLine(cost);
             rp.Print();
 
             Console.WriteLine("(11)");
-            // Onset과 음 높이를 모두 바꾸도록 옮기기 2
-            cost = rp.MoveNote(16, new RhythmPatternNote(15, rp.GetExistingClusterNumber(0)));
+            // 길이와 음 높이를 모두 바꾸도록 교체 2
+            cost = rp.ReplaceNote(3, new RhythmPatternNote(15, rp.GetExistingClusterNumber(0)));
             Console.WriteLine(cost);
             rp.Print();
 
             Console.WriteLine("(12)");
-            // 이웃한 다른 음표와 Onset이 같고 클러스터가 다르도록 옮기기
-            cost = rp.MoveNote(15, new RhythmPatternNote(24, rp.GetExistingClusterNumber(0)));
+            // 직후 음표와 길이가 같고 클러스터가 다르도록 교체 (맨 앞 음표라서 클러스터 순위 변경 비용이 없음)
+            cost = rp.ReplaceNote(2, new RhythmPatternNote(15, rp.GetExistingClusterNumber(1)));
             Console.WriteLine(cost);
             rp.Print();
 
             Console.WriteLine("(13)");
-            // 음 높이 변화를 유지하고 클러스터 번호를 바꾸지만 클러스터 위상을 바꾸지 않도록 옮기기
-            cost = rp.MoveNote(24, 26, rp.GetNewClusterNumber(2));
+            // 음 높이 변화와 길이를 유지하고 클러스터 번호를 바꾸지만 클러스터 순위를 바꾸지 않도록 교체
+            // (기존 클러스터가 사라지지 않음)
+            cost = rp.ReplaceNote(4, 16, -1);
             Console.WriteLine(cost);
             rp.Print();
 
             Console.WriteLine("(14)");
-            // 음 높이 변화는 유지하면서 클러스터 위상만 다르도록 옮기기 (기존 클러스터는 사라짐)
-            cost = rp.MoveNote(26, 26, rp.GetExistingClusterNumber(4));
+            // 음 높이 변화와 길이를 유지하면서 클러스터 번호를 바꾸지만 클러스터 순위를 바꾸지 않도록 교체
+            // (기존 클러스터는 사라짐)
+            cost = rp.ReplaceNote(4, 16, 1);
             Console.WriteLine(cost);
             rp.Print();
 
             Console.WriteLine("(15)");
-            // 중간에 있는 기존 음표 제거
-            cost = rp.DeleteNote(26);
+            // 음 높이 변화는 유지하면서 클러스터 순위만 다르도록 교체
+            cost = rp.ReplaceNote(4, 16, 3);
             Console.WriteLine(cost);
             rp.Print();
 
             Console.WriteLine("(16)");
-            // 맨 끝의 기존 음표 제거
-            cost = rp.DeleteNote(56);
-            Console.WriteLine(cost);
-            rp.Print();
-
-            Console.WriteLine("(17)");
-            // 맨 앞의 기존 음표 제거
-            cost = rp.DeleteNote(1);
-            Console.WriteLine(cost);
-            rp.Print();
-
-            Console.WriteLine("(18)");
-            // 직전 음표와 같은 음을 갖는 음표 제거
-            cost = rp.DeleteNote(15);
-            Console.WriteLine(cost);
-            rp.Print();
-
-            Console.WriteLine("(19)");
-            // 없는 음표 제거
-            cost = rp.DeleteNote(19);
-            Console.WriteLine(cost);
-            rp.Print();
-
-            Console.WriteLine("(20)");
-            // 제거했던 위치에 새로운 음표 삽입
-            cost = rp.InsertNote(15, -4);
-            Console.WriteLine(cost);
-            rp.Print();
-        }
-
-        private void RhythmPatternEditTest2()
-        {
-            Console.WriteLine("RhythmPattern Edit Test 2");
-            RhythmPattern rp = new RhythmPattern();
-            int cost = 0;
-            cost += rp.InsertNote(new RhythmPatternNote(0, 0));
-            Console.WriteLine(cost);
-            cost += rp.InsertNote(16, -1);
-            Console.WriteLine(cost);
-            cost += rp.InsertNote(new RhythmPatternNote(32, -2));
-            Console.WriteLine(cost);
-            cost += rp.InsertNote(40, -1);
-            Console.WriteLine(cost);
-            cost += rp.InsertNote(new RhythmPatternNote(48, 0));
-            Console.WriteLine(cost);
-            cost += rp.InsertNote(56, -4);
-            Console.WriteLine(cost);
-            rp.Print();
-
-            cost = 0;
-            cost += rp.MoveNote(56, new RhythmPatternNote(56, 4));
-            Console.WriteLine(cost);
-            cost += rp.MoveNote(48, 48, 3);
-            Console.WriteLine(cost);
-            cost += rp.MoveNote(40, new RhythmPatternNote(40, 0));
-            Console.WriteLine(cost);
-            rp.Print();
-
-            Console.WriteLine("(1*)");
-            // 음표와 음표 사이에 삽입
-            RhythmPattern.OperationInfo op = new RhythmPattern.OperationInfo(
-                RhythmPattern.OperationInfo.Type.Insert, new RhythmPatternNote(),
-                new RhythmPatternNote(24, rp.GetNewClusterNumber(1)));
-            cost = rp.PerformOperation(op);
-            Console.WriteLine(cost);
-            rp.Print();
-
-            Console.WriteLine("(2*)");
-            // 이미 음표가 있는 위치에 삽입
-            op = new RhythmPattern.OperationInfo(
-                RhythmPattern.OperationInfo.Type.Insert, new RhythmPatternNote(),
-                new RhythmPatternNote(24, rp.GetNewClusterNumber(3)));
-            cost = rp.PerformOperation(op);
-            Console.WriteLine(cost);
-            rp.Print();
-
-            Console.WriteLine("(3*^)");
-            // 인덱스는 유지하고 onset을 바꾸는 옮기기
-            op = new RhythmPattern.OperationInfo(
-                RhythmPattern.OperationInfo.Type.Move,
-                new RhythmPatternNote(8, rp.GetNewClusterNumber(0)), rp.noteList.First.Value);
-            cost = rp.PerformOperation(op.Inverse());
-            Console.WriteLine(cost);
-            rp.Print();
-
-            Console.WriteLine("(4*^)");
-            // 맨 앞에 삽입
-            op = new RhythmPattern.OperationInfo(
-                RhythmPattern.OperationInfo.Type.Delete,
-                new RhythmPatternNote(0, 1), new RhythmPatternNote());
-            cost = rp.PerformOperation(op.Inverse());
-            Console.WriteLine(cost);
-            rp.Print();
-
-            Console.WriteLine("(5)");
-            // 직전 음과 같은 음 높이를 갖는 음표 삽입
-            cost = rp.InsertNote(new RhythmPatternNote(4, 1));
-            Console.WriteLine(cost);
-            rp.Print();
-
-            Console.WriteLine("(6*)");
-            // 인덱스를 넘어서서 옮기기
-            op = new RhythmPattern.OperationInfo(
-                RhythmPattern.OperationInfo.Type.Move, rp.noteList.First.Value,
-                new RhythmPatternNote(7, 0));
-            cost = rp.PerformOperation(op);
-            Console.WriteLine(cost);
-            rp.Print();
-
-            Console.WriteLine("(7)");
-            // 없는 음표를 옮기기 1
-            cost = rp.MoveNote(0, new RhythmPatternNote(1, 3));
-            Console.WriteLine(cost);
-            rp.Print();
-
-            Console.WriteLine("(8)");
-            // 없는 음표를 옮기기 2
-            cost = rp.MoveNote(1, new RhythmPatternNote(1, 3));
-            Console.WriteLine(cost);
-            rp.Print();
-
-            Console.WriteLine("(9)");
-            // 같은 음표로 옮기기
-            cost = rp.MoveNote(0, new RhythmPatternNote(0, 1));
-            Console.WriteLine(cost);
-            rp.Print();
-
-            Console.WriteLine("(10)");
-            // Onset과 음 높이를 모두 바꾸도록 옮기기 1
-            cost = rp.MoveNote(0, new RhythmPatternNote(1, 3));
-            Console.WriteLine(cost);
-            rp.Print();
-
-            Console.WriteLine("(11)");
-            // Onset과 음 높이를 모두 바꾸도록 옮기기 2
-            cost = rp.MoveNote(16, new RhythmPatternNote(15, rp.GetExistingClusterNumber(0)));
-            Console.WriteLine(cost);
-            rp.Print();
-
-            Console.WriteLine("(12)");
-            // 이웃한 다른 음표와 Onset이 같고 클러스터가 다르도록 옮기기
-            cost = rp.MoveNote(15, new RhythmPatternNote(24, rp.GetExistingClusterNumber(0)));
-            Console.WriteLine(cost);
-            rp.Print();
-
-            Console.WriteLine("(13)");
-            // 음 높이 변화를 유지하고 클러스터 번호를 바꾸지만 클러스터 위상을 바꾸지 않도록 옮기기
-            cost = rp.MoveNote(24, 26, rp.GetNewClusterNumber(2));
-            Console.WriteLine(cost);
-            rp.Print();
-
-            Console.WriteLine("(14)");
-            // 음 높이 변화는 유지하면서 클러스터 위상만 다르도록 옮기기 (기존 클러스터는 사라짐)
-            cost = rp.MoveNote(26, 26, rp.GetExistingClusterNumber(4));
-            Console.WriteLine(cost);
-            rp.Print();
-
-            Console.WriteLine("(15*)");
             // 중간에 있는 기존 음표 제거
-            op = new RhythmPattern.OperationInfo(
-                RhythmPattern.OperationInfo.Type.Delete, new RhythmPatternNote(26, rp.GetExistingClusterNumber(3)),
-                new RhythmPatternNote());
-            cost = rp.PerformOperation(op);
-            Console.WriteLine(cost);
-            rp.Print();
-
-            Console.WriteLine("(16*^)");
-            // 맨 끝의 기존 음표 제거
-            op = new RhythmPattern.OperationInfo(
-                RhythmPattern.OperationInfo.Type.Insert,
-                new RhythmPatternNote(), new RhythmPatternNote(56, 4));
-            cost = rp.PerformOperation(op.Inverse());
+            cost = rp.DeleteNote(4);
             Console.WriteLine(cost);
             rp.Print();
 
             Console.WriteLine("(17)");
-            // 맨 앞의 기존 음표 제거
-            cost = rp.DeleteNote(1);
+            // 맨 끝의 기존 음표 제거
+            cost = rp.DeleteNote(7);
             Console.WriteLine(cost);
             rp.Print();
 
             Console.WriteLine("(18)");
-            // 직전 음표와 같은 음을 갖는 음표 제거
-            cost = rp.DeleteNote(15);
+            // 맨 앞의 기존 음표 제거
+            cost = rp.DeleteNote(0);
             Console.WriteLine(cost);
             rp.Print();
 
             Console.WriteLine("(19)");
-            // 없는 음표 제거
-            cost = rp.DeleteNote(19);
+            // 맨 처음 쉼표 길이 조정 1
+            cost = rp.DelayNotes(8);
             Console.WriteLine(cost);
             rp.Print();
 
             Console.WriteLine("(20)");
             // 제거했던 위치에 새로운 음표 삽입
-            cost = rp.InsertNote(15, -4);
+            cost = rp.InsertNote(0, 8, 1);
+            Console.WriteLine(cost);
+            rp.Print();
+
+            Console.WriteLine("(21)");
+            // 직전 음표와 같은 음을 갖는 음표 제거
+            cost = rp.DeleteNote(1);
+            Console.WriteLine(cost);
+            rp.Print();
+
+            Console.WriteLine("(22)");
+            // 없는 음표 제거
+            cost = rp.DeleteNote(22);
+            Console.WriteLine(cost);
+            rp.Print();
+
+            Console.WriteLine("(23)");
+            // 맨 처음 쉼표 길이 조정 2
+            cost = rp.DelayNotes(4);
+            Console.WriteLine(cost);
+            rp.Print();
+
+            Console.WriteLine("(24)");
+            // 맨 처음 쉼표 길이를 잘못되게 조정
+            cost = rp.DelayNotes(-1);
+            Console.WriteLine(cost);
+            rp.Print();
+
+            Console.WriteLine("(25)");
+            // 맨 처음 쉼표 길이를 이전 상태와 같게 조정
+            cost = rp.DelayNotes(4);
+            Console.WriteLine(cost);
+            rp.Print();
+
+            Console.WriteLine("(26)");
+            // 비용이 2가 되도록 연산 수행
+            cost = rp.ReplaceNote(5, 8, -2);
+            Console.WriteLine(cost);
+            rp.Print();
+
+            Console.WriteLine("(27)");
+            // 맨 처음 쉼표 길이 조정 3
+            cost = rp.DelayNotes(0);
+            Console.WriteLine(cost);
+            rp.Print();
+
+            Console.WriteLine("(28)");
+            // 연산 정보를 이용해 음표와 음표 사이에 삽입
+            RhythmPattern.OperationInfo op1 = new RhythmPattern.OperationInfo(
+                RhythmPattern.OperationInfo.Type.Insert, 3, new RhythmPatternNote(),
+                new RhythmPatternNote(2, rp.GetExistingClusterNumber(0)));
+            cost = rp.PerformOperation(op1);
+            Console.WriteLine(cost);
+            rp.Print();
+
+            Console.WriteLine("(29)");
+            // 연산 정보를 이용해 음표 제거
+            RhythmPattern.OperationInfo op2 = new RhythmPattern.OperationInfo(
+                RhythmPattern.OperationInfo.Type.Delete, 2,
+                new RhythmPatternNote(15, rp.GetExistingClusterNumber(0)), new RhythmPatternNote());
+            cost = rp.PerformOperation(op2);
+            Console.WriteLine(cost);
+            rp.Print();
+
+            Console.WriteLine("(30)");
+            // 연산 정보를 이용해 음표 교체
+            RhythmPattern.OperationInfo op3 = new RhythmPattern.OperationInfo(
+                RhythmPattern.OperationInfo.Type.Replace, 1,
+                new RhythmPatternNote(15, -2), new RhythmPatternNote(16, 2));
+            cost = rp.PerformOperation(op3);
+            Console.WriteLine(cost);
+            rp.Print();
+
+            Console.WriteLine("(31)");
+            // 연산 정보를 이용해 리듬 패턴의 맨 앞 쉼표 길이 조정
+            RhythmPattern.OperationInfo op4 = new RhythmPattern.OperationInfo(0, 16);
+            cost = rp.PerformOperation(op4);
+            Console.WriteLine(cost);
+            rp.Print();
+
+            Console.WriteLine("(32)");
+            // 쉼표 길이를 조정하는 연산의 역연산 수행
+            cost = rp.PerformOperation(op4.Inverse());
+            Console.WriteLine(cost);
+            rp.Print();
+
+            Console.WriteLine("(33)");
+            // 음표를 교체하는 연산의 역연산 수행
+            cost = rp.PerformOperation(op3.Inverse());
+            Console.WriteLine(cost);
+            rp.Print();
+
+            Console.WriteLine("(34)");
+            // 음표를 제거하는 연산의 역연산 수행
+            cost = rp.PerformOperation(op2.Inverse());
+            Console.WriteLine(cost);
+            rp.Print();
+
+            Console.WriteLine("(35)");
+            // 음표를 삽입하는 연산의 역연산 수행
+            cost = rp.PerformOperation(op1.Inverse());
+            Console.WriteLine(cost);
+            rp.Print();
+
+            Console.WriteLine("(36)");
+            // 상황에 맞지 않는 연산 정보 1
+            op1 = new RhythmPattern.OperationInfo(RhythmPattern.OperationInfo.Type.Replace,
+                5, new RhythmPatternNote(16, -2), new RhythmPatternNote(16, -3));
+            cost = rp.PerformOperation(op1);
+            Console.WriteLine(cost);
+            rp.Print();
+
+            Console.WriteLine("(37)");
+            // 상황에 맞지 않는 연산 정보 2
+            op1 = new RhythmPattern.OperationInfo(RhythmPattern.OperationInfo.Type.Delete,
+                5, new RhythmPatternNote(16, -2), new RhythmPatternNote());
+            cost = rp.PerformOperation(op1);
+            Console.WriteLine(cost);
+            rp.Print();
+
+            Console.WriteLine("(38)");
+            // 상황에 맞지 않는 연산 정보 3
+            op1 = new RhythmPattern.OperationInfo(4, 0);
+            cost = rp.PerformOperation(op1);
+            Console.WriteLine(cost);
+            rp.Print();
+
+            Console.WriteLine("(39)");
+            // 상황에 맞지 않는 연산 정보 4
+            op1 = new RhythmPattern.OperationInfo(RhythmPattern.OperationInfo.Type.Delete,
+                5, new RhythmPatternNote(8, -3), new RhythmPatternNote());
+            cost = rp.PerformOperation(op1);
             Console.WriteLine(cost);
             rp.Print();
         }
@@ -584,6 +546,7 @@ namespace ChordingCoding.SFX.Test
             Console.WriteLine("distance(<-): " + rp2.Distance(rp));
             */
 
+            /*
             RhythmPattern rp = new RhythmPattern();
             int cost = 0;
             rp.InsertNote(0, 0);
@@ -596,11 +559,11 @@ namespace ChordingCoding.SFX.Test
 
             Console.WriteLine("(1)");
             RhythmPattern rp2 = rp.Copy();
-            cost = rp2.MoveNote(56, new RhythmPatternNote(56, 4));
+            cost = rp2.ReplaceNote(56, new RhythmPatternNote(56, 4));
             Console.WriteLine(cost);
-            cost = rp2.MoveNote(48, 48, 3);
+            cost = rp2.ReplaceNote(48, 48, 3);
             Console.WriteLine(cost);
-            cost = rp2.MoveNote(40, new RhythmPatternNote(40, 0));
+            cost = rp2.ReplaceNote(40, new RhythmPatternNote(40, 0));
             Console.WriteLine(cost);
 
             rp.Print();
@@ -610,11 +573,11 @@ namespace ChordingCoding.SFX.Test
 
             Console.WriteLine("(2)");
             rp2 = rp.Copy();
-            cost = rp2.MoveNote(48, 48, 3);
+            cost = rp2.ReplaceNote(48, 48, 3);
             Console.WriteLine(cost);
-            cost = rp2.MoveNote(40, 36, 1);
+            cost = rp2.ReplaceNote(40, 36, 1);
             Console.WriteLine(cost);
-            cost = rp2.MoveNote(16, 16, 3);
+            cost = rp2.ReplaceNote(16, 16, 3);
             Console.WriteLine(cost);
 
             rp.Print();
@@ -626,11 +589,11 @@ namespace ChordingCoding.SFX.Test
             rp2 = rp.Copy();
             cost = rp2.InsertNote(60, -2);
             Console.WriteLine(cost);
-            cost = rp2.MoveNote(40, 36, 0);
+            cost = rp2.ReplaceNote(40, 36, 0);
             Console.WriteLine(cost);
             cost = rp2.DeleteNote(32);
             Console.WriteLine(cost);
-            cost = rp2.MoveNote(16, 8, 1);
+            cost = rp2.ReplaceNote(16, 8, 1);
             Console.WriteLine(cost);
 
             rp.Print();

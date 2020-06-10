@@ -37,8 +37,8 @@ namespace ChordingCoding.SFX.Test
         public SFXTest()
         {
             //ChordRecognitionTest();
-            RhythmPatternEditTest();
-            //RhythmPatternDistanceTest();
+            //RhythmPatternEditTest();
+            RhythmPatternDistanceTest();
         }
 
         private void ChordRecognitionTest()
@@ -533,154 +533,189 @@ namespace ChordingCoding.SFX.Test
         private void RhythmPatternDistanceTest()
         {
             Console.WriteLine("RhythmPattern Distance Test");
-            /*
-            RhythmPattern rp = new RhythmPattern();
-            int cost = 0;
-            rp.Print();
 
-            Console.WriteLine("(01)");
-            RhythmPattern rp2 = rp.Copy();
-            rp2.InsertNote(4, 0);
-            rp2.Print();
-            Console.WriteLine("distance(->): " + rp.Distance(rp2));
-            Console.WriteLine("distance(<-): " + rp2.Distance(rp));
-            */
-
-            /*
-            RhythmPattern rp = new RhythmPattern();
+            RhythmPattern rp = new RhythmPattern(0);
             int cost = 0;
-            rp.InsertNote(0, 0);
-            rp.InsertNote(16, -1);
-            rp.InsertNote(32, -2);
-            rp.InsertNote(40, -1);
-            rp.InsertNote(48, 0);
-            rp.InsertNote(56, -4);
+            rp.InsertNote(0, 16, 0);
+            rp.InsertNote(1, 16, -1);
+            rp.InsertNote(2, 8, -2);
+            rp.InsertNote(3, 8, -1);
+            rp.InsertNote(4, 8, 0);
+            rp.InsertNote(5, 8, -4);
             rp.Print();
 
             Console.WriteLine("(1)");
             RhythmPattern rp2 = rp.Copy();
-            cost = rp2.ReplaceNote(56, new RhythmPatternNote(56, 4));
+            cost = rp2.ReplaceNote(5, new RhythmPatternNote(8, 4));
             Console.WriteLine(cost);
-            cost = rp2.ReplaceNote(48, 48, 3);
+            cost = rp2.ReplaceNote(4, 8, 3);
             Console.WriteLine(cost);
-            cost = rp2.ReplaceNote(40, new RhythmPatternNote(40, 0));
+            cost = rp2.ReplaceNote(3, new RhythmPatternNote(8, 0));
             Console.WriteLine(cost);
 
             rp.Print();
             Console.WriteLine();
             rp2.Print();
-            Console.WriteLine("distance: " + rp.Distance(rp2));
+            Console.WriteLine("distance: " + rp.DistanceWithDirection(rp2));
+            Console.WriteLine("inverse distance: " + rp2.DistanceWithDirection(rp));
 
             Console.WriteLine("(2)");
             rp2 = rp.Copy();
-            cost = rp2.ReplaceNote(48, 48, 3);
+            cost = rp2.ReplaceNote(4, 8, 3);
             Console.WriteLine(cost);
-            cost = rp2.ReplaceNote(40, 36, 1);
+            cost = rp2.ReplaceNote(3, 12, 1);
             Console.WriteLine(cost);
-            cost = rp2.ReplaceNote(16, 16, 3);
+            cost = rp2.ReplaceNote(1, 16, 3);
             Console.WriteLine(cost);
 
             rp.Print();
             Console.WriteLine();
             rp2.Print();
-            Console.WriteLine("distance: " + rp.Distance(rp2));
+            Console.WriteLine("distance: " + rp.DistanceWithDirection(rp2));
+            Console.WriteLine("inverse distance: " + rp2.DistanceWithDirection(rp));
 
             Console.WriteLine("(3)");
-            rp2 = rp.Copy();
-            cost = rp2.InsertNote(60, -2);
+            RhythmPattern rp3 = rp2.Copy();
+            rp2 = rp3.Copy();
+            cost = rp2.InsertNote(5, 8, -2);
             Console.WriteLine(cost);
-            cost = rp2.ReplaceNote(40, 36, 0);
+            cost = rp2.DeleteNote(2);
             Console.WriteLine(cost);
-            cost = rp2.DeleteNote(32);
+            cost = rp2.ReplaceNote(3, 8, 3);
             Console.WriteLine(cost);
-            cost = rp2.ReplaceNote(16, 8, 1);
+            cost = rp2.ReplaceNote(1, 24, 1);
             Console.WriteLine(cost);
-
-            rp.Print();
-            Console.WriteLine();
-            rp2.Print();
-            Console.WriteLine("distance: " + rp.Distance(rp2));
-
-            /*
-            Console.WriteLine("(4)");
-            rp2 = new RhythmPattern(
-                new RhythmPatternNote(0, 0),
-                new RhythmPatternNote(8, -1),
-                new RhythmPatternNote(16, -2),
-                new RhythmPatternNote(20, -1),
-                new RhythmPatternNote(24, 0),
-                new RhythmPatternNote(28, -4)
-                );
-
-            rp.Print();
-            Console.WriteLine();
-            rp2.Print();
-            Console.WriteLine("distance: " + rp.Distance(rp2));
-
-            Console.WriteLine("(4-1)");
-            RhythmPattern rp3 = new RhythmPattern(
-                new RhythmPatternNote(0, 0),
-                new RhythmPatternNote(16, -1),
-                new RhythmPatternNote(32, -2)
-                );
-
-            rp2 = new RhythmPattern(
-                new RhythmPatternNote(0, 0),
-                new RhythmPatternNote(8, -1),
-                new RhythmPatternNote(16, -2)
-                );
 
             rp3.Print();
             Console.WriteLine();
             rp2.Print();
-            Console.WriteLine("distance: " + rp3.Distance(rp2));
+            Console.WriteLine("distance: " + rp3.DistanceWithDirection(rp2));
+            Console.WriteLine("inverse distance: " + rp2.DistanceWithDirection(rp3));
+
+            Console.WriteLine("(4)");
+            rp2 = rp.Copy();
+            cost = rp2.InsertNote(5, 8, -2);
+            Console.WriteLine(cost);
+            cost = rp2.DeleteNote(2);
+            Console.WriteLine(cost);
+            cost = rp2.ReplaceNote(3, 8, 3);
+            Console.WriteLine(cost);
+            cost = rp2.ReplaceNote(1, 24, 1);
+            Console.WriteLine(cost);
+
+            rp.Print();
+            Console.WriteLine();
+            rp2.Print();
+            Console.WriteLine("distance: " + rp.DistanceWithDirection(rp2));
+            Console.WriteLine("inverse distance: " + rp2.DistanceWithDirection(rp));
 
             Console.WriteLine("(5)");
-            rp2 = new RhythmPattern(
-                new RhythmPatternNote(0, 0),
-                new RhythmPatternNote(32, -1),
-                new RhythmPatternNote(64, -2),
-                new RhythmPatternNote(80, -1),
-                new RhythmPatternNote(96, 0),
-                new RhythmPatternNote(112, -4)
-                );
-
+            rp = new RhythmPattern(0,
+                new RhythmPatternNote(8, 0),
+                new RhythmPatternNote(6, 0),
+                new RhythmPatternNote(2, -2),
+                new RhythmPatternNote(4, 0),
+                new RhythmPatternNote(8, 4),
+                new RhythmPatternNote(8, 3),
+                new RhythmPatternNote(8, 1),
+                new RhythmPatternNote(8, 0),
+                new RhythmPatternNote(4, 1),
+                new RhythmPatternNote(4, 0),
+                new RhythmPatternNote(4, -1));
+            rp2 = new RhythmPattern(0,
+                new RhythmPatternNote(8, -2),
+                new RhythmPatternNote(6, -2),
+                new RhythmPatternNote(2, -2),
+                new RhythmPatternNote(4, -2),
+                new RhythmPatternNote(8, 0),
+                new RhythmPatternNote(36, -1));
             rp.Print();
             Console.WriteLine();
             rp2.Print();
-            Console.WriteLine("distance: " + rp.Distance(rp2));
+            Console.WriteLine("distance: " + rp.DistanceWithDirection(rp2));
+            rp2.Print();
+            Console.WriteLine();
+            rp.Print();
+            Console.WriteLine("inverse distance: " + rp2.DistanceWithDirection(rp));
 
             Console.WriteLine("(6)");
-            rp2 = rp.Copy();
-            cost = rp2.DeleteNote(0);
-            Console.WriteLine(cost);
-            cost = rp2.DeleteNote(40);
-            Console.WriteLine(cost);
-            cost = rp2.MoveNote(48, 52, -4);
-            Console.WriteLine(cost);
-
+            rp2 = new RhythmPattern(0,
+                new RhythmPatternNote(4, -2),
+                new RhythmPatternNote(4, 0),
+                new RhythmPatternNote(4, 2),
+                new RhythmPatternNote(8, 5),
+                new RhythmPatternNote(12, 7),
+                new RhythmPatternNote(4, -1),
+                new RhythmPatternNote(4, 1),
+                new RhythmPatternNote(4, 3),
+                new RhythmPatternNote(8, 6),
+                new RhythmPatternNote(12, 5));
             rp.Print();
             Console.WriteLine();
             rp2.Print();
-            Console.WriteLine("distance: " + rp.Distance(rp2));
+            Console.WriteLine("distance: " + rp.DistanceWithDirection(rp2));
+            Console.WriteLine("inverse distance: " + rp2.DistanceWithDirection(rp));
 
             Console.WriteLine("(7)");
-            rp2 = new RhythmPattern(
-                new RhythmPatternNote(0, 0),
-                new RhythmPatternNote(4, -3),
+            rp2 = new RhythmPattern(0,
                 new RhythmPatternNote(8, -1),
-                new RhythmPatternNote(12, -3),
-                new RhythmPatternNote(16, -3),
-                new RhythmPatternNote(20, -1),
-                new RhythmPatternNote(24, -3),
-                new RhythmPatternNote(28, 0)
-                );
-
+                new RhythmPatternNote(6, -1),
+                new RhythmPatternNote(2, -3),
+                new RhythmPatternNote(4, -1),
+                new RhythmPatternNote(8, 3),
+                new RhythmPatternNote(8, 2),
+                new RhythmPatternNote(8, 0),
+                new RhythmPatternNote(8, -1),
+                new RhythmPatternNote(4, 0),
+                new RhythmPatternNote(4, -1),
+                new RhythmPatternNote(4, -3));
             rp.Print();
             Console.WriteLine();
             rp2.Print();
-            Console.WriteLine("distance: " + rp.Distance(rp2));
-            */
+            Console.WriteLine("distance: " + rp.DistanceWithDirection(rp2));
+            Console.WriteLine("inverse distance: " + rp2.DistanceWithDirection(rp));
+            Console.WriteLine("min: " + rp.Distance(rp2));
+
+            Console.WriteLine("(8)");
+            rp = new RhythmPattern(0);
+            rp.InsertNote(0, 16, 0);
+            rp.InsertNote(1, 16, -1);
+            rp.InsertNote(2, 8, -2);
+            rp.InsertNote(3, 8, -1);
+            rp.InsertNote(4, 8, 0);
+            rp.InsertNote(5, 8, -4);
+            rp2 = new RhythmPattern(0,
+                new RhythmPatternNote(4, -2),
+                new RhythmPatternNote(4, 0),
+                new RhythmPatternNote(4, 2),
+                new RhythmPatternNote(8, 5),
+                new RhythmPatternNote(12, 7),
+                new RhythmPatternNote(4, -1),
+                new RhythmPatternNote(4, 1),
+                new RhythmPatternNote(4, 3),
+                new RhythmPatternNote(8, 6),
+                new RhythmPatternNote(12, 5));
+            rp.Print();
+            Console.WriteLine();
+            rp2.Print();
+            Console.WriteLine("distance: " + rp.DistanceWithDirection(rp2));
+            Console.WriteLine("inverse distance: " + rp2.DistanceWithDirection(rp));
+            Console.WriteLine("min: " + rp.Distance(rp2));
+
+            Console.WriteLine("(9)");
+            rp = new RhythmPattern(0,
+                new RhythmPatternNote(8, 0),
+                new RhythmPatternNote(8, 0));
+            rp2 = new RhythmPattern(4,
+                new RhythmPatternNote(4, 0),
+                new RhythmPatternNote(4, 1),
+                new RhythmPatternNote(4, 0));
+            rp.Print();
+            Console.WriteLine();
+            rp2.Print();
+            Console.WriteLine("distance: " + rp.DistanceWithDirection(rp2));
+            Console.WriteLine("inverse distance: " + rp2.DistanceWithDirection(rp));
+            Console.WriteLine("min: " + rp.Distance(rp2));
         }
     }
 }

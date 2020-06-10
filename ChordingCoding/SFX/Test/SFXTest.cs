@@ -38,7 +38,7 @@ namespace ChordingCoding.SFX.Test
         {
             //ChordRecognitionTest();
             //RhythmPatternEditTest();
-            RhythmPatternDistanceTest();
+            //RhythmPatternDistanceTest();
         }
 
         private void ChordRecognitionTest()
@@ -676,6 +676,7 @@ namespace ChordingCoding.SFX.Test
             Console.WriteLine("inverse distance: " + rp2.DistanceWithDirection(rp));
             Console.WriteLine("min: " + rp.Distance(rp2));
 
+            // In this example, `rp.DistanceWithDirection(rp2)` is differ from `rp2.DistanceWithDirection(rp)`.
             Console.WriteLine("(8)");
             rp = new RhythmPattern(0);
             rp.InsertNote(0, 16, 0);

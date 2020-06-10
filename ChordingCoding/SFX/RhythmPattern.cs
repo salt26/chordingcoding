@@ -454,21 +454,6 @@ namespace ChordingCoding.SFX
             return DURATION_COST + alpha;
         }
 
-        /*
-        /// <summary>
-        /// 리듬 패턴에서 특정 인덱스의 음표 하나를 제거하는 연산을 수행합니다.
-        /// 반환값은 수행한 연산의 비용입니다.
-        /// 인자로 넘긴 음표와 시작 위치가 같은 음표를 찾아 제거합니다.
-        /// 존재하지 않는 음표를 제거하려 할 경우 제거 연산이 수행되지 않고 INVALID_COST를 반환합니다.
-        /// </summary>
-        /// <param name="note">제거할 기존 음표 (시작 위치만 중요)</param>
-        /// <returns></returns>
-        public int DeleteNote(RhythmPatternNote note)
-        {
-            return DeleteNote(note.Duration);
-        }
-        */
-
         /// <summary>
         /// 리듬 패턴에 있던 음표 하나의 인덱스(음표 목록에서의 상대적 위치)를 유지하면서
         /// Duration과 클러스터를 교체하는 연산을 수행합니다.
@@ -545,7 +530,7 @@ namespace ChordingCoding.SFX
             }
 
             int newClusterIndex = GetClusterRank(node);
-            //Console.WriteLine("ClusterIndex: " + oldClusterIndex + " -> " + newClusterIndex);
+            //Console.WriteLine("ClusterRank: " + oldClusterIndex + " -> " + newClusterIndex);
             if (oldClusterIndex != newClusterIndex)
             {
                 // (교체한 음표의 클러스터 위상 변경 비용)
@@ -746,6 +731,7 @@ namespace ChordingCoding.SFX
         /// <returns></returns>
         public int Distance(RhythmPattern other)
         {
+            // Note: This method finds the local optimum, not the global optimum.
             return Math.Min(this.DistanceWithDirection(other), other.DistanceWithDirection(this));
         }
 
@@ -761,6 +747,10 @@ namespace ChordingCoding.SFX
         /// <returns></returns>
         public int DistanceWithDirection(RhythmPattern other)
         {
+            // Dynamic Programming (time complexity: O(n^2))
+            // Note: This method finds the local optimum, not the global optimum.
+            // To find the global optimum, backtracking technique should be used. (time complexity: O(3^n))
+
             int lenThis = this.noteList.Count;
             int lenOther = other.noteList.Count;
             RhythmPattern rp;
@@ -962,7 +952,7 @@ namespace ChordingCoding.SFX
 
                 #endregion
 
-                #region 반대 방향으로 역연산들을 취해주면 최적 거리가 같게 나오는지 테스트
+                #region 반대 방향으로 역연산들을 취해주면 최적 거리가 같게 나오는지 테스트 -> 같게 나오지 않는 예제가 존재한다!
 
                 Console.WriteLine("Inverse test");
                 RhythmPattern rpForTest2 = other.Copy();

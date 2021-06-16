@@ -46,7 +46,12 @@ namespace ChordingCoding.UI
         /// <summary>
         /// 시각 효과를 표시할지 결정합니다.
         /// </summary>
-        const bool ENABLE_VFX = false;
+        public const bool ENABLE_VFX = false;
+
+        /// <summary>
+        /// 감정 분석을 실시할지 결정합니다.
+        /// </summary>
+        public const bool ENABLE_SENTIMENT_ANALYZER = false;
 
         static Dictionary<string, int> _opacity = new Dictionary<string, int>();
         static List<ParticleSystem> particleSystems = new List<ParticleSystem>();
@@ -252,10 +257,20 @@ namespace ChordingCoding.UI
             SetNoteResolution(resolution);
 
             MarshallingUpdateSplashScreen(12);
-            ksa = new KoreanSentimentAnalyzer(); // 반드시 Music.Initialize()가 완료된 후에 호출할 것.
+            if (ENABLE_SENTIMENT_ANALYZER)
+            {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                ksa = new KoreanSentimentAnalyzer(); // 반드시 Music.Initialize()가 완료된 후에 호출할 것.
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+            }
 
             MarshallingUpdateSplashScreen(13);
-            esa = new EnglishSentimentAnalyzer(); // 반드시 Music.Initialize()가 완료된 후에 호출할 것.
+            if (ENABLE_SENTIMENT_ANALYZER)
+            {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                esa = new EnglishSentimentAnalyzer(); // 반드시 Music.Initialize()가 완료된 후에 호출할 것.
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+            }
 
             #endregion
 
@@ -264,8 +279,13 @@ namespace ChordingCoding.UI
             #region Start phase
 
             TypingTracker.Start();
-            ksa.Start();
-            esa.Start();
+            if (ENABLE_SENTIMENT_ANALYZER)
+            {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                ksa.Start();
+                esa.Start();
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+            }
             Music.Start();
 
             notifyIcon1.ShowBalloonTip(8);

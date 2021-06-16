@@ -109,8 +109,13 @@ namespace ChordingCoding.UI
                 // 키보드 및 마우스 입력 이벤트를 감지하여 콜백을 호출하도록 합니다.
                 _keyboardHookID = SetLowLevelKeyboardHook(TypingTracker._keyboardProc);
                 _mouseHookID = SetLowLevelMouseHook(TypingTracker._mouseProc);
-                wed = new WinEventDelegate(WinEventProc);
-                _hhook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, wed, 0, 0, WINEVENT_OUTOFCONTEXT);
+                if (MainForm.ENABLE_CONTEXT_LOGGING)
+                {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                    wed = new WinEventDelegate(WinEventProc);
+                    _hhook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, wed, 0, 0, WINEVENT_OUTOFCONTEXT);
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+                }
                 IsReady = true;
             }
         }
@@ -127,8 +132,13 @@ namespace ChordingCoding.UI
                 // SetHook에서 잡은 handle을 놓습니다.
                 UnhookWindowsHookEx(_keyboardHookID);
                 UnhookWindowsHookEx(_mouseHookID);
-                wed = null;
-                UnhookWinEvent(_hhook);
+                if (MainForm.ENABLE_CONTEXT_LOGGING)
+                {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                    wed = null;
+                    UnhookWinEvent(_hhook);
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+                }
                 IsReady = false;
             }
         }
@@ -170,7 +180,10 @@ namespace ChordingCoding.UI
                 // Do something when KeyDown event occurs.
 
                 //Console.WriteLine("KeyCode: " + (Keys)vkCode);
-                AppendContextLog(1, (Keys)vkCode);
+                if (MainForm.ENABLE_CONTEXT_LOGGING)
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                    AppendContextLog(1, (Keys)vkCode);
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
 
                 Keys key = (Keys)vkCode;
                 if (vkCode >= 21 && vkCode <= 25 && (Control.ModifierKeys & Keys.Alt) == Keys.Alt)
@@ -379,21 +392,25 @@ namespace ChordingCoding.UI
         {
             if (nCode >= 0)
             {
-
-                switch ((MouseMessages)wParam)
+                if (MainForm.ENABLE_CONTEXT_LOGGING)
                 {
-                    case MouseMessages.WM_LBUTTONDOWN:
-                        AppendContextLog(2, "MouseLeftDown");
-                        break;
-                    case MouseMessages.WM_RBUTTONDOWN:
-                        AppendContextLog(2, "MouseRightDown");
-                        break;
-                    case MouseMessages.WM_MBUTTONDOWN:
-                        AppendContextLog(2, "MouseMiddleDown");
-                        break;
-                    case MouseMessages.WM_MOUSEWHEEL:
-                        AppendContextLog(2, "MouseWheel");
-                        break;
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                    switch ((MouseMessages)wParam)
+                    {
+                        case MouseMessages.WM_LBUTTONDOWN:
+                            AppendContextLog(2, "MouseLeftDown");
+                            break;
+                        case MouseMessages.WM_RBUTTONDOWN:
+                            AppendContextLog(2, "MouseRightDown");
+                            break;
+                        case MouseMessages.WM_MBUTTONDOWN:
+                            AppendContextLog(2, "MouseMiddleDown");
+                            break;
+                        case MouseMessages.WM_MOUSEWHEEL:
+                            AppendContextLog(2, "MouseWheel");
+                            break;
+                    }
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
                 }
 
                 if ((MouseMessages)wParam == MouseMessages.WM_LBUTTONDOWN ||
@@ -562,7 +579,12 @@ namespace ChordingCoding.UI
         /// <param name="dwmsEventTime"></param>
         public static void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
-            AppendContextLog(0, GetForegroundProcessName(), GetActiveWindowTitle());
+            if (MainForm.ENABLE_CONTEXT_LOGGING)
+            {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                AppendContextLog(0, GetForegroundProcessName(), GetActiveWindowTitle());
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+            }
         }
 
         private const int WM_IME_CONTROL = 643;
@@ -683,8 +705,9 @@ namespace ChordingCoding.UI
             long deltaTicks = DateTime.Now.Ticks - prevTicks;
             prevTicks = DateTime.Now.Ticks;
 
-
-            string s = type + "," + DateTime.Now.ToString() + "," + (deltaTicks / 10000000f);
+            string s = type + "," + DateTime.Now.Year + "," + DateTime.Now.Month + 
+                "," + DateTime.Now.Day + "," + DateTime.Now.Hour + "," + DateTime.Now.Minute +
+                "," + DateTime.Now.Second + "," + DateTime.Now.Millisecond + "," + (deltaTicks / 10000000f);
             foreach (object message in messages)
             {
                 if (message is null)

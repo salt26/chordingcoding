@@ -26,10 +26,12 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.IO;
 using ChordingCoding.Utility;
 using ChordingCoding.SFX;
 using ChordingCoding.Word.English;
 using ChordingCoding.Word.Korean;
+using System.Security.Cryptography;
 
 namespace ChordingCoding.UI
 {
@@ -42,6 +44,7 @@ namespace ChordingCoding.UI
         // https://looool.tistory.com/15
         // https://docs.microsoft.com/en-us/archive/blogs/toub/low-level-mouse-hook-in-c
         // https://docs.microsoft.com/en-us/windows/win32/learnwin32/mouse-clicks
+        // https://stackoverflow.com/questions/4372055/detect-active-window-changed-using-c-sharp-without-polling
 
         private const int WH_KEYBOARD_LL = 13;
         private const int WH_MOUSE_LL = 14;
@@ -58,6 +61,9 @@ namespace ChordingCoding.UI
             WM_MBUTTONDOWN = 0x0207,
             WM_MBUTTONUP = 0x0208
         }
+
+        private const uint WINEVENT_OUTOFCONTEXT = 0;
+        private const uint EVENT_SYSTEM_FOREGROUND = 3;
 
         [StructLayout(LayoutKind.Sequential)]
         private struct POINT
@@ -77,16 +83,21 @@ namespace ChordingCoding.UI
         }
 
         public delegate IntPtr HookProc(int nCode, IntPtr wParam, IntPtr lParam);
+        public delegate void WinEventDelegate(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime);
+        public static WinEventDelegate wed = null;
 
         public static HookProc _keyboardProc = KeyboardHookCallback;
         public static HookProc _mouseProc = MouseHookCallback;
         public static IntPtr _keyboardHookID = IntPtr.Zero;
         public static IntPtr _mouseHookID = IntPtr.Zero;
+        public static IntPtr _hhook = IntPtr.Zero;
 
         public static bool IsReady { get; private set; } = false;
 
         private static string wordState = "";
         private static string backspaceState = null;
+
+        private static string savePath = "WorkingContext.csv";
 
         /// <summary>
         /// 키보드 및 마우스 입력 이벤트를 감지하도록 합니다.
@@ -98,6 +109,8 @@ namespace ChordingCoding.UI
                 // 키보드 및 마우스 입력 이벤트를 감지하여 콜백을 호출하도록 합니다.
                 _keyboardHookID = SetLowLevelKeyboardHook(TypingTracker._keyboardProc);
                 _mouseHookID = SetLowLevelMouseHook(TypingTracker._mouseProc);
+                wed = new WinEventDelegate(WinEventProc);
+                _hhook = SetWinEventHook(EVENT_SYSTEM_FOREGROUND, EVENT_SYSTEM_FOREGROUND, IntPtr.Zero, wed, 0, 0, WINEVENT_OUTOFCONTEXT);
                 IsReady = true;
             }
         }
@@ -114,6 +127,8 @@ namespace ChordingCoding.UI
                 // SetHook에서 잡은 handle을 놓습니다.
                 UnhookWindowsHookEx(_keyboardHookID);
                 UnhookWindowsHookEx(_mouseHookID);
+                wed = null;
+                UnhookWinEvent(_hhook);
                 IsReady = false;
             }
         }
@@ -155,6 +170,7 @@ namespace ChordingCoding.UI
                 // Do something when KeyDown event occurs.
 
                 //Console.WriteLine("KeyCode: " + (Keys)vkCode);
+                File.AppendAllText(savePath, "1," + DateTime.Now.ToString() + "," + (Keys)vkCode + "\n", Encoding.UTF8);
 
                 Keys key = (Keys)vkCode;
                 if (vkCode >= 21 && vkCode <= 25 && (Control.ModifierKeys & Keys.Alt) == Keys.Alt)
@@ -358,9 +374,10 @@ namespace ChordingCoding.UI
                     (MouseMessages)wParam == MouseMessages.WM_RBUTTONDOWN ||
                     (MouseMessages)wParam == MouseMessages.WM_MBUTTONDOWN)
                 {
+                    File.AppendAllText(savePath, "2," + DateTime.Now.ToString() + "," + (int)wParam + "\n", Encoding.UTF8);
                     //LowLevelMouseHookStruct hookStruct = (LowLevelMouseHookStruct)Marshal.PtrToStructure(lParam, typeof(LowLevelMouseHookStruct));
                     //Console.WriteLine("(" + hookStruct.point.x + ", " + hookStruct.point.y + ")");
-                    
+
                     Util.TaskQueue.Add("wordState", ResetWord);
                 }
             }
@@ -379,6 +396,9 @@ namespace ChordingCoding.UI
         private static extern IntPtr SetWindowsHookEx(int idHook,
             HookProc lpfn, IntPtr hMod, uint dwThreadId);
 
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern IntPtr SetWinEventHook(uint eventMin, uint eventMax, IntPtr hmodWinEventProc, WinEventDelegate lpfnWinEventProc, uint idProcess, uint idThread, uint dwFlags);
+
         /// <summary>
         /// Hook 프로시저를 해제합니다.
         /// </summary>
@@ -387,6 +407,15 @@ namespace ChordingCoding.UI
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         [return: MarshalAs(UnmanagedType.Bool)]
         private static extern bool UnhookWindowsHookEx(IntPtr hhk);
+
+        /// <summary>
+        /// SetWinEventHook에서 생성된 이벤트 hook을 제거합니다.
+        /// </summary>
+        /// <param name="hWinEventHook"></param>
+        /// <returns></returns>
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        [return: MarshalAs(UnmanagedType.Bool)]
+        private static extern bool UnhookWinEvent(IntPtr hWinEventHook);
 
         /// <summary>
         /// 다음 hook 프로시저에게 전달합니다.
@@ -441,6 +470,49 @@ namespace ChordingCoding.UI
         /// <returns></returns>
         [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
         private static extern IntPtr GetForegroundWindow();
+
+        /// <summary>
+        /// 핸들 창의 창 이름을 가져옵니다.
+        /// </summary>
+        /// <param name="hWnd"></param>
+        /// <param name="text"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
+
+        /// <summary>
+        /// 현재 포커스를 가진 창의 이름을 반환합니다.
+        /// </summary>
+        /// <returns></returns>
+        private static string GetActiveWindowTitle()
+        {
+            const int nChars = 256;
+            IntPtr handle = IntPtr.Zero;
+            StringBuilder Buff = new StringBuilder(nChars);
+            handle = GetForegroundWindow();
+
+            if (GetWindowText(handle, Buff, nChars) > 0)
+            {
+                return Buff.ToString();
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 현재 포커스를 가진 창의 이름을 로그에 출력합니다.
+        /// </summary>
+        /// <param name="hWinEventHook"></param>
+        /// <param name="eventType"></param>
+        /// <param name="hwnd"></param>
+        /// <param name="idObject"></param>
+        /// <param name="idChild"></param>
+        /// <param name="dwEventThread"></param>
+        /// <param name="dwmsEventTime"></param>
+        public static void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
+        {
+            File.AppendAllText(savePath, "0," + DateTime.Now.ToString() + "," + GetActiveWindowTitle() + "\n", Encoding.UTF8);
+        }
 
         private const int WM_IME_CONTROL = 643;
 

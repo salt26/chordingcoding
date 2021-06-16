@@ -31,7 +31,6 @@ using ChordingCoding.Utility;
 using ChordingCoding.SFX;
 using ChordingCoding.Word.English;
 using ChordingCoding.Word.Korean;
-using System.Security.Cryptography;
 
 namespace ChordingCoding.UI
 {
@@ -97,7 +96,8 @@ namespace ChordingCoding.UI
         private static string wordState = "";
         private static string backspaceState = null;
 
-        private static string savePath = "WorkingContext.csv";
+        private const string savePath = "WorkingContext.csv";
+        private static long prevTicks = DateTime.Now.Ticks;
 
         /// <summary>
         /// 키보드 및 마우스 입력 이벤트를 감지하도록 합니다.
@@ -170,7 +170,7 @@ namespace ChordingCoding.UI
                 // Do something when KeyDown event occurs.
 
                 //Console.WriteLine("KeyCode: " + (Keys)vkCode);
-                File.AppendAllText(savePath, "1," + DateTime.Now.ToString() + "," + (Keys)vkCode + "\n", Encoding.UTF8);
+                AppendContextLog(1, (Keys)vkCode);
 
                 Keys key = (Keys)vkCode;
                 if (vkCode >= 21 && vkCode <= 25 && (Control.ModifierKeys & Keys.Alt) == Keys.Alt)
@@ -282,6 +282,8 @@ namespace ChordingCoding.UI
         /// <param name="args">없음</param>
         private static void ResetWord(object[] args)
         {
+            if (!MainForm.ENABLE_SENTIMENT_ANALYZER) return;
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
             if (wordState.Length > 0)
             {
                 if (IsIMESetToEnglish())
@@ -300,6 +302,7 @@ namespace ChordingCoding.UI
                 }
             }
             wordState = "";
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
         }
 
         /// <summary>
@@ -308,6 +311,8 @@ namespace ChordingCoding.UI
         /// <param name="args">없음</param>
         private static void BackspaceWord(object[] args)
         {
+            if (!MainForm.ENABLE_SENTIMENT_ANALYZER) return;
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
             if (wordState.Length > 0)
             {
                 if (IsIMESetToEnglish())
@@ -327,6 +332,7 @@ namespace ChordingCoding.UI
                     }
                 }
             }
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
         }
 
         /// <summary>
@@ -344,6 +350,8 @@ namespace ChordingCoding.UI
         /// <param name="args">첫 번째 인자: 입력된 키 코드(int), 두 번째 인자: 키 입력 시 Shift가 함께 눌렸는지 여부(bool)</param>
         private static void AddCharToWord(object[] args)
         {
+            if (!MainForm.ENABLE_SENTIMENT_ANALYZER) return;
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
             int vkCode_ = (int)args[0];
             bool hasShiftPressed_ = (bool)args[1];
             StringBuilder charPressed = new StringBuilder(256);
@@ -357,6 +365,7 @@ namespace ChordingCoding.UI
             {
                 wordState += Hangul.EnglishToKorean(Util.StringWithShift(charPressed.ToString(), hasShiftPressed_));
             }
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
         }
 
         /// <summary>
@@ -370,11 +379,27 @@ namespace ChordingCoding.UI
         {
             if (nCode >= 0)
             {
+
+                switch ((MouseMessages)wParam)
+                {
+                    case MouseMessages.WM_LBUTTONDOWN:
+                        AppendContextLog(2, "MouseLeftDown");
+                        break;
+                    case MouseMessages.WM_RBUTTONDOWN:
+                        AppendContextLog(2, "MouseRightDown");
+                        break;
+                    case MouseMessages.WM_MBUTTONDOWN:
+                        AppendContextLog(2, "MouseMiddleDown");
+                        break;
+                    case MouseMessages.WM_MOUSEWHEEL:
+                        AppendContextLog(2, "MouseWheel");
+                        break;
+                }
+
                 if ((MouseMessages)wParam == MouseMessages.WM_LBUTTONDOWN ||
                     (MouseMessages)wParam == MouseMessages.WM_RBUTTONDOWN ||
                     (MouseMessages)wParam == MouseMessages.WM_MBUTTONDOWN)
                 {
-                    File.AppendAllText(savePath, "2," + DateTime.Now.ToString() + "," + (int)wParam + "\n", Encoding.UTF8);
                     //LowLevelMouseHookStruct hookStruct = (LowLevelMouseHookStruct)Marshal.PtrToStructure(lParam, typeof(LowLevelMouseHookStruct));
                     //Console.WriteLine("(" + hookStruct.point.x + ", " + hookStruct.point.y + ")");
 
@@ -482,6 +507,15 @@ namespace ChordingCoding.UI
         private static extern int GetWindowText(IntPtr hWnd, StringBuilder text, int count);
 
         /// <summary>
+        /// 핸들 창을 생성한 프로세스 또는 쓰레드의 ID를 가져옵니다.
+        /// </summary>
+        /// <param name="hWnd"></param>
+        /// <param name="lpdwProcessId"></param>
+        /// <returns></returns>
+        [DllImport("user32.dll", CharSet = CharSet.Auto, SetLastError = true)]
+        private static extern Int32 GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
+
+        /// <summary>
         /// 현재 포커스를 가진 창의 이름을 반환합니다.
         /// </summary>
         /// <returns></returns>
@@ -499,6 +533,23 @@ namespace ChordingCoding.UI
             return null;
         }
 
+        private static string GetForegroundProcessName()
+        {
+            IntPtr handle = IntPtr.Zero;
+            handle = GetForegroundWindow();
+            if (handle == null)
+                return null;
+            uint pid;
+            GetWindowThreadProcessId(handle, out pid);
+
+            foreach (Process p in Process.GetProcesses())
+            {
+                if (p.Id == pid)
+                    return p.ProcessName;
+            }
+            return null;
+        }
+
         /// <summary>
         /// 현재 포커스를 가진 창의 이름을 로그에 출력합니다.
         /// </summary>
@@ -511,7 +562,7 @@ namespace ChordingCoding.UI
         /// <param name="dwmsEventTime"></param>
         public static void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
-            File.AppendAllText(savePath, "0," + DateTime.Now.ToString() + "," + GetActiveWindowTitle() + "\n", Encoding.UTF8);
+            AppendContextLog(0, GetForegroundProcessName(), GetActiveWindowTitle());
         }
 
         private const int WM_IME_CONTROL = 643;
@@ -624,6 +675,35 @@ namespace ChordingCoding.UI
             finally
             {
                 hasNewContext = false;
+            }
+        }
+
+        public static void AppendContextLog(int type, params object[] messages)
+        {
+            long deltaTicks = DateTime.Now.Ticks - prevTicks;
+            prevTicks = DateTime.Now.Ticks;
+
+
+            string s = type + "," + DateTime.Now.ToString() + "," + (deltaTicks / 10000000f);
+            foreach (object message in messages)
+            {
+                if (message is null)
+                {
+                    s += ",";
+                }
+                else
+                {
+                    s += "," + message.ToString();
+                }
+            }
+            try
+            {
+                File.AppendAllText(savePath, s + "\n", Encoding.UTF8);
+            }
+            catch (Exception e)
+            {
+                if (!(e is IOException))
+                    throw;
             }
         }
     }

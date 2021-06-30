@@ -721,6 +721,10 @@ namespace ChordingCoding.UI
             }
             try
             {
+                if (!File.Exists(savePath))
+                {
+                    File.AppendAllText(savePath, "id,year,month,day,hour,minute,second,ms,delta,e,w1,w2,w3\n", Encoding.UTF8);
+                }
                 File.AppendAllText(savePath, s + "\n", Encoding.UTF8);
             }
             catch (Exception e)

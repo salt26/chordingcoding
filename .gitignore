@@ -4,6 +4,8 @@
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
 ignore
+Builds/WorkingContext.csv
+ChordingCoding/bin/x64/Debug/WorkingContext.csv
 
 # User-specific files
 *.rsuser

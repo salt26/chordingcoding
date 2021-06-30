@@ -44,7 +44,7 @@ Windows Forms로 개발된 응용 프로그램으로, 64-bit Windows에서 사�
    * 기록한 데이터를 [Working Context Visualization](https://github.com/salt26/working-context-visualization)를 통해 분석하고 살펴볼 수도 있습니다.
   
 ## Update Log
-### [v.1.6](https://github.com/salt26/chordingcoding/tree/v.1.6) - 21/06/31
+### [v.1.6](https://github.com/salt26/chordingcoding/tree/v.1.6) - 21/06/30
 * 시작 시 스플래시 화면 추가
 * 사용자 작업 맥락 추적 기능 추가
 

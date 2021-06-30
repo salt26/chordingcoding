@@ -41,9 +41,10 @@ Windows Forms로 개발된 응용 프로그램으로, 64-bit Windows에서 사�
    * 사용했던 프로그램 이름, 키보드 입력, 마우스 클릭 및 스크롤 입력이 기록됩니다.
    * 종료 후 Builds 폴더 안에 "WorkingContext.csv" 파일이 생성됩니다. 이것의 이름을 바꾸고 원하는 경로에 옮겨서 보관하세요.
    * 기록한 데이터는 사용자의 컴퓨터에만 남으며, 외부로는 전송되지 않습니다.
+   * 기록한 데이터를 [Working Context Visualization](https://github.com/salt26/working-context-visualization)를 통해 분석하고 살펴볼 수도 있습니다.
   
 ## Update Log
-### [v.1.6](https://github.com/salt26/chordingcoding/tree/v.1.6) - 21/06/16
+### [v.1.6](https://github.com/salt26/chordingcoding/tree/v.1.6) - 21/06/31
 * 시작 시 스플래시 화면 추가
 * 사용자 작업 맥락 추적 기능 추가
 

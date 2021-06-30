@@ -1,4 +1,6 @@
 # ChordingCoding
+![ChordingCoding Logo](https://raw.githubusercontent.com/salt26/chordingcoding/v.1.6/ChordingCoding/Resources/Logos/Logo.gif)
+
 With ChordingCoding, typing becomes composing music!
 
 (ChordingCoding과 함께라면, 타이핑이 곧 작곡이 됩니다!)
@@ -9,6 +11,8 @@ With ChordingCoding, typing becomes composing music!
 ChordingCoding은 코딩과 문서 작업에 지친 사람들의 감성을 채워주기 위해 만들었습니다.
 
 이 프로그램을 켜면 키보드로 타이핑을 할 때마다 아름다운 소리가 생겨납니다.
+
+또한 사용자의 작업 맥락을 자동으로 추적하여 기록합니다.
 
 Windows Forms로 개발된 응용 프로그램으로, 64-bit Windows에서 사용 가능합니다.
 
@@ -32,8 +36,17 @@ Windows Forms로 개발된 응용 프로그램으로, 64-bit Windows에서 사�
 6. 설정이 완료되면 소리를 켜고 키보드로 타이핑을 하면 됩니다.
    * 스페이스 등의 공백 문자를 입력할 때마다 화음이 달라집니다.
    * 일반 글자를 입력할 때마다 화음에 맞는 음이 무작위로 생성됩니다.
+
+7. ChordingCoding을 사용하는 동안 사용자의 작업 맥락을 추적하여 기록합니다.
+   * 사용했던 프로그램 이름, 키보드 입력, 마우스 클릭 및 스크롤 입력이 기록됩니다.
+   * 종료 후 Builds 폴더 안에 "WorkingContext.csv" 파일이 생성됩니다. 이것의 이름을 바꾸고 원하는 경로에 옮겨서 보관하세요.
+   * 기록한 데이터는 사용자의 컴퓨터에만 남으며, 외부로는 전송되지 않습니다.
   
 ## Update Log
+### [v.1.6](https://github.com/salt26/chordingcoding/tree/v.1.6) - 21/06/16
+* 시작 시 스플래시 화면 추가
+* 사용자 작업 맥락 추적 기능 추가
+
 ### [v.1.4](https://github.com/salt26/chordingcoding/tree/v.1.4) - 20/02/05
 * 테마 변경 (중세 탐방 -> 중세 유적지)
 * 전반적인 테마 개선

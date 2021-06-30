@@ -1,22 +1,38 @@
-﻿using System;
+﻿/*
+MIT License
+
+Copyright (c) 2019 salt26
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Timers;
-using System.Reflection;
-using System.Runtime.InteropServices;
-using System.ComponentModel;
-using System.Data;
-using System.Threading;
 using System.IO;
 //using Sanford.Multimedia.Midi;
-using NAudio.Wave;
-using NAudio.MediaFoundation;
-using NAudio.CoreAudioApi;
-using NAudio.Dmo.Effect;
-using NAudio.Dmo;
+//using NAudio.Wave;
+//using NAudio.MediaFoundation;
+//using NAudio.CoreAudioApi;
+//using NAudio.Dmo.Effect;
+//using NAudio.Dmo;
 using NFluidsynth;
+using ChordingCoding.Utility;
 
 namespace ChordingCoding.SFX
 {
@@ -64,7 +80,7 @@ namespace ChordingCoding.SFX
         /// <summary>
         /// 현재 화음
         /// </summary>
-        public static Chord chord;
+        public static Chord chord { get; private set; }
 
         private static int _noteResolution = 4;
         public static int NoteResolution
@@ -85,9 +101,9 @@ namespace ChordingCoding.SFX
             }
         }
         //public static OutputDevice outDevice;
-        public static Settings settings;
-        public static Synth syn;
-        public static AudioDriver adriver;
+        private static Settings settings;
+        private static Synth syn;
+        private static AudioDriver adriver;
 
         /*
         public static BufferedWaveProvider sound;
@@ -98,8 +114,20 @@ namespace ChordingCoding.SFX
         public static byte[] buffer;
         public static MemoryStream stream;
         */
+        private static bool IsReady { get; set; }
 
-        public static bool IsReady { get; private set; } = false;
+        private static bool canStart = false;
+        public static bool HasStart
+        {
+            get
+            {
+                return canStart && IsReady;
+            }
+            private set
+            {
+                canStart = value;
+            }
+        }
 
         /// <summary>
         /// 동기화된 박자에 맞게 음표가 재생되는 순간 호출되는 이벤트입니다.
@@ -129,6 +157,9 @@ namespace ChordingCoding.SFX
         /// <param name="timerTickDelegates">타이머의 틱마다 추가로 실행할 메서드의 대리자 목록</param>
         public static void Initialize(string SFXThemeName, int noteResolution, Timer.TickDelegate[] timerTickDelegates = null)
         {
+            IsReady = false;
+            HasStart = false;
+
             //outDevice = new OutputDevice(0);
             settings = new Settings();
             settings[ConfigurationKeys.SynthAudioChannels].IntValue = 2;
@@ -141,6 +172,7 @@ namespace ChordingCoding.SFX
             catch (FileNotFoundException e)
             {
                 Console.WriteLine(e.StackTrace);
+                return;
             }
             for (int i = 0; i < 16; i++)
             {
@@ -178,10 +210,9 @@ namespace ChordingCoding.SFX
             });
             */
             SFXTheme.CurrentSFXTheme = SFXTheme.FindSFXTheme(SFXThemeName);
-            Console.WriteLine(SFXThemeName + " " + SFXTheme.CurrentSFXTheme.Name);
+            //Console.WriteLine(SFXThemeName + " " + SFXTheme.CurrentSFXTheme.Name);
             NoteResolution = noteResolution;
             Accompaniment.Initialize();
-            ThemeChanged();
 
             tickDelegate += Tick;
             if (timerTickDelegates != null)
@@ -191,9 +222,6 @@ namespace ChordingCoding.SFX
                     tickDelegate += t;
                 }
             }
-
-            timerNumber = 0;
-            timer = new Timer(1, TickTimer);
 
             mgmt = new PowerManagement();
             mgmt.InitPowerEvents();
@@ -237,14 +265,31 @@ namespace ChordingCoding.SFX
         }
 
         /// <summary>
+        /// 이 클래스가 작동하기 위해서는
+        /// Initialize()가 호출된 후에 반드시 호출되어야 합니다.
+        /// </summary>
+        public static void Start()
+        {
+            if (IsReady && !HasStart)
+            {
+                timerNumber = 0;
+                timer = new Timer(1, TickTimer);
+                Accompaniment.Start();
+                HasStart = true;
+                ThemeChanged();
+
+                new Test.SFXTest();   // Run some tests.
+            }
+        }
+
+        /// <summary>
         /// 타이머를 멈추고 일시적으로 음악이 재생되지 않게 합니다.
         /// </summary>
         public static void Suspend()
         {
-            if (IsReady)
+            if (HasStart)
             {
                 for (int i = 0; i <= 8; i++) StopPlaying(i);
-                Score.ClearNoteOffBuffer();
                 timer.Stop();
                 IsReady = false;
             }
@@ -255,7 +300,7 @@ namespace ChordingCoding.SFX
         /// </summary>
         public static void Resume()
         {
-            if (!IsReady)
+            if (!HasStart)
             {
                 timer = new Timer(1, TickTimer);
                 IsReady = true;
@@ -267,10 +312,9 @@ namespace ChordingCoding.SFX
         /// </summary>
         public static void Dispose()
         {
-            if (IsReady)
+            if (HasStart)
             {
                 for (int i = 0; i <= 8; i++) StopPlaying(i);
-                Score.ClearNoteOffBuffer();
                 timer.Stop();
                 //outDevice.Close();
                 adriver.Dispose();
@@ -281,6 +325,7 @@ namespace ChordingCoding.SFX
                 syn.Dispose();
                 settings.Dispose();
                 mgmt.Stop();
+                HasStart = false;
                 IsReady = false;
             }
         }
@@ -297,7 +342,6 @@ namespace ChordingCoding.SFX
             {
                 Score.InitializePlaylist();
                 for (int i = 0; i <= 8; i++) StopPlaying(i);
-                Score.ClearNoteOffBuffer();
 
                 foreach (KeyValuePair<int, SFXTheme.InstrumentInfo> p in SFXTheme.CurrentSFXTheme.Instruments)
                 {
@@ -342,7 +386,7 @@ namespace ChordingCoding.SFX
         /// 자동 반주의 상태를 초기화합니다.
         /// 이것을 호출하는 함수는 반드시 이 함수 호출을 "play"라는 lockName의 Util.TaskQueue 함수 안에서 수행해야 합니다.
         /// </summary>
-        public static void ResetAccompaniment()
+        private static void ResetAccompaniment()
         {
             if (SFXTheme.IsReady)
             {
@@ -359,7 +403,7 @@ namespace ChordingCoding.SFX
         }
 
         /// <summary>
-        /// 음표 하나를 버퍼에 저장했다가 다음 박자에 맞춰 재생 장치에서 재생합니다.
+        /// 음표 하나를 버퍼에 저장했다가 다음 박자에 맞춰 재생합니다.
         /// </summary>
         /// <param name="pitch"></param>
         /// <param name="rhythm"></param>
@@ -367,7 +411,7 @@ namespace ChordingCoding.SFX
         /// <param name="velocity"></param>
         public static void PlayANoteSync(int pitch, int velocity, int rhythm, int staff)
         {
-            if (!IsReady) return;
+            if (!HasStart) return;
 
             void PlaySync(object[] args)
             {
@@ -405,13 +449,13 @@ namespace ChordingCoding.SFX
         /// <param name="staff"></param>
         public static void StopPlaying(int staff)
         {
-            if (!IsReady) return;
+            if (!HasStart) return;
             //Score.Stop(outDevice, staff);
             Score.Stop(syn, staff);
         }
 
         /// <summary>
-        /// 현재 화음에 맞는 음 하나를 재생합니다.
+        /// 현재 화음에 맞는 음 하나를 버퍼에 저장했다가 다음 박자에 맞춰 재생합니다.
         /// </summary>
         /// <returns></returns>
         public static void PlayNoteInChord()
@@ -438,25 +482,31 @@ namespace ChordingCoding.SFX
         private static void PlayChordTransition()
         {
             // ChordingCoding에서 공백 문자를 입력할 때 호출됨
+            if (!HasStart) return;
 
             int pitch;
             StopPlaying(0);
             chord = new Chord(SFXTheme.CurrentSFXTheme.ChordTransition, chord);
             pitch = chord.NextNote();
             syncPlayBuffer = new List<Note>();
+            Random r = new Random();
 
-            SFXTheme.InstrumentInfo ii = SFXTheme.CurrentSFXTheme.Instruments[0];
-            foreach (int p in chord.NotesInChord())
+            if (r.Next(0, 27) > 0)
             {
-                if (p != pitch)
+                // TPS 29 기준으로 한 마디에 한 번씩 시도할 때 1분에 한 번 꼴로 발생하는 확률로 채널(staff) 0의 악기를 재생하지 않음
+                SFXTheme.InstrumentInfo ii = SFXTheme.CurrentSFXTheme.Instruments[0];
+                foreach (int p in chord.NotesInChord())
                 {
-                    PlayANoteSync(ii.whitespacePitchModulator(p),
-                        ii.whitespaceVolume, ii.whitespaceRhythm, 0);
+                    if (p != pitch)
+                    {
+                        PlayANoteSync(ii.whitespacePitchModulator(p),
+                            ii.whitespaceVolume, ii.whitespaceRhythm, 0);
+                    }
                 }
             }
             foreach (KeyValuePair<int, SFXTheme.InstrumentInfo> pair in SFXTheme.CurrentSFXTheme.Instruments)
             {
-                if (pair.Value.whitespaceVolume > 0 && pair.Key != 1)
+                if (pair.Value.whitespaceVolume > 0 && pair.Key > 1)
                 {
                     PlayANoteSync(pair.Value.whitespacePitchModulator(pitch),
                         pair.Value.whitespaceVolume, pair.Value.whitespaceRhythm, pair.Key);
@@ -464,7 +514,6 @@ namespace ChordingCoding.SFX
             }
 
             // 빠르기 변경
-            Random r = new Random();
             SetTickPerSecond((int)TICK_PER_SECOND + (int)(1f * Math.Round(Util.GaussianRandom(r), MidpointRounding.AwayFromZero)));
 
             OnChordTransition?.Invoke(pitch);
@@ -476,7 +525,7 @@ namespace ChordingCoding.SFX
         /// <returns></returns>
         public static void PlayChordTransitionSync()
         {
-            if (IsReady)
+            if (HasStart)
             {
                 if (NoteResolution == 0)
                 {
@@ -519,6 +568,8 @@ namespace ChordingCoding.SFX
         /// </summary>
         private static void Tick()
         {
+            if (!HasStart) return;
+
             //Score.NoteOff(outDevice);
             Score.NoteOff(syn);
 
@@ -532,17 +583,17 @@ namespace ChordingCoding.SFX
                     {
                         StopPlaying(5);
                         SFXTheme.InstrumentInfo inst = SFXTheme.CurrentSFXTheme.Instruments[5];
-                        Note note = new Note(inst.sfxPitchModulator(45), inst.sfxVolume, inst.sfxRhythm, Measure, Position, 5);
+                        Note note = new Note(inst.sfxPitchModulator(45), inst.sfxVolume, inst.sfxRhythm * 64 * 60, Measure, Position, 5);   // 음표를 3840배 길게 늘여서 재생
                         //Score.PlayANoteForever(outDevice, note, (int)Math.Round(inst.sfxVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));     // 기본 빗소리 (사라지지 않아야 함)
-                        Score.PlayANoteForever(syn, note, SFXTheme.CurrentSFXTheme.Volume / 100f);
+                        Score.PlayANote(syn, note, SFXTheme.CurrentSFXTheme.Volume / 100f);
                     }
                     if (tickNumber % ((int)TICK_PER_SECOND * 10) == (int)TICK_PER_SECOND * 5)
                     {
                         StopPlaying(6);
                         SFXTheme.InstrumentInfo inst = SFXTheme.CurrentSFXTheme.Instruments[6];
-                        Note note = new Note(inst.sfxPitchModulator(45), inst.sfxVolume, inst.sfxRhythm, Measure, Position, 6);
+                        Note note = new Note(inst.sfxPitchModulator(45), inst.sfxVolume, inst.sfxRhythm * 64 * 60, Measure, Position, 6);   // 음표를 3840배 길게 늘여서 재생
                         //Score.PlayANoteForever(outDevice, note, (int)Math.Round(inst.sfxVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));     // 기본 빗소리 (사라지지 않아야 함)
-                        Score.PlayANoteForever(syn, note, SFXTheme.CurrentSFXTheme.Volume / 100f);
+                        Score.PlayANote(syn, note, SFXTheme.CurrentSFXTheme.Volume / 100f);
                     }
                 }
 
@@ -612,7 +663,7 @@ namespace ChordingCoding.SFX
                 syncTransitionBuffer = false;
                 PlayChordTransition();
             }
-            else if (syncTransitionBuffer && tickNumber % 16 == 0)
+            else if (syncTransitionBuffer && tickNumber % 32 == 0)
             {
                 syncTransitionBuffer = false;
                 PlayChordTransition();
@@ -638,7 +689,7 @@ namespace ChordingCoding.SFX
         /// </summary>
         private static void TickTimer()
         {
-            if (IsReady)
+            if (HasStart)
             {
                 if (timerNumber >= (int)(1000f / TICK_PER_SECOND))
                 {
@@ -792,7 +843,7 @@ namespace ChordingCoding.SFX
         /*
         public static void SoundPipeline(byte[] tempLeftBuffer)
         {
-            #region TODO 곧 없어질, 음악을 1초 단위로 합성하는 로직
+#region TODO 곧 없어질, 음악을 1초 단위로 합성하는 로직
             float second_per_tick = 1f / TICK_PER_SECOND;
             int frameNum = (int)(second_per_tick * 44100 * 2);
             GCHandle pinnedLeftArray = GCHandle.Alloc(tempLeftBuffer, GCHandleType.Pinned);
@@ -806,7 +857,7 @@ namespace ChordingCoding.SFX
             Console.WriteLine();
 
             pinnedLeftArray.Free();
-            #endregion
+#endregion
         }
         */
     }

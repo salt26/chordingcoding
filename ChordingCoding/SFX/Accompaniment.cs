@@ -1,8 +1,28 @@
-﻿using System;
+﻿/*
+MIT License
+
+Copyright (c) 2019 salt26
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ChordingCoding.SFX
 {
@@ -23,7 +43,9 @@ namespace ChordingCoding.SFX
         /// </summary>
         public static Dictionary<int, Pattern> currentPatterns = new Dictionary<int, Pattern>();
 
-        public static bool IsReady { get; private set; } = false;
+        private static bool IsReady { get; set; } = false;
+        public static bool HasStart { get; private set; } = false;
+
 
         /// <summary>
         /// 반주 패턴 구조체입니다.
@@ -653,6 +675,18 @@ namespace ChordingCoding.SFX
         }
 
         /// <summary>
+        /// 반주 패턴 재생 기능이 작동하기 위해서는
+        /// Initialize()가 호출된 후에 반드시 호출되어야 합니다.
+        /// </summary>
+        public static void Start()
+        {
+            if (IsReady && !HasStart)
+            {
+                HasStart = true;
+            }
+        }
+
+        /// <summary>
         /// 특정 staff의 현재 반주 패턴을 새로 설정하고 재생합니다.
         /// 현재 음악 테마의 자동 반주가 꺼진 상태이더라도 호출되어야 합니다.
         /// </summary>
@@ -667,7 +701,9 @@ namespace ChordingCoding.SFX
                 GenerateRhythmPattern(Music.NoteResolution);
             }
 
-            Score.Play(Accompaniment.currentPatterns[staff].score, "Accompaniment", SFXTheme.CurrentSFXTheme.Instruments[staff].accompanimentVolume / 127f);
+            if (HasStart) {
+                Score.Play(Accompaniment.currentPatterns[staff].score, "Accompaniment", SFXTheme.CurrentSFXTheme.Instruments[staff].accompanimentVolume / 127f);
+            }
         }
 
         /// <summary>

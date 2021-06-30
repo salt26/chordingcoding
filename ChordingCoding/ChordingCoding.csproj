@@ -51,12 +51,12 @@
     <ApplicationIcon>Resources\NoteWord.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>ChordingCoding.Program</StartupObject>
+    <StartupObject>ChordingCoding.UI.Program</StartupObject>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
     <OutputPath>bin\x64\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DefineConstants>TRACE;DEBUG</DefineConstants>
     <DebugType>full</DebugType>
     <PlatformTarget>x64</PlatformTarget>
     <LangVersion>7.3</LangVersion>
@@ -100,8 +100,83 @@
     <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="NAudio, Version=1.9.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NAudio.1.9.0\lib\net35\NAudio.dll</HintPath>
+    <Reference Include="IKVM.AWT.WinForms, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.AWT.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Beans, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.OpenJDK.Beans.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Charsets, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.OpenJDK.Charsets.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Corba, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.OpenJDK.Corba.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Core, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.OpenJDK.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Jdbc, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.OpenJDK.Jdbc.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Management, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.OpenJDK.Management.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Media, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.OpenJDK.Media.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Misc, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.OpenJDK.Misc.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Naming, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.OpenJDK.Naming.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Remoting, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.OpenJDK.Remoting.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Security, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.OpenJDK.Security.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.SwingAWT, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.OpenJDK.SwingAWT.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Text, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.OpenJDK.Text.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Tools, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.OpenJDK.Tools.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.Util, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.OpenJDK.Util.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.XML.API, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.OpenJDK.XML.API.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.XML.Bind, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.OpenJDK.XML.Bind.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.XML.Crypto, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.OpenJDK.XML.Crypto.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.XML.Parse, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.OpenJDK.XML.Parse.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.XML.Transform, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.OpenJDK.XML.Transform.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.XML.WebServices, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.OpenJDK.XML.WebServices.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.OpenJDK.XML.XPath, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.OpenJDK.XML.XPath.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.Runtime, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.Runtime.dll</HintPath>
+    </Reference>
+    <Reference Include="IKVM.Runtime.JNI, Version=7.2.4630.5, Culture=neutral, PublicKeyToken=13235d27fcbfff58, processorArchitecture=MSIL">
+      <HintPath>..\packages\IKVM.7.2.4630.5\lib\IKVM.Runtime.JNI.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio, Version=1.10.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NAudio.1.10.0\lib\net35\NAudio.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
@@ -119,69 +194,102 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="twitter-korean-processor, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Moda.Korean.TwitterKoreanProcessorCS.4.1.0\lib\twitter-korean-processor.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="NFluidsynth\AudioDriver.cs" />
-    <Compile Include="NFluidsynth\ConfigurationKeys.cs" />
-    <Compile Include="NFluidsynth\Enums.cs" />
-    <Compile Include="NFluidsynth\FileRenderer.cs" />
-    <Compile Include="NFluidsynth\FluidSynthInteropException.cs" />
-    <Compile Include="NFluidsynth\FluidsynthObject.cs" />
-    <Compile Include="NFluidsynth\Logger.cs" />
-    <Compile Include="NFluidsynth\MidiDriver.cs" />
-    <Compile Include="NFluidsynth\MidiEvent.cs" />
-    <Compile Include="NFluidsynth\MidiEventHandler.cs" />
-    <Compile Include="NFluidsynth\MidiRouter.cs" />
-    <Compile Include="NFluidsynth\MidiRouterRule.cs" />
-    <Compile Include="NFluidsynth\Native\LibFluidsynth.Audio.cs" />
-    <Compile Include="NFluidsynth\Native\LibFluidsynth.cs" />
-    <Compile Include="NFluidsynth\Native\LibFluidsynth.Midi.cs" />
-    <Compile Include="NFluidsynth\Native\LibFluidsynth.Misc.cs" />
-    <Compile Include="NFluidsynth\Native\LibFluidsynth.Settings.cs" />
-    <Compile Include="NFluidsynth\Native\LibFluidsynth.SfLoader.cs" />
-    <Compile Include="NFluidsynth\Native\LibFluidsynth.Synth.cs" />
-    <Compile Include="NFluidsynth\Player.cs" />
-    <Compile Include="NFluidsynth\Settings.cs" />
-    <Compile Include="NFluidsynth\SoundFont.cs" />
-    <Compile Include="NFluidsynth\SoundFontLoader.cs" />
-    <Compile Include="NFluidsynth\Synth.cs" />
-    <Compile Include="NFluidsynth\Utility.cs" />
-    <Compile Include="NFluidsynth\Voice.cs" />
-    <Compile Include="SFX\PowerManagement.cs" />
-    <Compile Include="SFX\Accompaniment.cs" />
-    <Compile Include="SFX\Chord.cs" />
-    <Compile Include="Form1.cs">
+    <Compile Include="SFX\RhythmPattern.cs" />
+    <Compile Include="SFX\Test\SFXTest.cs" />
+    <Compile Include="UI\SplashScreen.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="Form1.Designer.cs">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="UI\SplashScreen.Designer.cs">
+      <DependentUpon>SplashScreen.cs</DependentUpon>
     </Compile>
-    <Compile Include="InterceptKeys.cs" />
-    <Compile Include="SFX\Music.cs" />
-    <Compile Include="SFX\SFXTheme.cs" />
-    <Compile Include="SFX\Timer.cs" />
-    <Compile Include="Util.cs" />
-    <Compile Include="VFX\Particle.cs" />
-    <Compile Include="VFX\ParticleSystem.cs" />
+    <Compile Include="Word\English\SymSpell\EditDistance.cs" />
+    <Compile Include="Word\English\EnglishSentimentAnalyzer.cs" />
+    <Compile Include="Word\English\EnglishWordSentiment.cs" />
+    <Compile Include="Word\English\SymSpell\SoftWx.Match\DamerauOSA.cs" />
+    <Compile Include="Word\English\SymSpell\SoftWx.Match\Helpers.cs" />
+    <Compile Include="Word\English\SymSpell\SoftWx.Match\IDistance.cs" />
+    <Compile Include="Word\English\SymSpell\SoftWx.Match\ISimilarity.cs" />
+    <Compile Include="Word\English\SymSpell\SoftWx.Match\Levenshtein.cs" />
+    <Compile Include="Word\English\SymSpell\SymSpell.cs" />
+    <Compile Include="Word\Korean\KoreanWordSentiment.cs" />
+    <Compile Include="Word\Korean\TwitterKoreanProcessorCS.cs" />
+    <Compile Include="Word\Korean\Hangul.cs" />
+    <Compile Include="SFX\NFluidsynth\AudioDriver.cs" />
+    <Compile Include="SFX\NFluidsynth\ConfigurationKeys.cs" />
+    <Compile Include="SFX\NFluidsynth\Enums.cs" />
+    <Compile Include="SFX\NFluidsynth\FileRenderer.cs" />
+    <Compile Include="SFX\NFluidsynth\FluidSynthInteropException.cs" />
+    <Compile Include="SFX\NFluidsynth\FluidsynthObject.cs" />
+    <Compile Include="SFX\NFluidsynth\Logger.cs" />
+    <Compile Include="SFX\NFluidsynth\MidiDriver.cs" />
+    <Compile Include="SFX\NFluidsynth\MidiEvent.cs" />
+    <Compile Include="SFX\NFluidsynth\MidiEventHandler.cs" />
+    <Compile Include="SFX\NFluidsynth\MidiRouter.cs" />
+    <Compile Include="SFX\NFluidsynth\MidiRouterRule.cs" />
+    <Compile Include="SFX\NFluidsynth\Native\LibFluidsynth.Audio.cs" />
+    <Compile Include="SFX\NFluidsynth\Native\LibFluidsynth.cs" />
+    <Compile Include="SFX\NFluidsynth\Native\LibFluidsynth.Midi.cs" />
+    <Compile Include="SFX\NFluidsynth\Native\LibFluidsynth.Misc.cs" />
+    <Compile Include="SFX\NFluidsynth\Native\LibFluidsynth.Settings.cs" />
+    <Compile Include="SFX\NFluidsynth\Native\LibFluidsynth.SfLoader.cs" />
+    <Compile Include="SFX\NFluidsynth\Native\LibFluidsynth.Synth.cs" />
+    <Compile Include="SFX\NFluidsynth\Player.cs" />
+    <Compile Include="SFX\NFluidsynth\Settings.cs" />
+    <Compile Include="SFX\NFluidsynth\SoundFont.cs" />
+    <Compile Include="SFX\NFluidsynth\SoundFontLoader.cs" />
+    <Compile Include="SFX\NFluidsynth\Synth.cs" />
+    <Compile Include="SFX\NFluidsynth\Utility.cs" />
+    <Compile Include="SFX\NFluidsynth\Voice.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Theme.cs" />
-    <Compile Include="Interfaces\TrackBarMenuItem.cs" />
+    <Compile Include="SFX\PowerManagement.cs" />
+    <Compile Include="SFX\Accompaniment.cs" />
+    <Compile Include="SFX\Chord.cs" />
+    <Compile Include="UI\MainForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="UI\MainForm.Designer.cs">
+      <DependentUpon>MainForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="UI\TypingTracker.cs" />
+    <Compile Include="SFX\Music.cs" />
+    <Compile Include="SFX\SFXTheme.cs" />
+    <Compile Include="SFX\Timer.cs" />
+    <Compile Include="Word\Korean\KoreanSentimentAnalyzer.cs" />
+    <Compile Include="Util.cs" />
+    <Compile Include="UI\VFX\Particle.cs" />
+    <Compile Include="UI\VFX\ParticleSystem.cs" />
+    <Compile Include="UI\Theme.cs" />
+    <Compile Include="UI\TrackBarMenuItem.cs" />
     <Compile Include="SFX\Note.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SFX\Score.cs" />
-    <EmbeddedResource Include="Form1.resx">
-      <DependentUpon>Form1.cs</DependentUpon>
+    <Compile Include="Word\SentimentAnalyzer.cs" />
+    <Compile Include="Word\WordSentiment.cs" />
+    <EmbeddedResource Include="UI\MainForm.resx">
+      <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <SubType>Designer</SubType>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <EmbeddedResource Include="UI\SplashScreen.resx">
+      <DependentUpon>SplashScreen.cs</DependentUpon>
+    </EmbeddedResource>
+    <None Include="Resources\Gultan Bonte.ttf" />
+    <None Include="Resources\Typing.wav" />
+    <None Include="Word\English\EnglishSentiment.csv" />
+    <None Include="Word\Korean\HangulSentiment1.csv" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -197,6 +305,21 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\Logos\logo00.png" />
+    <Content Include="Resources\Logos\logo09.png" />
+    <Content Include="Resources\Logos\logo10.png" />
+    <Content Include="Resources\Logos\logo11.png" />
+    <Content Include="Resources\Logos\logo12.png" />
+    <Content Include="Resources\Logos\logo13.png" />
+    <Content Include="Resources\Logos\logo14.png" />
+    <Content Include="Resources\Logos\logo01.png" />
+    <Content Include="Resources\Logos\logo02.png" />
+    <Content Include="Resources\Logos\logo03.png" />
+    <Content Include="Resources\Logos\logo04.png" />
+    <Content Include="Resources\Logos\logo05.png" />
+    <Content Include="Resources\Logos\logo06.png" />
+    <Content Include="Resources\Logos\logo07.png" />
+    <Content Include="Resources\Logos\logo08.png" />
     <Content Include="Resources\NoteWord.ico" />
     <Content Include="Resources\Dot.png" />
     <Content Include="Resources\Leaf11.png" />
@@ -218,12 +341,12 @@
     <Content Include="Resources\Leaf35.png" />
     <Content Include="Resources\Leaf36.png" />
     <Content Include="Resources\Note8_.png" />
-    <None Include="Resources\NewIcon.png" />
     <Content Include="Resources\Rain.png" />
     <Content Include="Resources\Rain_.png" />
     <Content Include="Resources\Star.png" />
+    <Content Include="Resources\Title.png" />
     <Content Include="Resources\Tray.ico" />
-    <Content Include="Resources\Tray.png" />
+    <None Include="Resources\Typing2.wav" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.2">
@@ -237,8 +360,6 @@
       <Install>false</Install>
     </BootstrapperPackage>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Scripts\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

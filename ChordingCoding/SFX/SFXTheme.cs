@@ -1,8 +1,27 @@
-﻿using System;
+﻿/*
+MIT License
+
+Copyright (c) 2019 salt26
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 //using Sanford.Multimedia.Midi;
 
 namespace ChordingCoding.SFX
@@ -143,7 +162,7 @@ namespace ChordingCoding.SFX
             {
                 _theme = value;
 
-                if (Music.IsReady)
+                if (Music.HasStart)
                 {
                     Music.ThemeChanged();
                 }
@@ -480,6 +499,8 @@ namespace ChordingCoding.SFX
             availableInstruments.Add(new CharacterInstrumentInfo(52, (pitch) => (pitch + 19) % 24 + 53, 48, 127, (pitch) => (pitch + 19) % 24 + 53, 48, 0));    // [24] Choir channel 1, Choir aahs (Alto)
             availableInstruments.Add(new CharacterInstrumentInfo(52, (pitch) => (pitch + 5) % 24 + 43, 48, 127, (pitch) => (pitch + 5) % 24 + 43, 48, 0));      // [25] Choir channel 2, Choir aahs (Bariton)
             availableInstruments.Add(new AccompanimentInstrumentInfo(47, (pitch) => ((pitch + 6) % 12) + 18, 64, 100));                                         // [26] Choir channel 7, Timpani
+            availableInstruments.Add(new AccompanimentInstrumentInfo(-1, (pitch) => pitch, 0, 72));                                                 // [27] channel 7 또는 8에서 1번 악기를 참조하여 재생할 때 사용
+            availableInstruments.Add(new AccompanimentInstrumentInfo(-1, (pitch) => pitch, 0, 112));                                                // [28] channel 7 또는 8에서 1번 악기를 참조하여 재생할 때 사용
 
             Dictionary<int, InstrumentInfo> instruments;
 
@@ -562,16 +583,16 @@ namespace ChordingCoding.SFX
             
             instruments = new Dictionary<int, InstrumentInfo>();
             instruments.Add(7, availableInstruments[20]);
-            instruments.Add(8, availableInstruments[21]);
+            instruments.Add(8, availableInstruments[27]);
             availableInstrumentSets.Add(new InstrumentSet("Melody", "멜로디", instruments, InstrumentSet.Type.accompaniment, 3, 7));   // 1번 채널의 악기를 사용
 
             instruments = new Dictionary<int, InstrumentInfo>();
             instruments.Add(7, availableInstruments[26]);
-            instruments.Add(8, availableInstruments[21]);
+            instruments.Add(8, availableInstruments[28]);
             availableInstrumentSets.Add(new InstrumentSet("Timpani", "팀파니", instruments, InstrumentSet.Type.accompaniment, 1, 3));
 
             instruments = new Dictionary<int, InstrumentInfo>();
-            instruments.Add(7, availableInstruments[21]);
+            instruments.Add(7, availableInstruments[27]);
             availableInstrumentSets.Add(new InstrumentSet("Guitar", "기타", instruments, InstrumentSet.Type.accompaniment, 4, 5));   // 1번 채널의 악기를 사용, 밑반주 패턴이 "멜로디"와 다름
 
             instruments = new Dictionary<int, InstrumentInfo>();

@@ -29,8 +29,14 @@ namespace ChordingCoding.SFX
 {
     public class Chord
     {
-        public enum Root { C, Db, D, Eb, E, F, Gb, G, Ab, A, Bb, B }
-        public enum Type { Major, minor, sus2, sus4, dim, aug, dom7, m7, NULL = -1 }
+        public enum Root
+        {
+            C = 0, Db = 1, D = 2, Eb = 3, E = 4, F = 5,
+            Gb = 6, G = 7, Ab = 8, A = 9, Bb = 10, B = 11
+        }
+        public enum Type { Major = 0, minor = 1, aug = 2, dim = 3, sus4 = 4, dom7 = 5, m7 = 6, sus2 = 7, NULL = -1 }
+
+        public const bool VERBOSE = true;
 
         public Root root;
         public Type type;
@@ -55,6 +61,60 @@ namespace ChordingCoding.SFX
         /// <summary>
         /// 랜덤으로 화음을 초기화합니다.
         /// </summary>
+        public Chord()
+        {
+            Random r = new Random();
+            int rand;
+            minOctave = SFXTheme.CurrentSFXTheme.MinOctave;
+            maxOctave = SFXTheme.CurrentSFXTheme.MaxOctave;
+
+            Chord newChord = ChordTransitionMatrix.RomanNumeralToChord(Music.chordTransitionMatrix.SampleRomanNumeralFromBasic(
+                Music.key.mode, 0), Music.key.tonic);
+
+            root = newChord.root;
+            type = newChord.type;
+            if (VERBOSE)
+                Console.WriteLine(root.ToString() + type.ToString());
+
+            rand = r.Next(16);
+            octave = (minOctave + maxOctave) / 2;
+            switch (rand)
+            {
+                case 0:
+                    octave -= 2;
+                    break;
+                case 1:
+                case 2:
+                case 3:
+                    octave -= 1;
+                    break;
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                    break;
+                case 12:
+                case 13:
+                case 14:
+                    octave += 1;
+                    break;
+                default:    // case 15:
+                    octave += 2;
+                    break;
+            }
+            if (octave > maxOctave) octave = maxOctave;
+            if (octave < minOctave) octave = minOctave;
+
+        }
+
+        /// <summary>
+        /// Old chord initializing model (deprecated)
+        /// </summary>
+        /// <param name="chordTransition"></param>
         public Chord(SFXTheme.ChordTransitionType chordTransition)
         {
             Random r = new Random();
@@ -134,7 +194,7 @@ namespace ChordingCoding.SFX
                     if (octave < minOctave) octave = minOctave;
 
                     break;
-                    #endregion
+                #endregion
                 case SFXTheme.ChordTransitionType.SomewhatBlue:
                     #region Rain Chord
                     root = (Root)r.Next(12);
@@ -209,7 +269,7 @@ namespace ChordingCoding.SFX
                     if (octave < minOctave) octave = minOctave;
 
                     break;
-                    #endregion
+                #endregion
                 case SFXTheme.ChordTransitionType.SimilarOne:
                     #region Star Chord
                     root = (Root)r.Next(12);
@@ -299,6 +359,85 @@ namespace ChordingCoding.SFX
         /// <summary>
         /// 주어진 화음과 자연스럽게 이어지도록 새 화음을 초기화합니다.
         /// </summary>
+        /// <param name="c"></param>
+        public Chord(Chord c)
+        {
+            Random r = new Random();
+            int rand;
+            int oldP, p;
+            minOctave = SFXTheme.CurrentSFXTheme.MinOctave;
+            maxOctave = SFXTheme.CurrentSFXTheme.MaxOctave;
+
+            if (c.type == Type.NULL)
+            {
+                Music.key.Transpose();
+            }
+
+            Chord newChord = ChordTransitionMatrix.RomanNumeralToChord(Music.chordTransitionMatrix.SampleRomanNumeralFromBasic(
+                Music.key.mode, ChordTransitionMatrix.ChordToRomanNumeral(c, Music.key.tonic)), Music.key.tonic);
+
+            root = newChord.root;
+            type = newChord.type;
+            if (VERBOSE)
+                Console.WriteLine(root.ToString() + type.ToString());
+
+            rand = r.Next(16);
+            octave = c.octave;
+            switch (rand)
+            {
+                case 0:
+                    octave -= 1;
+                    if (octave < minOctave) octave = minOctave + 1;
+                    break;
+                case 1:
+                case 2:
+                case 3:
+                    octave -= 1;
+                    if (octave < minOctave) octave = minOctave;
+                    break;
+                case 4:
+                case 5:
+                case 6:
+                case 7:
+                case 8:
+                case 9:
+                case 10:
+                case 11:
+                    break;
+                case 12:
+                case 13:
+                case 14:
+                    octave += 1;
+                    if (octave > maxOctave) octave = maxOctave;
+                    break;
+                default:    // case 15:
+                    octave += 1;
+                    if (octave > maxOctave) octave = maxOctave - 1;
+                    break;
+            }
+            if (octave > maxOctave) octave = maxOctave;
+            if (octave < minOctave) octave = minOctave;
+
+            oldP = (int)c.root + c.octave * 12;
+            p = (int)root + octave * 12;
+            while (oldP + 12 < p)
+            {
+                octave--;
+                p = (int)root + octave * 12;
+            }
+            while (oldP - 12 > p)
+            {
+                octave++;
+                p = (int)root + octave * 12;
+            }
+            if (octave > maxOctave) octave = maxOctave;
+            if (octave < minOctave) octave = minOctave;
+        }
+
+        /// <summary>
+        /// Old chord transition model (deprecated)
+        /// </summary>
+        /// <param name="chordTransition"></param>
         /// <param name="c"></param>
         public Chord(SFXTheme.ChordTransitionType chordTransition, Chord c)
         {
@@ -1012,7 +1151,7 @@ namespace ChordingCoding.SFX
                         break;
                 }
             }
-            
+
             return (p + TypeToNote(v)) % 128;
         }
 
@@ -1130,7 +1269,7 @@ namespace ChordingCoding.SFX
         public static Chord RecognizeChordFromScore(Score score, bool use4Harmonics = false)
         {
             // L. Oudre, Y. Grenier, and C. Févotte. Chord Recognition by Fitting Rescaled Chroma Vectors to Chord Templates. IEEE Transactions on Audio, Speech, and Language Processing, vol. 19, no. 7, pp. 2222-2233, 2011.
-            
+
             const double e = 0.0000000000000001;  // To avoid numerical instability
 
             #region Set an appropriate chord template.
@@ -1494,5 +1633,4 @@ namespace ChordingCoding.SFX
             return Color.FromArgb((int)(r + 0.5f), (int)(g + 0.5f), (int)(b + 0.5f));
         }
     }
-
 }

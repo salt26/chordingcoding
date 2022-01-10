@@ -51,12 +51,12 @@ namespace ChordingCoding.UI
         /// <summary>
         /// 감정 분석을 실시할지 결정합니다.
         /// </summary>
-        public const bool ENABLE_SENTIMENT_ANALYZER = false;
+        public const bool ENABLE_SENTIMENT_ANALYZER = true;
 
         /// <summary>
         /// 작업 시 발생하는 이벤트를 파일에 기록할지 결정합니다.
         /// </summary>
-        public const bool ENABLE_CONTEXT_LOGGING = true;
+        public const bool ENABLE_CONTEXT_LOGGING = false;
 
         static Dictionary<string, int> _opacity = new Dictionary<string, int>();
         static List<ParticleSystem> particleSystems = new List<ParticleSystem>();

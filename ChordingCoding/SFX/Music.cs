@@ -25,6 +25,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using Newtonsoft.Json;
 //using Sanford.Multimedia.Midi;
 //using NAudio.Wave;
 //using NAudio.MediaFoundation;
@@ -77,10 +78,14 @@ namespace ChordingCoding.SFX
         // 같은 반주를 연속으로 재생한 횟수 (Key는 staff 번호)
         private static Dictionary<int, int> accompanimentPlayNumber = new Dictionary<int, int>();
 
+        public static MusicalKey key { get; private set; }
+
         /// <summary>
         /// 현재 화음
         /// </summary>
         public static Chord chord { get; private set; }
+
+        public static ChordTransitionMatrix chordTransitionMatrix = null;
 
         private static int _noteResolution = 4;
         public static int NoteResolution
@@ -209,6 +214,15 @@ namespace ChordingCoding.SFX
                 outputDevice.Play();
             });
             */
+
+            key = new MusicalKey();
+
+            using (StreamReader r = new StreamReader("ChordTransition.json"))
+            {
+                string json = r.ReadToEnd();
+                chordTransitionMatrix = JsonConvert.DeserializeObject<ChordTransitionMatrix>(json);
+            }
+
             SFXTheme.CurrentSFXTheme = SFXTheme.FindSFXTheme(SFXThemeName);
             //Console.WriteLine(SFXThemeName + " " + SFXTheme.CurrentSFXTheme.Name);
             NoteResolution = noteResolution;
@@ -373,7 +387,8 @@ namespace ChordingCoding.SFX
                     catch (ObjectDisposedException) { }
                     //catch (OutputDeviceException) { }
                 }
-                chord = new Chord(SFXTheme.CurrentSFXTheme.ChordTransition);
+                //chord = new Chord(SFXTheme.CurrentSFXTheme.ChordTransition);
+                chord = new Chord();
                 tickNumber = 0;
 
                 ResetAccompaniment();
@@ -486,7 +501,8 @@ namespace ChordingCoding.SFX
 
             int pitch;
             StopPlaying(0);
-            chord = new Chord(SFXTheme.CurrentSFXTheme.ChordTransition, chord);
+            //chord = new Chord(SFXTheme.CurrentSFXTheme.ChordTransition, chord);
+            chord = new Chord(chord);
             pitch = chord.NextNote();
             syncPlayBuffer = new List<Note>();
             Random r = new Random();

@@ -178,6 +178,10 @@
     <Reference Include="NAudio, Version=1.10.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NAudio.1.10.0\lib\net35\NAudio.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json, Version=6.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>.\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
@@ -199,6 +203,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="SFX\ChordTransitionMatrix.cs" />
+    <Compile Include="SFX\MusicalKey.cs" />
     <Compile Include="SFX\RhythmPattern.cs" />
     <Compile Include="SFX\Test\SFXTest.cs" />
     <Compile Include="UI\SplashScreen.cs">
@@ -288,6 +294,7 @@
     </EmbeddedResource>
     <None Include="Resources\Gultan Bonte.ttf" />
     <None Include="Resources\Typing.wav" />
+    <None Include="SFX\ChordTransition.json" />
     <None Include="Word\English\EnglishSentiment.csv" />
     <None Include="Word\Korean\HangulSentiment1.csv" />
     <None Include="packages.config" />

@@ -7,13 +7,13 @@ namespace ChordingCoding.SFX
     {
         public const bool VERBOSE = true;
 
-        public List<List<List<double>>> Basic;
-        public List<List<List<List<double>>>> Sentimental;
-        public List<List<List<List<List<double>>>>> SentimentVariational;
+        public List<List<List<double>>> basic;
+        public List<List<List<List<double>>>> sentimental;
+        public List<List<List<List<List<double>>>>> sentimentVariational;
 
         public List<double> GetBasicChordProbVector(MusicalKey.Mode mode, int prevChord)
         {
-            return NormalizeAndCumulate(Basic[(int)mode][prevChord]);
+            return NormalizeAndCumulate(basic[(int)mode][prevChord]);
         }
 
         public int SampleRomanNumeralFromBasic(MusicalKey.Mode mode, int prevChord)

@@ -105,6 +105,22 @@ namespace ChordingCoding.SFX
                 }
             }
         }
+
+        private static int _sentimentAwareness = 0;
+        public static int SentimentAwareness
+        {
+            get
+            {
+                return _sentimentAwareness;
+            }
+            set
+            {
+                if (value < 0) _sentimentAwareness = 0;
+                else if (value > 99) _sentimentAwareness = 99;
+                else _sentimentAwareness = value;
+            }
+        }
+
         //public static OutputDevice outDevice;
         private static Settings settings;
         private static Synth syn;

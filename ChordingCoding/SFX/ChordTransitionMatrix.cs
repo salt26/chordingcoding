@@ -13,12 +13,12 @@ namespace ChordingCoding.SFX
 
         public List<double> GetBasicChordProbVector(MusicalKey.Mode mode, int prevChord)
         {
-            return NormalizeAndCumulate(basic[(int)mode][prevChord]);
+            return Normalize(basic[(int)mode][prevChord]);
         }
 
         public int SampleRomanNumeralFromBasic(MusicalKey.Mode mode, int prevChord)
         {
-            List<double> vector = GetBasicChordProbVector(mode, prevChord);
+            List<double> vector = NormalizeAndCumulate(basic[(int)mode][prevChord]);
 
             Random r = new Random();
             double p = r.NextDouble();
@@ -42,6 +42,71 @@ namespace ChordingCoding.SFX
                     return mid;
                 }
                 else if(vector[mid] <= p)
+                {
+                    low = mid + 1;
+                }
+                else
+                {
+                    high = mid - 1;
+                }
+            }
+            if (VERBOSE)
+            {
+                if (low == 0)
+                    Console.WriteLine(vector[0]);
+                else
+                    Console.WriteLine(vector[low] - vector[low - 1]);
+            }
+            return low;
+        }
+
+        public List<double> GetSentimentalChordProbVector(int currSentimentIndex, MusicalKey.Mode mode, int prevChord)
+        {
+            return Normalize(sentimental[currSentimentIndex][(int)mode][prevChord]);
+        }
+
+        public List<double> GetSentimentVariationalChordProbVector(int prevSentimentIndex, int currSentimentIndex, MusicalKey.Mode mode, int prevChord)
+        {
+            return Normalize(sentimentVariational[prevSentimentIndex][currSentimentIndex][(int)mode][prevChord]);
+        }
+
+        public int SampleRomanNumeralFromAll(int prevSentimentIndex, int currSentimentIndex, MusicalKey.Mode mode, int prevChord, int sentimentAwareness)
+        {
+            if (sentimentAwareness < 0) sentimentAwareness = 0;
+            else if (sentimentAwareness > 99) sentimentAwareness = 99;
+            List<double> basicVector = GetBasicChordProbVector(mode, prevChord);
+            List<double> sentimentalVector = GetSentimentalChordProbVector(currSentimentIndex, mode, prevChord);
+            List<double> sentimentVariationalVector = GetSentimentVariationalChordProbVector(prevSentimentIndex, currSentimentIndex, mode, prevChord);
+            List<double> vector = new List<double>();
+            for (int i = 0; i < basicVector.Count; i++)
+            {
+                double interpolatedProb = (100 - sentimentAwareness) / 100f * basicVector[i] + sentimentAwareness / 200f * (sentimentalVector[i] + sentimentVariationalVector[i]);
+                vector.Add(interpolatedProb);
+            }
+            vector = NormalizeAndCumulate(vector);
+
+            Random r = new Random();
+            double p = r.NextDouble();
+
+            // Binary search
+            int low = 0;
+            int high = vector.Count - 1;
+            while (low < high)
+            {
+                int mid = (low + high) / 2;
+                if (mid == 0)
+                {
+                    if (VERBOSE)
+                        Console.WriteLine(vector[0]);
+                    return mid;
+                }
+                else if (vector[mid - 1] <= p && p < vector[mid])
+                {
+                    if (VERBOSE)
+                        Console.WriteLine(vector[mid] - vector[mid - 1]);
+                    return mid;
+                }
+                else if (vector[mid] <= p)
                 {
                     low = mid + 1;
                 }
@@ -92,6 +157,25 @@ namespace ChordingCoding.SFX
                 default: // Chord.Type.NULL:
                     return 0;
             }
+        }
+
+        private List<double> Normalize(List<double> probVector)
+        {
+            List<double> normalizedVector = new List<double>();
+            double sum = 0.0;
+
+            for (int i = 0; i < probVector.Count; i++)
+            {
+                sum += probVector[i];
+            }
+
+            if (sum == 0f) return probVector;
+
+            for (int i = 0; i < probVector.Count; i++)
+            {
+                normalizedVector.Add(probVector[i] / sum);
+            }
+            return normalizedVector;
         }
 
         private List<double> NormalizeAndCumulate(List<double> probVector)

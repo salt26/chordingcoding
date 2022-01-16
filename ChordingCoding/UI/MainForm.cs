@@ -260,6 +260,14 @@ namespace ChordingCoding.UI
 
             MarshallingUpdateSplashScreen(11);
             SetNoteResolution(resolution);
+            if (ENABLE_SENTIMENT_ANALYZER)
+            {
+                SetSentimentAwareness((int)Properties.Settings.Default["SentimentAwareness"]);
+            }
+            else
+            {
+                Music.SentimentAwareness = 0;
+            }
 
             MarshallingUpdateSplashScreen(12);
             if (ENABLE_SENTIMENT_ANALYZER)
@@ -314,6 +322,7 @@ namespace ChordingCoding.UI
                 Properties.Settings.Default["Accompaniment" + theme.Name] = theme.SFX.hasAccompanied;
             }
             Properties.Settings.Default["NoteResolution"] = Music.NoteResolution;
+            Properties.Settings.Default["SentimentAwareness"] = Music.SentimentAwareness;
             Properties.Settings.Default.Save();
             notifyIcon1.Dispose();
             TypingTracker.DestroyIMEContext();
@@ -757,6 +766,15 @@ namespace ChordingCoding.UI
                     단위리듬ToolStripMenuItem.Text = "단위 리듬 (없음)";
                     break;
             }
+        }
+
+        private void SetSentimentAwareness(int sentimentAwareness)
+        {
+            if (!ENABLE_SENTIMENT_ANALYZER) return;
+            if (sentimentAwareness < 0 || sentimentAwareness > 99) return;
+
+            Music.SentimentAwareness = sentimentAwareness;
+            // TODO: UI 만들고 반영하기
         }
 
         private void _4분음표ToolStripMenuItem_Click(object sender, EventArgs e)

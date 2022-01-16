@@ -21,6 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#define USE_NEW_SCHEME
 using System;
 
 namespace ChordingCoding.Word
@@ -31,7 +32,46 @@ namespace ChordingCoding.Word
     /// </summary>
     public abstract class WordSentiment
     {
-        // English: http://www.wjh.harvard.edu/~inquirer/homecat.htm
+#if USE_NEW_SCHEME
+        // English: https://link.springer.com/article/10.3758/s13428-012-0314-x#SecESM1
+        // Korean: http://ling.snu.ac.kr/kosac/pub/PACLIC26.pdf
+
+        public enum Valence
+        {
+            Low = 0, Medium = 1, High = 2, NULL = -1
+        };
+
+        public enum Arousal
+        {
+            Low = 0, Medium = 1, High = 2, NULL = -1
+        };
+
+        public string Word { get; protected set; }
+
+        public abstract Valence GetValence();
+        public abstract Arousal GetArousal();
+
+        public int GetCategoryIndex()
+        {
+            int v = (int)GetValence();
+            int a = (int)GetArousal();
+            if (v == -1 || a == -1)
+            {
+                return -1;
+            }
+            else
+            {
+                return 3 * v + a;
+            }
+        }
+
+        public virtual void Print()
+        {
+            string s = "Valence: " + GetValence().ToString() + "\tArousal: " + GetArousal().ToString();
+            Console.WriteLine(s);
+        }
+#else
+        // English(old): http://www.wjh.harvard.edu/~inquirer/homecat.htm
         // Korean: http://ling.snu.ac.kr/kosac/pub/PACLIC26.pdf
 
         public enum Valence
@@ -85,5 +125,6 @@ namespace ChordingCoding.Word
                 "\tIntention: " + GetIntention().ToString();
             Console.WriteLine(s);
         }
+#endif
     }
 }

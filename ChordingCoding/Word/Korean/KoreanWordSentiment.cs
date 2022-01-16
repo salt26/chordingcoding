@@ -21,6 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#define USE_NEW_SCHEME
 using System;
 
 namespace ChordingCoding.Word.Korean
@@ -30,6 +31,133 @@ namespace ChordingCoding.Word.Korean
     /// </summary>
     public class KoreanWordSentiment : WordSentiment
     {
+#if USE_NEW_SCHEME
+        public enum PolarityValue { COMP = 0, NEG = 1, NEUT = 2, NONE = 3, POS = 4, NULL = -1 };
+        public enum IntensityValue { High = 0, Low = 1, Medium = 2, None = 3, NULL = -1 };
+        public enum SubjectivityTypeValue
+        {
+            Agreement = 0, Argument = 1, Emotion = 2, Intention = 3,
+            Judgment = 4, Others = 5, Speculation = 6, NULL = -1
+        };
+        public enum SubjectivityPolarityValue { COMP = 0, NEG = 1, NEUT = 2, POS = 3, NULL = -1 };
+
+        public PolarityValue Polarity { get; }
+        public IntensityValue Intensity { get; }
+        public SubjectivityTypeValue SubjectivityType { get; }
+        public SubjectivityPolarityValue SubjectivityPolarity { get; }
+
+        public KoreanWordSentiment(string word, PolarityValue polarity, IntensityValue intensity,
+            SubjectivityTypeValue subjectivityType = SubjectivityTypeValue.NULL,
+            SubjectivityPolarityValue subjectivityPolarity = SubjectivityPolarityValue.NULL)
+        {
+            Word = word;
+            Polarity = polarity;
+            Intensity = intensity;
+            SubjectivityType = subjectivityType;
+            SubjectivityPolarity = subjectivityPolarity;
+        }
+
+        public KoreanWordSentiment(string word, string polarity, string intensity,
+            string subjectivityType = "", string subjectivityPolarity = "")
+        {
+            Word = word;
+            Polarity = StringToPolarity(polarity);
+            Intensity = StringToIntensity(intensity);
+            SubjectivityType = StringToSubjectivityType(subjectivityType);
+            SubjectivityPolarity = StringToSubjectivityPolarity(subjectivityPolarity);
+        }
+
+        private PolarityValue StringToPolarity(string polarity)
+        {
+            switch (polarity)
+            {
+                case "COMP": return PolarityValue.COMP;
+                case "NEG": return PolarityValue.NEG;
+                case "NEUT": return PolarityValue.NEUT;
+                case "NONE": return PolarityValue.NONE;
+                case "POS": return PolarityValue.POS;
+                default: //throw new ArgumentException("Invalid Polarity string");
+                    return PolarityValue.NULL;
+            }
+        }
+
+        private IntensityValue StringToIntensity(string intensity)
+        {
+            switch (intensity)
+            {
+                case "High": return IntensityValue.High;
+                case "Low": return IntensityValue.Low;
+                case "Medium": return IntensityValue.Medium;
+                case "None": return IntensityValue.None;
+                default: //throw new ArgumentException("Invalid Intensity string");
+                    return IntensityValue.NULL;
+            }
+        }
+
+        private SubjectivityTypeValue StringToSubjectivityType(string subjectivityType)
+        {
+            switch (subjectivityType)
+            {
+                case "Agreement": return SubjectivityTypeValue.Agreement;
+                case "Argument": return SubjectivityTypeValue.Argument;
+                case "Emotion": return SubjectivityTypeValue.Emotion;
+                case "Intention": return SubjectivityTypeValue.Intention;
+                case "Judgment": return SubjectivityTypeValue.Judgment;
+                case "Others": return SubjectivityTypeValue.Others;
+                case "Speculation": return SubjectivityTypeValue.Speculation;
+                default: //throw new ArgumentException("Invalid SubjectivityType string");
+                    return SubjectivityTypeValue.NULL;
+            }
+        }
+
+        private SubjectivityPolarityValue StringToSubjectivityPolarity(string subjectivityPolarity)
+        {
+            switch (subjectivityPolarity)
+            {
+                case "COMP": return SubjectivityPolarityValue.COMP;
+                case "NEG": return SubjectivityPolarityValue.NEG;
+                case "NEUT": return SubjectivityPolarityValue.NEUT;
+                case "POS": return SubjectivityPolarityValue.POS;
+                default: //throw new ArgumentException("Invalid SubjectivityPolarity string");
+                    return SubjectivityPolarityValue.NULL;
+            }
+        }
+
+        public override void Print()
+        {
+            string s = "Polarity: " + Polarity.ToString() + "\tIntensity: " + Intensity.ToString() +
+                   "\tSubjectivityType: " + SubjectivityType.ToString() + "\tSubjectivityPolarity: " +
+                   SubjectivityPolarity.ToString();
+            Console.WriteLine(s);
+            base.Print();
+        }
+
+        public override Valence GetValence()
+        {
+            switch (Polarity)
+            {
+                case PolarityValue.COMP: return Valence.NULL;
+                case PolarityValue.NEG: return Valence.Low;
+                case PolarityValue.NEUT: return Valence.Medium;
+                case PolarityValue.NONE: return Valence.NULL;
+                case PolarityValue.POS: return Valence.High;
+                default: return Valence.NULL;
+            }
+        }
+
+        public override Arousal GetArousal()
+        {
+            switch (Intensity)
+            {
+                case IntensityValue.High: return Arousal.High;
+                case IntensityValue.Low: return Arousal.Low;
+                case IntensityValue.Medium: return Arousal.Medium;
+                case IntensityValue.None: return Arousal.NULL;
+                case IntensityValue.NULL: return Arousal.NULL;
+                default: return Arousal.NULL;
+            }
+        }
+#else
         public enum PolarityValue { COMP = 0, NEG = 1, NEUT = 2, NONE = 3, POS = 4, NULL = -1 };
         public enum IntensityValue { High = 0, Low = 1, Medium = 2, None = 3, NULL = -1 };
         public enum SubjectivityTypeValue
@@ -230,5 +358,6 @@ namespace ChordingCoding.Word.Korean
                 return Intention.NULL;
             }
         }
+#endif
     }
 }

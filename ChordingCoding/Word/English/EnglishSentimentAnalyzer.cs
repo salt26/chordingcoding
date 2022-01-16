@@ -21,6 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#define USE_NEW_SCHEME
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -40,11 +41,18 @@ namespace ChordingCoding.Word.English
 
         // aggregateEnglishSentiment
         private int[] aggregateValence;
+#if USE_NEW_SCHEME
+        private int[] aggregateArousal;
+        private int aggregateCount;
+        private double aggregateValenceValue;
+        private double aggregateArousalValue;
+#else
         private int[] aggregateStateIntensity;
         private int[] aggregateEmotion;
         private int[] aggregateJudgment;
         private int[] aggregateAgreement;
         private int[] aggregateIntention;
+#endif
 
         public static EnglishSentimentAnalyzer instance = null;
 
@@ -66,11 +74,12 @@ namespace ChordingCoding.Word.English
             if (!(instance is null)) return;
             instance = this;
 
-            #region Load English sentiment dictionary
+            #region Load English sentiment dictionary (old)
             /*
              * EnglishSentiment.csv is created by MorphemeParser(https://github.com/salt26/morpheme-parser).
              * The original data source is Inquirer Dictionary(http://www.wjh.harvard.edu/~inquirer/homecat.htm).
              */
+#if !USE_NEW_SCHEME
             englishSentimentCSV = new Util.CSVReader("EnglishSentiment.csv", true);
             englishSentimentDictionary = new Dictionary<string, EnglishWordSentiment>();
 
@@ -81,6 +90,26 @@ namespace ChordingCoding.Word.English
             }
 
             Util.TaskQueue.Add("aggregateEnglishSentiment", InitializeAggregate);
+#endif
+            #endregion
+
+            #region Load English sentiment dictionary (new)
+            /*
+             * EnglishSentiment2.csv is created by Modality Changer(https://github.com/salt26/modality-changer).
+             * The original data source is Warriner et al. (2013)(https://link.springer.com/article/10.3758/s13428-012-0314-x#SecESM1).
+             */
+#if USE_NEW_SCHEME
+            englishSentimentCSV = new Util.CSVReader("EnglishSentiment2.csv", true);
+            englishSentimentDictionary = new Dictionary<string, EnglishWordSentiment>();
+
+            foreach (List<string> row in englishSentimentCSV.GetData())
+            {
+                englishSentimentDictionary.Add(row[0], new EnglishWordSentiment(
+                    row[0], row[1], row[3], row[2], row[4]));
+            }
+
+            Util.TaskQueue.Add("aggregateEnglishSentiment", InitializeAggregate);
+#endif
             #endregion
 
             #region Load SymSpell (spelling correction engine)
@@ -124,6 +153,18 @@ namespace ChordingCoding.Word.English
                         {
                             aggregateValence[(int)sentiment.GetValence()] += weight;
                         }
+#if USE_NEW_SCHEME
+                        if (sentiment.GetArousal() != WordSentiment.Arousal.NULL)
+                        {
+                            aggregateArousal[(int)sentiment.GetArousal()] += weight;
+                        }
+                        if (sentiment.valenceValue != -2 && sentiment.arousalValue != -2)
+                        {
+                            aggregateCount += weight;
+                            aggregateValenceValue += sentiment.valenceValue * weight;
+                            aggregateArousalValue += sentiment.arousalValue * weight;
+                        }
+#else
                         if (sentiment.GetStateIntensity() != WordSentiment.StateIntensity.NULL)
                         {
                             aggregateStateIntensity[(int)sentiment.GetStateIntensity()] += weight;
@@ -144,6 +185,7 @@ namespace ChordingCoding.Word.English
                         {
                             aggregateIntention[(int)sentiment.GetIntention()] += weight;
                         }
+#endif
                     }
                     Util.TaskQueue.Add("aggregateEnglishSentiment", UpdateAggregate,
                         englishSentimentDictionary[word]);
@@ -157,7 +199,11 @@ namespace ChordingCoding.Word.English
         /// <returns>The results of sentiment analysis</returns>
         public override WordSentiment GetSentimentAndFlush()
         {
+#if USE_NEW_SCHEME
+            WordSentiment ret = new EnglishWordSentiment("", "", "", "", "");
+#else
             WordSentiment ret = new EnglishWordSentiment("", "", "", "", "", "", "");
+#endif
 
             if (!HasStart) return ret;
 
@@ -166,11 +212,17 @@ namespace ChordingCoding.Word.English
                 Random r = new Random();
 
                 WordSentiment.Valence v;
+#if USE_NEW_SCHEME
+                WordSentiment.Arousal a;
+                double vv;
+                double av;
+#else
                 WordSentiment.StateIntensity si;
                 WordSentiment.Emotion e;
                 WordSentiment.Judgment j;
                 WordSentiment.Agreement a;
                 WordSentiment.Intention i;
+#endif
 
                 if (aggregateValence.Sum() <= 0)
                 {
@@ -195,6 +247,43 @@ namespace ChordingCoding.Word.English
                     v = (WordSentiment.Valence)argmax[r.Next(argmax.Count)];
                 }
 
+#if USE_NEW_SCHEME
+                if (aggregateArousal.Sum() <= 0)
+                {
+                    a = WordSentiment.Arousal.NULL;
+                }
+                else
+                {
+                    int max = 0;
+                    List<int> argmax = new List<int>();
+                    for (int k = 0; k < aggregateArousal.Length; k++)
+                    {
+                        if (aggregateArousal[k] > max)
+                        {
+                            max = aggregateArousal[k];
+                            argmax = new List<int>() { k };
+                        }
+                        else if (aggregateArousal[k] == max)
+                        {
+                            argmax.Add(k);
+                        }
+                    }
+                    a = (WordSentiment.Arousal)argmax[r.Next(argmax.Count)];
+                }
+
+                if (aggregateCount == 0)
+                {
+                    vv = -2;
+                    av = -2;
+                }
+                else
+                {
+                    vv = aggregateValenceValue / aggregateCount;
+                    av = aggregateArousalValue / aggregateCount;
+                }
+
+                ret = new EnglishWordSentiment("", vv, av, v, a);
+#else
                 if (aggregateStateIntensity.Sum() <= 0)
                 {
                     si = WordSentiment.StateIntensity.NULL;
@@ -311,6 +400,7 @@ namespace ChordingCoding.Word.English
                 }
 
                 ret = new EnglishWordSentiment("", v, si, e, j, a, i);
+#endif
             }
 
             Util.TaskQueue.Add("aggregateEnglishSentiment", GetAggregate);
@@ -326,12 +416,19 @@ namespace ChordingCoding.Word.English
         /// <param name="args"></param>
         private void InitializeAggregate(object[] args)
         {
-            aggregateValence = new int[4] { 0, 0, 0, 0 };
+            aggregateValence = new int[3] { 0, 0, 0 };
+#if USE_NEW_SCHEME
+            aggregateArousal = new int[3] { 0, 0, 0 };
+            aggregateCount = 0;
+            aggregateValenceValue = 0;
+            aggregateArousalValue = 0;
+#else
             aggregateStateIntensity = new int[3] { 0, 0, 0 };
             aggregateEmotion = new int[4] { 0, 0, 0, 0 };
             aggregateJudgment = new int[4] { 0, 0, 0, 0 };
             aggregateAgreement = new int[4] { 0, 0, 0, 0 };
             aggregateIntention = new int[4] { 0, 0, 0, 0 };
+#endif
         }
     }
 }

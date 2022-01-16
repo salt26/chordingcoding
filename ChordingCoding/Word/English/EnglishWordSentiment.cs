@@ -21,12 +21,88 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#define USE_NEW_SCHEME
 using System;
 
 namespace ChordingCoding.Word.English
 {
     public class EnglishWordSentiment : WordSentiment
     {
+#if USE_NEW_SCHEME
+        public double valenceValue;
+        public double arousalValue;
+        private Valence valence;
+        private Arousal arousal;
+
+        public EnglishWordSentiment(string word, double valenceValue, double arousalValue,
+            Valence valence, Arousal arousal)
+        {
+            Word = word;
+            this.valenceValue = valenceValue;
+            this.arousalValue = arousalValue;
+            this.valence = valence;
+            this.arousal = arousal;
+        }
+
+        public EnglishWordSentiment(string word, string valenceValue, string arousalValue,
+            string valence, string arousal)
+        {
+            Word = word;
+            this.valence = StringToValence(valence);
+            this.arousal = StringToArousal(arousal);
+            if (!Double.TryParse(valenceValue, out this.valenceValue))
+            {
+                this.valenceValue = -2;
+                this.valence = Valence.NULL;
+            }
+            if (!Double.TryParse(arousalValue, out this.arousalValue))
+            {
+                this.arousalValue = -2;
+                this.arousal = Arousal.NULL;
+            }
+        }
+
+        private Valence StringToValence(string valence)
+        {
+            switch (valence)
+            {
+                case "L": return Valence.Low;
+                case "M": return Valence.Medium;
+                case "H": return Valence.High;
+                default: //throw new ArgumentException("Invalid Valence string");
+                    return Valence.NULL;
+            }
+        }
+
+        private Arousal StringToArousal(string arousal)
+        {
+            switch (arousal)
+            {
+                case "L": return Arousal.Low;
+                case "M": return Arousal.Medium;
+                case "H": return Arousal.High;
+                default: //throw new ArgumentException("Invalid Arousal string");
+                    return Arousal.NULL;
+            }
+        }
+
+        public override void Print()
+        {
+            string s = "ValenceValue: " + valenceValue.ToString() + "\tArousalValue: " + arousalValue.ToString();
+            Console.WriteLine(s);
+            base.Print();
+        }
+
+        public override Valence GetValence()
+        {
+            return valence;
+        }
+
+        public override Arousal GetArousal()
+        {
+            return arousal;
+        }
+#else
         private Valence valence;
         private StateIntensity stateIntensity;
         private Emotion emotion;
@@ -107,5 +183,6 @@ namespace ChordingCoding.Word.English
         {
             return valence;
         }
+#endif
     }
 }

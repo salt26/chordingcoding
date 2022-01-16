@@ -21,6 +21,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+#define USE_NEW_SCHEME
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -63,8 +64,10 @@ namespace ChordingCoding.Word.Korean
         // aggregateKoreanSentiment
         private int[] aggregatePolarity;
         private int[] aggregateIntensity;
+#if !USE_NEW_SCHEME
         private int[] aggregateSubjectivityType;
         private int[] aggregateSubjectivityPolarity;
+#endif
 
         public static KoreanSentimentAnalyzer instance = null;
 
@@ -160,8 +163,10 @@ namespace ChordingCoding.Word.Korean
                             int weight = 1;
                             aggregatePolarity[(int)sentiment.Polarity] += weight;
                             aggregateIntensity[(int)sentiment.Intensity] += weight;
+#if !USE_NEW_SCHEME
                             aggregateSubjectivityType[(int)sentiment.SubjectivityType] += weight;
                             aggregateSubjectivityPolarity[(int)sentiment.SubjectivityPolarity] += weight;
+#endif
                         }
                         Util.TaskQueue.Add("aggregateKoreanSentiment", UpdateAggregate,
                             koreanSentimentDictionary[j - 1][word]);
@@ -235,6 +240,7 @@ namespace ChordingCoding.Word.Korean
                     i = (KoreanWordSentiment.IntensityValue)argmax[r.Next(argmax.Count)];
                 }
 
+#if !USE_NEW_SCHEME
                 // SubjectivityType -> take argmax
                 if (aggregateSubjectivityType.Sum() <= 0)
                 {
@@ -282,6 +288,7 @@ namespace ChordingCoding.Word.Korean
                     }
                     sp = (KoreanWordSentiment.SubjectivityPolarityValue)argmax[r.Next(argmax.Count)];
                 }
+#endif
             }
 
             Util.TaskQueue.Add("aggregateKoreanSentiment", GetAggregate);
@@ -303,6 +310,7 @@ namespace ChordingCoding.Word.Korean
             {
                 s += ((KoreanWordSentiment.IntensityValue)i).ToString() + ": " + aggregateIntensity[i] + "\t";
             }
+#if !USE_NEW_SCHEME
             s += "\n";
             for (int i = 0; i < aggregateSubjectivityType.Length; i++)
             {
@@ -313,6 +321,7 @@ namespace ChordingCoding.Word.Korean
             {
                 s += ((KoreanWordSentiment.SubjectivityPolarityValue)i).ToString() + ": " + aggregateSubjectivityPolarity[i] + "\t";
             }
+#endif
             Console.WriteLine(s);
         }
 
@@ -324,8 +333,10 @@ namespace ChordingCoding.Word.Korean
         {
             aggregatePolarity = new int[5] { 0, 0, 0, 0, 0 };
             aggregateIntensity = new int[4] { 0, 0, 0, 0 };
+#if !USE_NEW_SCHEME
             aggregateSubjectivityType = new int[7] { 0, 0, 0, 0, 0, 0, 0 };
             aggregateSubjectivityPolarity = new int[4] { 0, 0, 0, 0 };
+#endif
         }
     }
 }

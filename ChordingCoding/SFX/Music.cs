@@ -34,6 +34,7 @@ using Newtonsoft.Json;
 //using NAudio.Dmo;
 using NFluidsynth;
 using ChordingCoding.Utility;
+using ChordingCoding.Sentiment;
 
 namespace ChordingCoding.SFX
 {
@@ -44,7 +45,7 @@ namespace ChordingCoding.SFX
     {
         public delegate void PlayEventDelegate(int pitch);
 
-        private static float TICK_PER_SECOND = 27f;   // 1초에 호출되는 tick 수
+        private static float tickPerSecond = 27f;   // 1초에 호출되는 tick 수
         private static long tickNumber = 0;           // 테마 변경 후 지금까지 지난 tick 수
 
         /// <summary>
@@ -546,7 +547,19 @@ namespace ChordingCoding.SFX
             }
 
             // 빠르기 변경
-            SetTickPerSecond((int)TICK_PER_SECOND + (int)(1f * Math.Round(Util.GaussianRandom(r), MidpointRounding.AwayFromZero)));
+            SentimentState.Arousal arousal = SentimentState.GetShortTermArousal();
+            switch(arousal)
+            {
+                case SentimentState.Arousal.High:
+                    SetTickPerSecond((int)tickPerSecond + 1);
+                    break;
+                case SentimentState.Arousal.Low:
+                    SetTickPerSecond((int)tickPerSecond - 1);
+                    break;
+                case SentimentState.Arousal.NULL:
+                    SetTickPerSecond((int)tickPerSecond + (int)(1f * Math.Round(Util.GaussianRandom(r), MidpointRounding.AwayFromZero)));
+                    break;
+            }
 
             OnChordTransition?.Invoke(pitch);
         }
@@ -589,7 +602,7 @@ namespace ChordingCoding.SFX
 
             if (tickPerSecond < 20) tickPerSecond = 20;
             if (tickPerSecond > 35) tickPerSecond = 35;
-            TICK_PER_SECOND = tickPerSecond;
+            Music.tickPerSecond = tickPerSecond;
             //Console.WriteLine(TICK_PER_SECOND);
             timerNumber = 0;
         }
@@ -611,7 +624,7 @@ namespace ChordingCoding.SFX
                 if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(5) &&
                     SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(6))
                 {
-                    if (tickNumber % ((int)TICK_PER_SECOND * 10) == 0)
+                    if (tickNumber % ((int)tickPerSecond * 10) == 0)
                     {
                         StopPlaying(5);
                         SFXTheme.InstrumentInfo inst = SFXTheme.CurrentSFXTheme.Instruments[5];
@@ -619,7 +632,7 @@ namespace ChordingCoding.SFX
                         //Score.PlayANoteForever(outDevice, note, (int)Math.Round(inst.sfxVolume * (SFXTheme.CurrentSFXTheme.Volume / 100D)));     // 기본 빗소리 (사라지지 않아야 함)
                         Score.PlayANote(syn, note, SFXTheme.CurrentSFXTheme.Volume / 100f);
                     }
-                    if (tickNumber % ((int)TICK_PER_SECOND * 10) == (int)TICK_PER_SECOND * 5)
+                    if (tickNumber % ((int)tickPerSecond * 10) == (int)tickPerSecond * 5)
                     {
                         StopPlaying(6);
                         SFXTheme.InstrumentInfo inst = SFXTheme.CurrentSFXTheme.Instruments[6];
@@ -723,7 +736,7 @@ namespace ChordingCoding.SFX
         {
             if (HasStart)
             {
-                if (timerNumber >= (int)(1000f / TICK_PER_SECOND))
+                if (timerNumber >= (int)(1000f / tickPerSecond))
                 {
                     timerNumber = 0;
                     tickDelegate();

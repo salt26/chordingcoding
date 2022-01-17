@@ -373,7 +373,7 @@ namespace ChordingCoding.SFX
 
             if (c.type == Type.NULL)
             {
-                Music.key.Transpose();
+                Music.key.Transpose(SentimentState.GetLongTermValence());
             }
 
             Chord newChord = ChordTransitionMatrix.RomanNumeralToChord(Music.chordTransitionMatrix.SampleRomanNumeralFromAll(

@@ -24,6 +24,7 @@ SOFTWARE.
 using System;
 using System.Drawing;
 using System.Collections.Generic;
+using ChordingCoding.Sentiment;
 
 namespace ChordingCoding.SFX
 {
@@ -68,8 +69,10 @@ namespace ChordingCoding.SFX
             minOctave = SFXTheme.CurrentSFXTheme.MinOctave;
             maxOctave = SFXTheme.CurrentSFXTheme.MaxOctave;
 
-            Chord newChord = ChordTransitionMatrix.RomanNumeralToChord(Music.chordTransitionMatrix.SampleRomanNumeralFromBasic(
-                Music.key.mode, 0), Music.key.tonic);
+            Chord newChord = ChordTransitionMatrix.RomanNumeralToChord(Music.chordTransitionMatrix.SampleRomanNumeralFromAll(
+                SentimentState.SentimentIndexFromVA(SentimentState.GetShortTermPrevValence(), SentimentState.GetShortTermPrevArousal()),
+                SentimentState.SentimentIndexFromVA(SentimentState.GetShortTermValence(), SentimentState.GetShortTermArousal()),
+                Music.key.mode, 0, Music.SentimentAwareness), Music.key.tonic);
 
             root = newChord.root;
             type = newChord.type;
@@ -373,8 +376,10 @@ namespace ChordingCoding.SFX
                 Music.key.Transpose();
             }
 
-            Chord newChord = ChordTransitionMatrix.RomanNumeralToChord(Music.chordTransitionMatrix.SampleRomanNumeralFromBasic(
-                Music.key.mode, ChordTransitionMatrix.ChordToRomanNumeral(c, Music.key.tonic)), Music.key.tonic);
+            Chord newChord = ChordTransitionMatrix.RomanNumeralToChord(Music.chordTransitionMatrix.SampleRomanNumeralFromAll(
+                SentimentState.SentimentIndexFromVA(SentimentState.GetShortTermPrevValence(), SentimentState.GetShortTermPrevArousal()),
+                SentimentState.SentimentIndexFromVA(SentimentState.GetShortTermValence(), SentimentState.GetShortTermArousal()),
+                Music.key.mode, ChordTransitionMatrix.ChordToRomanNumeral(c, Music.key.tonic), Music.SentimentAwareness), Music.key.tonic);
 
             root = newChord.root;
             type = newChord.type;

@@ -29,6 +29,7 @@ using System.Text;
 using System.IO;
 using ChordingCoding.Utility;
 using ChordingCoding.SFX;
+using ChordingCoding.Sentiment;
 using ChordingCoding.Word.English;
 using ChordingCoding.Word.Korean;
 
@@ -303,15 +304,21 @@ namespace ChordingCoding.UI
                 {
                     Console.WriteLine("wordState: " + wordState);
                     EnglishSentimentAnalyzer.instance.Analyze(wordState);
-                    EnglishSentimentAnalyzer.instance.GetSentimentAndFlush().Print();
+                    //EnglishSentimentAnalyzer.instance.GetSentimentAndFlush().Print();
+                    EnglishWordSentiment w = (EnglishWordSentiment)EnglishSentimentAnalyzer.instance.GetSentimentAndFlush();
+                    w.Print();
                     // TODO 음악 생성기에 넘기기
+                    SentimentState.UpdateState(w);
                 }
                 else
                 {
                     Console.WriteLine("wordState: " + Hangul.Assemble(wordState));
                     KoreanSentimentAnalyzer.instance.Analyze(Hangul.Assemble(wordState));
-                    KoreanSentimentAnalyzer.instance.GetSentimentAndFlush().Print();
+                    //KoreanSentimentAnalyzer.instance.GetSentimentAndFlush().Print();
+                    KoreanWordSentiment w = (KoreanWordSentiment)KoreanSentimentAnalyzer.instance.GetSentimentAndFlush();
+                    w.Print();
                     // TODO 음악 생성기에 넘기기
+                    SentimentState.UpdateState(w);
                 }
             }
             wordState = "";

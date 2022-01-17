@@ -203,6 +203,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Sentiment\SentimentState.cs" />
     <Compile Include="SFX\ChordTransitionMatrix.cs" />
     <Compile Include="SFX\MusicalKey.cs" />
     <Compile Include="SFX\RhythmPattern.cs" />

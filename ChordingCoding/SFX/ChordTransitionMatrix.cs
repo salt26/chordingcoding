@@ -74,14 +74,32 @@ namespace ChordingCoding.SFX
         {
             if (sentimentAwareness < 0) sentimentAwareness = 0;
             else if (sentimentAwareness > 99) sentimentAwareness = 99;
+
+            if (currSentimentIndex < 0 || sentimentAwareness == 0)
+            {
+                return SampleRomanNumeralFromBasic(mode, prevChord);
+            }
+
+            List<double> vector = new List<double>();
             List<double> basicVector = GetBasicChordProbVector(mode, prevChord);
             List<double> sentimentalVector = GetSentimentalChordProbVector(currSentimentIndex, mode, prevChord);
-            List<double> sentimentVariationalVector = GetSentimentVariationalChordProbVector(prevSentimentIndex, currSentimentIndex, mode, prevChord);
-            List<double> vector = new List<double>();
-            for (int i = 0; i < basicVector.Count; i++)
+            List<double> sentimentVariationalVector;
+            if (prevSentimentIndex >= 0)
             {
-                double interpolatedProb = (100 - sentimentAwareness) / 100f * basicVector[i] + sentimentAwareness / 200f * (sentimentalVector[i] + sentimentVariationalVector[i]);
-                vector.Add(interpolatedProb);
+                sentimentVariationalVector = GetSentimentVariationalChordProbVector(prevSentimentIndex, currSentimentIndex, mode, prevChord);
+                for (int i = 0; i < basicVector.Count; i++)
+                {
+                    double interpolatedProb = (100 - sentimentAwareness) / 100f * basicVector[i] + sentimentAwareness / 200f * (sentimentalVector[i] + sentimentVariationalVector[i]);
+                    vector.Add(interpolatedProb);
+                }
+            }
+            else
+            {
+                for (int i = 0; i < basicVector.Count; i++)
+                {
+                    double interpolatedProb = (100 - sentimentAwareness) / 100f * basicVector[i] + sentimentAwareness / 100f * sentimentalVector[i];
+                    vector.Add(interpolatedProb);
+                }
             }
             vector = NormalizeAndCumulate(vector);
 

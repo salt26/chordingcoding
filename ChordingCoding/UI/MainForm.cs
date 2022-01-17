@@ -36,6 +36,7 @@ using System.Media;
 using ChordingCoding.Utility;
 using ChordingCoding.SFX;
 using ChordingCoding.UI.VFX;
+using ChordingCoding.Sentiment;
 using ChordingCoding.Word.Korean;
 using ChordingCoding.Word.English;
 
@@ -263,6 +264,7 @@ namespace ChordingCoding.UI
             if (ENABLE_SENTIMENT_ANALYZER)
             {
                 SetSentimentAwareness((int)Properties.Settings.Default["SentimentAwareness"]);
+                SentimentState.Initialize();
             }
             else
             {

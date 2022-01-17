@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using ChordingCoding.Utility;
+using ChordingCoding.Sentiment;
 
 namespace ChordingCoding.Word.English
 {
@@ -149,12 +150,12 @@ namespace ChordingCoding.Word.English
                         EnglishWordSentiment sentiment = args[0] as EnglishWordSentiment;
                         int weight = 1;
 
-                        if (sentiment.GetValence() != WordSentiment.Valence.NULL)
+#if USE_NEW_SCHEME
+                        if (sentiment.GetValence() != SentimentState.Valence.NULL)
                         {
                             aggregateValence[(int)sentiment.GetValence()] += weight;
                         }
-#if USE_NEW_SCHEME
-                        if (sentiment.GetArousal() != WordSentiment.Arousal.NULL)
+                        if (sentiment.GetArousal() != SentimentState.Arousal.NULL)
                         {
                             aggregateArousal[(int)sentiment.GetArousal()] += weight;
                         }
@@ -165,6 +166,10 @@ namespace ChordingCoding.Word.English
                             aggregateArousalValue += sentiment.arousalValue * weight;
                         }
 #else
+                        if (sentiment.GetValence() != WordSentiment.Valence.NULL)
+                        {
+                            aggregateValence[(int)sentiment.GetValence()] += weight;
+                        }
                         if (sentiment.GetStateIntensity() != WordSentiment.StateIntensity.NULL)
                         {
                             aggregateStateIntensity[(int)sentiment.GetStateIntensity()] += weight;
@@ -211,18 +216,77 @@ namespace ChordingCoding.Word.English
             {
                 Random r = new Random();
 
-                WordSentiment.Valence v;
 #if USE_NEW_SCHEME
-                WordSentiment.Arousal a;
+                SentimentState.Valence v;
+                SentimentState.Arousal a;
                 double vv;
                 double av;
+
+                if (aggregateValence.Sum() <= 0)
+                {
+                    v = SentimentState.Valence.NULL;
+                }
+                else
+                {
+                    int max = 0;
+                    List<int> argmax = new List<int>();
+                    for (int k = 0; k < aggregateValence.Length; k++)
+                    {
+                        if (aggregateValence[k] > max)
+                        {
+                            max = aggregateValence[k];
+                            argmax = new List<int>() { k };
+                        }
+                        else if (aggregateValence[k] == max)
+                        {
+                            argmax.Add(k);
+                        }
+                    }
+                    v = (SentimentState.Valence)argmax[r.Next(argmax.Count)];
+                }
+
+                if (aggregateArousal.Sum() <= 0)
+                {
+                    a = SentimentState.Arousal.NULL;
+                }
+                else
+                {
+                    int max = 0;
+                    List<int> argmax = new List<int>();
+                    for (int k = 0; k < aggregateArousal.Length; k++)
+                    {
+                        if (aggregateArousal[k] > max)
+                        {
+                            max = aggregateArousal[k];
+                            argmax = new List<int>() { k };
+                        }
+                        else if (aggregateArousal[k] == max)
+                        {
+                            argmax.Add(k);
+                        }
+                    }
+                    a = (SentimentState.Arousal)argmax[r.Next(argmax.Count)];
+                }
+
+                if (aggregateCount == 0)
+                {
+                    vv = -2;
+                    av = -2;
+                }
+                else
+                {
+                    vv = aggregateValenceValue / aggregateCount;
+                    av = aggregateArousalValue / aggregateCount;
+                }
+
+                ret = new EnglishWordSentiment("", vv, av, v, a);
 #else
+                WordSentiment.Valence v;
                 WordSentiment.StateIntensity si;
                 WordSentiment.Emotion e;
                 WordSentiment.Judgment j;
                 WordSentiment.Agreement a;
                 WordSentiment.Intention i;
-#endif
 
                 if (aggregateValence.Sum() <= 0)
                 {
@@ -247,43 +311,6 @@ namespace ChordingCoding.Word.English
                     v = (WordSentiment.Valence)argmax[r.Next(argmax.Count)];
                 }
 
-#if USE_NEW_SCHEME
-                if (aggregateArousal.Sum() <= 0)
-                {
-                    a = WordSentiment.Arousal.NULL;
-                }
-                else
-                {
-                    int max = 0;
-                    List<int> argmax = new List<int>();
-                    for (int k = 0; k < aggregateArousal.Length; k++)
-                    {
-                        if (aggregateArousal[k] > max)
-                        {
-                            max = aggregateArousal[k];
-                            argmax = new List<int>() { k };
-                        }
-                        else if (aggregateArousal[k] == max)
-                        {
-                            argmax.Add(k);
-                        }
-                    }
-                    a = (WordSentiment.Arousal)argmax[r.Next(argmax.Count)];
-                }
-
-                if (aggregateCount == 0)
-                {
-                    vv = -2;
-                    av = -2;
-                }
-                else
-                {
-                    vv = aggregateValenceValue / aggregateCount;
-                    av = aggregateArousalValue / aggregateCount;
-                }
-
-                ret = new EnglishWordSentiment("", vv, av, v, a);
-#else
                 if (aggregateStateIntensity.Sum() <= 0)
                 {
                     si = WordSentiment.StateIntensity.NULL;

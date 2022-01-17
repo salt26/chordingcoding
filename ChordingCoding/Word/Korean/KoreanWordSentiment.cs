@@ -23,6 +23,7 @@ SOFTWARE.
 */
 #define USE_NEW_SCHEME
 using System;
+using ChordingCoding.Sentiment;
 
 namespace ChordingCoding.Word.Korean
 {
@@ -132,29 +133,29 @@ namespace ChordingCoding.Word.Korean
             base.Print();
         }
 
-        public override Valence GetValence()
+        public override SentimentState.Valence GetValence()
         {
             switch (Polarity)
             {
-                case PolarityValue.COMP: return Valence.NULL;
-                case PolarityValue.NEG: return Valence.Low;
-                case PolarityValue.NEUT: return Valence.Medium;
-                case PolarityValue.NONE: return Valence.NULL;
-                case PolarityValue.POS: return Valence.High;
-                default: return Valence.NULL;
+                case PolarityValue.COMP: return SentimentState.Valence.NULL;
+                case PolarityValue.NEG: return SentimentState.Valence.Low;
+                case PolarityValue.NEUT: return SentimentState.Valence.Medium;
+                case PolarityValue.NONE: return SentimentState.Valence.NULL;
+                case PolarityValue.POS: return SentimentState.Valence.High;
+                default: return SentimentState.Valence.NULL;
             }
         }
 
-        public override Arousal GetArousal()
+        public override SentimentState.Arousal GetArousal()
         {
             switch (Intensity)
             {
-                case IntensityValue.High: return Arousal.High;
-                case IntensityValue.Low: return Arousal.Low;
-                case IntensityValue.Medium: return Arousal.Medium;
-                case IntensityValue.None: return Arousal.NULL;
-                case IntensityValue.NULL: return Arousal.NULL;
-                default: return Arousal.NULL;
+                case IntensityValue.High: return SentimentState.Arousal.High;
+                case IntensityValue.Low: return SentimentState.Arousal.Low;
+                case IntensityValue.Medium: return SentimentState.Arousal.Medium;
+                case IntensityValue.None: return SentimentState.Arousal.NULL;
+                case IntensityValue.NULL: return SentimentState.Arousal.NULL;
+                default: return SentimentState.Arousal.NULL;
             }
         }
 #else

@@ -23,6 +23,7 @@ SOFTWARE.
 */
 #define USE_NEW_SCHEME
 using System;
+using ChordingCoding.Sentiment;
 
 namespace ChordingCoding.Word.English
 {
@@ -31,11 +32,11 @@ namespace ChordingCoding.Word.English
 #if USE_NEW_SCHEME
         public double valenceValue;
         public double arousalValue;
-        private Valence valence;
-        private Arousal arousal;
+        private SentimentState.Valence valence;
+        private SentimentState.Arousal arousal;
 
         public EnglishWordSentiment(string word, double valenceValue, double arousalValue,
-            Valence valence, Arousal arousal)
+            SentimentState.Valence valence, SentimentState.Arousal arousal)
         {
             Word = word;
             this.valenceValue = valenceValue;
@@ -53,36 +54,36 @@ namespace ChordingCoding.Word.English
             if (!Double.TryParse(valenceValue, out this.valenceValue))
             {
                 this.valenceValue = -2;
-                this.valence = Valence.NULL;
+                this.valence = SentimentState.Valence.NULL;
             }
             if (!Double.TryParse(arousalValue, out this.arousalValue))
             {
                 this.arousalValue = -2;
-                this.arousal = Arousal.NULL;
+                this.arousal = SentimentState.Arousal.NULL;
             }
         }
 
-        private Valence StringToValence(string valence)
+        private SentimentState.Valence StringToValence(string valence)
         {
             switch (valence)
             {
-                case "L": return Valence.Low;
-                case "M": return Valence.Medium;
-                case "H": return Valence.High;
+                case "L": return SentimentState.Valence.Low;
+                case "M": return SentimentState.Valence.Medium;
+                case "H": return SentimentState.Valence.High;
                 default: //throw new ArgumentException("Invalid Valence string");
-                    return Valence.NULL;
+                    return SentimentState.Valence.NULL;
             }
         }
 
-        private Arousal StringToArousal(string arousal)
+        private SentimentState.Arousal StringToArousal(string arousal)
         {
             switch (arousal)
             {
-                case "L": return Arousal.Low;
-                case "M": return Arousal.Medium;
-                case "H": return Arousal.High;
+                case "L": return SentimentState.Arousal.Low;
+                case "M": return SentimentState.Arousal.Medium;
+                case "H": return SentimentState.Arousal.High;
                 default: //throw new ArgumentException("Invalid Arousal string");
-                    return Arousal.NULL;
+                    return SentimentState.Arousal.NULL;
             }
         }
 
@@ -93,12 +94,12 @@ namespace ChordingCoding.Word.English
             base.Print();
         }
 
-        public override Valence GetValence()
+        public override SentimentState.Valence GetValence()
         {
             return valence;
         }
 
-        public override Arousal GetArousal()
+        public override SentimentState.Arousal GetArousal()
         {
             return arousal;
         }

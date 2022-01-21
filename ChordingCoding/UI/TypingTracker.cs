@@ -177,7 +177,7 @@ namespace ChordingCoding.UI
             {
                 int vkCode = Marshal.ReadInt32(lParam);
 
-                // https://sites.google.com/site/douglaslash/Home/programming/c-notes--snippets/c-keycodes
+                // https://docs.microsoft.com/ko-kr/dotnet/api/system.windows.forms.keys?view=windowsdesktop-6.0
                 // Do something when KeyDown event occurs.
 
                 //Console.WriteLine("KeyCode: " + (Keys)vkCode);
@@ -285,6 +285,12 @@ namespace ChordingCoding.UI
                 {
                     // Insert, Delete, Caps Lock, Num Lock, Scroll Lock
                     Util.TaskQueue.Add("wordState", BackspaceStateToNull);
+                }
+                else if (vkCode == 123)
+                {
+                    // F12
+                    // Save MIDI recording file
+                    Util.TaskQueue.Add("MidiTrack", Music.SaveTrack);
                 }
             }
             return CallNextHookEx(_keyboardHookID, nCode, wParam, lParam);

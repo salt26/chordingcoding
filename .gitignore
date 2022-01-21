@@ -5,7 +5,9 @@
 
 ignore
 Builds/WorkingContext.csv
+Builds/Recordings
 ChordingCoding/bin/x64/Debug/WorkingContext.csv
+ChordingCoding/bin/x64/Debug/Recordings
 
 # User-specific files
 *.rsuser

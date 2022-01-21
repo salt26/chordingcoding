@@ -23,7 +23,7 @@ SOFTWARE.
 */
 using System;
 using System.Collections.Generic;
-//using Sanford.Multimedia.Midi;
+using Sanford.Multimedia.Midi;
 using NFluidsynth;
 using ChordingCoding.Utility;
 
@@ -515,6 +515,7 @@ namespace ChordingCoding.SFX
                         try
                         {
                             // 재생 중이었던 음표의 재생을 멈춥니다.
+                            Util.TaskQueue.Add("MidiTrack", Music.InsertTrackNoteOff, staff, pitch);
                             syn.NoteOff(staff, pitch);
                         }
                         catch (ObjectDisposedException) { }
@@ -534,6 +535,7 @@ namespace ChordingCoding.SFX
                     // (Midi message pair를 번역하여 Midi message를 생성합니다.)
                     try
                     {
+                        Util.TaskQueue.Add("MidiTrack", Music.InsertTrackNoteOn, p.Value >> 16, p.Value & 65535, velocity);
                         syn.NoteOn(p.Value >> 16, p.Value & 65535, velocity);
                         if (!noteOffBuffer_.ContainsKey(staff))
                         {
@@ -630,6 +632,7 @@ namespace ChordingCoding.SFX
                     try
                     {
                         // 음표의 재생을 멈춥니다.
+                        Util.TaskQueue.Add("MidiTrack", Music.InsertTrackNoteOff, staff, p);
                         syn.NoteOff(staff, p);
                     }
                     catch (ObjectDisposedException) { }
@@ -723,6 +726,7 @@ namespace ChordingCoding.SFX
                             // (Midi message pair를 번역하여 Midi message를 생성합니다.)
                             try
                             {
+                                Util.TaskQueue.Add("MidiTrack", Music.InsertTrackNoteOff, -p.Value >> 16, -p.Value & 65535);
                                 syn_.NoteOff(-p.Value >> 16, -p.Value & 65535);
                             }
                             catch (ObjectDisposedException) { }

@@ -25,8 +25,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
+using System.Diagnostics;
 using Newtonsoft.Json;
-//using Sanford.Multimedia.Midi;
+using Sanford.Multimedia.Midi;
 //using NAudio.Wave;
 //using NAudio.MediaFoundation;
 //using NAudio.CoreAudioApi;
@@ -136,6 +137,46 @@ namespace ChordingCoding.SFX
         public static byte[] buffer;
         public static MemoryStream stream;
         */
+
+        public static List<KeyValuePair<int, IMidiMessage>> track;
+        public static int TrackElapsedTime  // 현재 시점 (프로그램 시작 후 지난 ms 단위의 시간)
+        {
+            get;
+            private set;
+        }
+        public static int TrackResumedTime  // 컨텍스트가 마지막으로 재개된 시점
+        {
+            get;
+            private set;
+        }
+        public static int TrackLastTime     // 현재까지 재생된 마지막 음이 끝나는 시점
+        {
+            get;
+            private set;
+        }
+        public static int TrackEventTime
+        {
+            get
+            {
+                return (int)((TrackElapsedTime - TrackResumedTime) * 0.048f + 0.5f);
+            }
+        }
+        public static int TrackLastEventTime
+        {
+            get
+            {
+                return (int)((TrackLastTime - TrackResumedTime) * 0.048f + 0.5f);
+            }
+        }
+        public static bool HasTrackCleared  // 트랙이 비어있는가?
+        {
+            get;
+            private set;
+        }
+        private static int trackLoseContextTime = 60000;    // 1 minutes
+        private static List<KeyValuePair<int, int>> TrackProgramChanges;
+        private static List<KeyValuePair<int, int>> TrackNoteOnMessages;
+
         private static bool IsReady { get; set; }
 
         private static bool canStart = false;
@@ -231,6 +272,14 @@ namespace ChordingCoding.SFX
                 outputDevice.Play();
             });
             */
+
+            track = new List<KeyValuePair<int, IMidiMessage>>();
+            TrackElapsedTime = 0;
+            TrackLastTime = -1;
+            TrackResumedTime = -1;
+            HasTrackCleared = true;
+            TrackProgramChanges = new List<KeyValuePair<int, int>>();
+            TrackNoteOnMessages = new List<KeyValuePair<int, int>>();
 
             key = new MusicalKey();
 
@@ -333,6 +382,7 @@ namespace ChordingCoding.SFX
         {
             if (!HasStart)
             {
+                Util.TaskQueue.Add("MidiTrack", ClearTrack);
                 timer = new Timer(1, TickTimer);
                 IsReady = true;
             }
@@ -383,21 +433,29 @@ namespace ChordingCoding.SFX
                             if (p.Value.instrumentCode == -1)
                             {
                                 if (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(1))
+                                {
                                     //outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, p.Key, SFXTheme.CurrentSFXTheme.Instruments[1].instrumentCode));
+                                    Util.TaskQueue.Add("MidiTrack", InsertTrackProgramChange, p.Key, SFXTheme.CurrentSFXTheme.Instruments[1].instrumentCode);
                                     syn.ProgramChange(p.Key, SFXTheme.CurrentSFXTheme.Instruments[1].instrumentCode);
+                                }
                                 else
+                                {
                                     //outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, p.Key, p.Value.instrumentCode));
+                                    Util.TaskQueue.Add("MidiTrack", InsertTrackProgramChange, p.Key, p.Value.instrumentCode);
                                     syn.ProgramChange(p.Key, p.Value.instrumentCode);
+                                }
                             }
                             else
                             {
                                 //outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, p.Key, p.Value.instrumentCode));
+                                Util.TaskQueue.Add("MidiTrack", InsertTrackProgramChange, p.Key, p.Value.instrumentCode);
                                 syn.ProgramChange(p.Key, p.Value.instrumentCode);
                             }
                         }
                         else
                         {
                             //outDevice.Send(new ChannelMessage(ChannelCommand.ProgramChange, p.Key, p.Value.instrumentCode));
+                            Util.TaskQueue.Add("MidiTrack", InsertTrackProgramChange, p.Key, p.Value.instrumentCode);
                             syn.ProgramChange(p.Key, p.Value.instrumentCode);
                         }
                     }
@@ -742,7 +800,135 @@ namespace ChordingCoding.SFX
                     tickDelegate();
                 }
                 timerNumber++;
+
+                if (TrackElapsedTime >= 1000000000)
+                {
+                    // TODO: 11일 13시간 이상 켜두고 있는 경우 트랙 초기화 -> 초기화 말고 더 좋은 방법?
+                    TrackElapsedTime = 0;
+                    TrackLastTime = -1;
+                    Util.TaskQueue.Add("MidiTrack", ClearTrack);
+                }
+                else if (!HasTrackCleared && TrackElapsedTime >= TrackLastTime + trackLoseContextTime)
+                {
+                    Util.TaskQueue.Add("MidiTrack", ClearTrack);
+                }
+                TrackElapsedTime++;
             }
+        }
+
+        /// <summary>
+        /// 트랙을 초기화합니다.
+        /// 반드시 "MidiTrack"라는 lockName의 Util.TaskQueue로 실행되어야 합니다.
+        /// </summary>
+        /// <param name="args"></param>
+        private static void ClearTrack(object[] args)
+        {
+            if (track != null)
+            {
+                TrackResumedTime = -1;
+                track.Clear();
+                HasTrackCleared = true;
+                Console.WriteLine("ClearTrack");
+            }
+        }
+
+        /// <summary>
+        /// 트랙에 악기 변경을 적용합니다.
+        /// 반드시 "MidiTrack"라는 lockName의 Util.TaskQueue로 실행되어야 합니다.
+        /// </summary>
+        /// <param name="args">첫 번째 인자는 채널 번호(staff, 0 ~ 15), 두 번째 인자는 악기 번호(instrumentCode, 0 ~ 127)</param>
+        private static void InsertTrackProgramChange(object[] args)
+        {
+            if (!HasTrackCleared)
+            {
+                track.Add(new KeyValuePair<int, IMidiMessage>(TrackEventTime, new ChannelMessage(ChannelCommand.ProgramChange, (int)args[0], (int)args[1])));
+            }
+            else
+            {
+                // HasTrackCleared가 true인 경우에는 바로 트랙에 삽입하지 말고 기억해두기만 했다가 InsertTrackNoteOn에서 적용하기
+                TrackProgramChanges.RemoveAll(e => e.Key == (int)args[0]);
+                TrackProgramChanges.Add(new KeyValuePair<int, int>((int)args[0], (int)args[1]));
+            }
+        }
+
+        /// <summary>
+        /// 트랙의 현재 시점에 NoteOn 이벤트를 추가합니다.
+        /// 반드시 "MidiTrack"라는 lockName의 Util.TaskQueue로 실행되어야 합니다.
+        /// </summary>
+        /// <param name="args">첫 번째 인자는 채널 번호(staff, 0 ~ 15), 두 번째 인자는 음 높이(pitch, 0 ~ 127), 세 번째 인자는 음 세기(velocity, 0 ~ 127)</param>
+        public static void InsertTrackNoteOn(object[] args)
+        {
+            if (HasTrackCleared)
+            {
+                TrackResumedTime = TrackElapsedTime;
+                foreach (KeyValuePair<int, int> e in TrackProgramChanges)
+                {
+                    track.Add(new KeyValuePair<int, IMidiMessage>(TrackEventTime, new ChannelMessage(ChannelCommand.ProgramChange, e.Key, e.Value)));
+                }
+                TrackProgramChanges.Clear();
+                TrackNoteOnMessages.Clear();
+                HasTrackCleared = false;
+            }
+            track.Add(new KeyValuePair<int, IMidiMessage>(TrackEventTime, new ChannelMessage(ChannelCommand.NoteOn,
+                (int)args[0], (int)args[1], (int)args[2])));
+            Console.WriteLine("NoteOn: TrackElapsedTime = " + TrackElapsedTime + ", ET - RT = " + (TrackElapsedTime - TrackResumedTime));
+
+            if ((int)args[2] > 0)
+            {
+                TrackNoteOnMessages.Add(new KeyValuePair<int, int>((int)args[0], (int)args[1]));
+            }
+            else
+            {
+                TrackNoteOnMessages.RemoveAll(e => e.Key == (int)args[0] && e.Value == (int)args[1]);
+            }
+        }
+
+        /// <summary>
+        /// 트랙의 현재 시점에 NoteOff 이벤트를 추가합니다.
+        /// 반드시 "MidiTrack"라는 lockName의 Util.TaskQueue로 실행되어야 합니다.
+        /// </summary>
+        /// <param name="args">첫 번째 인자는 채널 번호(staff, 0 ~ 15), 두 번째 인자는 음 높이(pitch, 0 ~ 127)</param>
+        public static void InsertTrackNoteOff(object[] args)
+        {
+            TrackLastTime = TrackElapsedTime;
+            track.Add(new KeyValuePair<int, IMidiMessage>(TrackEventTime, new ChannelMessage(ChannelCommand.NoteOff,
+                (int)args[0], (int)args[1], 127)));
+            Console.WriteLine("NoteOff: TrackElapsedTime = " + TrackElapsedTime + ", ET - RT = " + (TrackElapsedTime - TrackResumedTime));
+
+            TrackNoteOnMessages.RemoveAll(e => e.Key == (int)args[0] && e.Value == (int)args[1]);
+        }
+
+        public static void SaveTrack(object[] args)
+        {
+            if (HasTrackCleared) return;
+            Sequence seq = new Sequence();
+            Track newTrack = new Track();
+            foreach (KeyValuePair<int, IMidiMessage> e in track)
+            {
+                newTrack.Insert(e.Key, e.Value);
+            }
+            foreach (KeyValuePair<int, int> e in TrackNoteOnMessages)
+            {
+                newTrack.Insert(TrackLastEventTime, new ChannelMessage(ChannelCommand.NoteOff,
+                    e.Key, e.Value, 127));
+            }
+            newTrack.EndOfTrackOffset = TrackLastEventTime;
+            seq.Add(newTrack);
+            if (!Directory.Exists("Recordings"))
+            {
+                Directory.CreateDirectory("Recordings");
+            }
+            seq.Save("Recordings\\" + DateTime.Now.ToString("yyMMdd_HH-mm-ss.FFF") + ".mid");
+
+            // https://www.codeproject.com/Questions/852563/How-to-open-file-explorer-at-given-location-in-csh
+            ProcessStartInfo startInfo = new ProcessStartInfo
+            {
+                // TODO
+                Arguments = "/select," + "\"" + Directory.GetCurrentDirectory() + "\\Recodings",
+                FileName = "explorer.exe"
+            };
+            Process.Start(startInfo);
+            Console.WriteLine("\"" + Directory.GetCurrentDirectory() + "\\Recodings");
         }
 
         /// <summary>

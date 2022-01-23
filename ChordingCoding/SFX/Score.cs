@@ -535,7 +535,7 @@ namespace ChordingCoding.SFX
                     // (Midi message pair를 번역하여 Midi message를 생성합니다.)
                     try
                     {
-                        Util.TaskQueue.Add("MidiTrack", Music.InsertTrackNoteOn, p.Value >> 16, p.Value & 65535, velocity);
+                        Util.TaskQueue.Add("MidiTrack", Music.InsertTrackNoteOn, p.Value >> 16, p.Value & 65535, velocity, note.ToMidi()[1].Key - p.Key);
                         syn.NoteOn(p.Value >> 16, p.Value & 65535, velocity);
                         if (!noteOffBuffer_.ContainsKey(staff))
                         {

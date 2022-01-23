@@ -46,8 +46,10 @@ namespace ChordingCoding.SFX
     {
         public delegate void PlayEventDelegate(int pitch);
 
+        private const int TRACK_TICKS_PER_BEAT = 480;   // 녹음본의 TPB (4분음표 하나를 나타내는 타이밍 단위)
+
         private static float tickPerSecond = 27f;   // 1초에 호출되는 tick 수
-        private static long tickNumber = 0;           // 테마 변경 후 지금까지 지난 tick 수
+        private static long tickNumber = 0;         // 테마 변경 후 지금까지 지난 tick 수
 
         /// <summary>
         /// 현재 마디 수를 나타냅니다.
@@ -139,33 +141,26 @@ namespace ChordingCoding.SFX
         */
 
         public static List<KeyValuePair<int, IMidiMessage>> track;
-        public static int TrackElapsedTime  // 현재 시점 (프로그램 시작 후 지난 ms 단위의 시간)
+        public static long TrackElapsedTime // 현재 시점 (프로그램 시작 후 지난 microsecond(1/1000초) 단위의 시간)
         {
             get;
             private set;
         }
-        public static int TrackResumedTime  // 컨텍스트가 마지막으로 재개된 시점
+        public static long TrackResumedTime // 컨텍스트가 마지막으로 재개된 시점
         {
             get;
             private set;
         }
-        public static int TrackLastTime     // 현재까지 재생된 마지막 음이 끝나는 시점
+        public static long TrackLastTime    // 현재까지 마지막에 발생한 이벤트(NoteOn, NoteOff)의 발생 시점
         {
             get;
             private set;
         }
-        public static int TrackEventTime
+        public static int TrackEventTime    // 현재 컨텍스트에서 이벤트가 삽입될 시점 (960/1000초 단위)
         {
             get
             {
-                return (int)((TrackElapsedTime - TrackResumedTime) * 0.048f + 0.5f);
-            }
-        }
-        public static int TrackLastEventTime
-        {
-            get
-            {
-                return (int)((TrackLastTime - TrackResumedTime) * 0.048f + 0.5f);
+                return (int)((TrackElapsedTime - TrackResumedTime) * TRACK_TICKS_PER_BEAT * 2f / 1000f + 0.5f);
             }
         }
         public static bool HasTrackCleared  // 트랙이 비어있는가?
@@ -175,7 +170,12 @@ namespace ChordingCoding.SFX
         }
         private static int trackLoseContextTime = 60000;    // 1 minutes
         private static List<KeyValuePair<int, int>> TrackProgramChanges;
-        private static List<KeyValuePair<int, int>> TrackNoteOnMessages;
+
+        /// <summary>
+        /// 녹음본을 저장하는 순간에 아직 처리되지 않은 NoteOff 이벤트를 추적하는 버퍼.
+        /// Key는 타이밍(TrackEventTime과 같은 단위), Value.Key는 채널 번호(staff), Value.Value는 음 높이(pitch).
+        /// </summary>
+        private static List<KeyValuePair<int, KeyValuePair<int, int>>> TrackNoteOffBuffer;
 
         private static bool IsReady { get; set; }
 
@@ -275,11 +275,11 @@ namespace ChordingCoding.SFX
 
             track = new List<KeyValuePair<int, IMidiMessage>>();
             TrackElapsedTime = 0;
-            TrackLastTime = -1;
-            TrackResumedTime = -1;
+            TrackLastTime = 0;
+            TrackResumedTime = 0;
             HasTrackCleared = true;
             TrackProgramChanges = new List<KeyValuePair<int, int>>();
-            TrackNoteOnMessages = new List<KeyValuePair<int, int>>();
+            TrackNoteOffBuffer = new List<KeyValuePair<int, KeyValuePair<int, int>>>();
 
             key = new MusicalKey();
 
@@ -661,13 +661,13 @@ namespace ChordingCoding.SFX
             if (tickPerSecond < 20) tickPerSecond = 20;
             if (tickPerSecond > 35) tickPerSecond = 35;
             Music.tickPerSecond = tickPerSecond;
-            //Console.WriteLine(TICK_PER_SECOND);
+            //Console.WriteLine(tickPerSecond);
             timerNumber = 0;
         }
 
         /// <summary>
         /// 리듬에 맞게 음표를 재생합니다.
-        /// tickDelegate에 의해 1초에 32번씩 자동으로 호출됩니다.
+        /// tickDelegate에 의해 1초에 tickPerSecond번씩 자동으로 호출됩니다.
         /// </summary>
         private static void Tick()
         {
@@ -801,11 +801,9 @@ namespace ChordingCoding.SFX
                 }
                 timerNumber++;
 
-                if (TrackElapsedTime >= 1000000000)
+                if (!HasTrackCleared && TrackEventTime >= 1209600 * TRACK_TICKS_PER_BEAT)
                 {
-                    // TODO: 11일 13시간 이상 켜두고 있는 경우 트랙 초기화 -> 초기화 말고 더 좋은 방법?
-                    TrackElapsedTime = 0;
-                    TrackLastTime = -1;
+                    // 하나의 컨텍스트가 7일 이상 유지되고 있는 경우 트랙 초기화
                     Util.TaskQueue.Add("MidiTrack", ClearTrack);
                 }
                 else if (!HasTrackCleared && TrackElapsedTime >= TrackLastTime + trackLoseContextTime)
@@ -825,10 +823,25 @@ namespace ChordingCoding.SFX
         {
             if (track != null)
             {
-                TrackResumedTime = -1;
+                TrackResumedTime = TrackElapsedTime;
                 track.Clear();
+                TrackNoteOffBuffer.Clear();
                 HasTrackCleared = true;
                 Console.WriteLine("ClearTrack");
+
+                foreach (KeyValuePair<int, SFXTheme.InstrumentInfo> p in SFXTheme.CurrentSFXTheme.Instruments)
+                {
+                    if ((p.Key == 7 || p.Key == 8) && p.Value.instrumentCode == -1 && SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(1))
+                    {
+                        TrackProgramChanges.RemoveAll(e => e.Key == p.Key);
+                        TrackProgramChanges.Add(new KeyValuePair<int, int>(p.Key, SFXTheme.CurrentSFXTheme.Instruments[1].instrumentCode));
+                    }
+                    else
+                    {
+                        TrackProgramChanges.RemoveAll(e => e.Key == p.Key);
+                        TrackProgramChanges.Add(new KeyValuePair<int, int>(p.Key, p.Value.instrumentCode));
+                    }
+                }
             }
         }
 
@@ -855,9 +868,11 @@ namespace ChordingCoding.SFX
         /// 트랙의 현재 시점에 NoteOn 이벤트를 추가합니다.
         /// 반드시 "MidiTrack"라는 lockName의 Util.TaskQueue로 실행되어야 합니다.
         /// </summary>
-        /// <param name="args">첫 번째 인자는 채널 번호(staff, 0 ~ 15), 두 번째 인자는 음 높이(pitch, 0 ~ 127), 세 번째 인자는 음 세기(velocity, 0 ~ 127)</param>
+        /// <param name="args">첫 번째 인자는 채널 번호(staff, 0 ~ 15), 두 번째 인자는 음 높이(pitch, 0 ~ 127), 세 번째 인자는 음 세기(velocity, 0 ~ 127),
+        /// 네 번째 인자는 뒤따르는 NoteOff가 놓일 Score 상 위치에서 현재 NoteOn이 놓이는 Score 상 위치를 뺀 값(float)</param>
         public static void InsertTrackNoteOn(object[] args)
         {
+            TrackLastTime = TrackElapsedTime;
             if (HasTrackCleared)
             {
                 TrackResumedTime = TrackElapsedTime;
@@ -866,20 +881,21 @@ namespace ChordingCoding.SFX
                     track.Add(new KeyValuePair<int, IMidiMessage>(TrackEventTime, new ChannelMessage(ChannelCommand.ProgramChange, e.Key, e.Value)));
                 }
                 TrackProgramChanges.Clear();
-                TrackNoteOnMessages.Clear();
+                TrackNoteOffBuffer.Clear();
                 HasTrackCleared = false;
             }
             track.Add(new KeyValuePair<int, IMidiMessage>(TrackEventTime, new ChannelMessage(ChannelCommand.NoteOn,
                 (int)args[0], (int)args[1], (int)args[2])));
-            Console.WriteLine("NoteOn: TrackElapsedTime = " + TrackElapsedTime + ", ET - RT = " + (TrackElapsedTime - TrackResumedTime));
+            Console.WriteLine("NoteOn: TrackElapsedTime = " + TrackElapsedTime + ", ET - RT = " + (TrackElapsedTime - TrackResumedTime) + ", TrackEventTime = " + TrackEventTime);
 
             if ((int)args[2] > 0)
             {
-                TrackNoteOnMessages.Add(new KeyValuePair<int, int>((int)args[0], (int)args[1]));
+                TrackNoteOffBuffer.Add(new KeyValuePair<int, KeyValuePair<int, int>>((int)(TrackEventTime + ((float)args[3] * TRACK_TICKS_PER_BEAT * 2 / tickPerSecond) + 0.5f),
+                    new KeyValuePair<int, int>((int)args[0], (int)args[1])));
             }
             else
             {
-                TrackNoteOnMessages.RemoveAll(e => e.Key == (int)args[0] && e.Value == (int)args[1]);
+                TrackNoteOffBuffer.RemoveAll(e => e.Value.Key == (int)args[0] && e.Value.Value == (int)args[1]);
             }
         }
 
@@ -893,42 +909,54 @@ namespace ChordingCoding.SFX
             TrackLastTime = TrackElapsedTime;
             track.Add(new KeyValuePair<int, IMidiMessage>(TrackEventTime, new ChannelMessage(ChannelCommand.NoteOff,
                 (int)args[0], (int)args[1], 127)));
-            Console.WriteLine("NoteOff: TrackElapsedTime = " + TrackElapsedTime + ", ET - RT = " + (TrackElapsedTime - TrackResumedTime));
+            Console.WriteLine("NoteOff: TrackElapsedTime = " + TrackElapsedTime + ", ET - RT = " + (TrackElapsedTime - TrackResumedTime) + ", TrackEventTime = " + TrackEventTime);
 
-            TrackNoteOnMessages.RemoveAll(e => e.Key == (int)args[0] && e.Value == (int)args[1]);
+            TrackNoteOffBuffer.RemoveAll(e => e.Value.Key == (int)args[0] && e.Value.Value == (int)args[1]);
         }
 
         public static void SaveTrack(object[] args)
         {
             if (HasTrackCleared) return;
-            Sequence seq = new Sequence();
+            Sequence seq = new Sequence(TRACK_TICKS_PER_BEAT);
             Track newTrack = new Track();
             foreach (KeyValuePair<int, IMidiMessage> e in track)
             {
                 newTrack.Insert(e.Key, e.Value);
             }
-            foreach (KeyValuePair<int, int> e in TrackNoteOnMessages)
+            int maxTiming = 0;
+            foreach (KeyValuePair<int, KeyValuePair<int, int>> e in TrackNoteOffBuffer)
             {
-                newTrack.Insert(TrackLastEventTime, new ChannelMessage(ChannelCommand.NoteOff,
-                    e.Key, e.Value, 127));
+                newTrack.Insert(e.Key, new ChannelMessage(ChannelCommand.NoteOff, e.Value.Key, e.Value.Value, 127));
+                if (e.Key > maxTiming)
+                {
+                    maxTiming = e.Key;
+                }
             }
-            newTrack.EndOfTrackOffset = TrackLastEventTime;
+            newTrack.EndOfTrackOffset = maxTiming;
             seq.Add(newTrack);
             if (!Directory.Exists("Recordings"))
             {
                 Directory.CreateDirectory("Recordings");
             }
-            seq.Save("Recordings\\" + DateTime.Now.ToString("yyMMdd_HH-mm-ss.FFF") + ".mid");
+            string fileName = DateTime.Now.ToString("yyMMdd_HH-mm-ss.FFF") + ".mid";
 
-            // https://www.codeproject.com/Questions/852563/How-to-open-file-explorer-at-given-location-in-csh
-            ProcessStartInfo startInfo = new ProcessStartInfo
+            try
             {
-                // TODO
-                Arguments = "/select," + "\"" + Directory.GetCurrentDirectory() + "\\Recodings",
-                FileName = "explorer.exe"
-            };
-            Process.Start(startInfo);
-            Console.WriteLine("\"" + Directory.GetCurrentDirectory() + "\\Recodings");
+                seq.Save("Recordings\\" + fileName);
+
+                // https://www.codeproject.com/Questions/852563/How-to-open-file-explorer-at-given-location-in-csh
+                ProcessStartInfo startInfo = new ProcessStartInfo
+                {
+                    // TODO
+                    Arguments = "/select,\"Recordings\\" + fileName + "\"",
+                    FileName = "explorer.exe"
+                };
+                Process.Start(startInfo);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.StackTrace);
+            }
         }
 
         /// <summary>

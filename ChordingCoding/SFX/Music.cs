@@ -852,6 +852,7 @@ namespace ChordingCoding.SFX
         /// <param name="args">첫 번째 인자는 채널 번호(staff, 0 ~ 15), 두 번째 인자는 악기 번호(instrumentCode, 0 ~ 127)</param>
         private static void InsertTrackProgramChange(object[] args)
         {
+            if (!HasStart) return;
             if (!HasTrackCleared)
             {
                 track.Add(new KeyValuePair<int, IMidiMessage>(TrackEventTime, new ChannelMessage(ChannelCommand.ProgramChange, (int)args[0], (int)args[1])));
@@ -872,6 +873,7 @@ namespace ChordingCoding.SFX
         /// 네 번째 인자는 뒤따르는 NoteOff가 놓일 Score 상 위치에서 현재 NoteOn이 놓이는 Score 상 위치를 뺀 값(float)</param>
         public static void InsertTrackNoteOn(object[] args)
         {
+            if (!HasStart) return;
             TrackLastTime = TrackElapsedTime;
             if (HasTrackCleared)
             {
@@ -906,6 +908,7 @@ namespace ChordingCoding.SFX
         /// <param name="args">첫 번째 인자는 채널 번호(staff, 0 ~ 15), 두 번째 인자는 음 높이(pitch, 0 ~ 127)</param>
         public static void InsertTrackNoteOff(object[] args)
         {
+            if (!HasStart) return;
             TrackLastTime = TrackElapsedTime;
             track.Add(new KeyValuePair<int, IMidiMessage>(TrackEventTime, new ChannelMessage(ChannelCommand.NoteOff,
                 (int)args[0], (int)args[1], 127)));
@@ -916,7 +919,7 @@ namespace ChordingCoding.SFX
 
         public static void SaveTrack(object[] args)
         {
-            if (HasTrackCleared) return;
+            if (!HasStart || HasTrackCleared) return;
             Sequence seq = new Sequence(TRACK_TICKS_PER_BEAT);
             Track newTrack = new Track();
             foreach (KeyValuePair<int, IMidiMessage> e in track)

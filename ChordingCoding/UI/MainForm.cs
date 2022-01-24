@@ -831,5 +831,10 @@ namespace ChordingCoding.UI
                 자동반주ToolStripMenuItem.CheckState = CheckState.Unchecked;
             }
         }
+
+        private void 녹음ToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Util.TaskQueue.Add("MidiTrack", Music.SaveTrack);
+        }
     }
 }

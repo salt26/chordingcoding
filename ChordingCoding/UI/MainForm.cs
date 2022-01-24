@@ -50,9 +50,14 @@ namespace ChordingCoding.UI
         public const bool ENABLE_VFX = false;
 
         /// <summary>
-        /// 감정 분석을 실시할지 결정합니다.
+        /// 감성 분석을 실시할지 결정합니다.
         /// </summary>
         public const bool ENABLE_SENTIMENT_ANALYZER = true;
+
+        /// <summary>
+        /// 감성 인식 수준을 변경할 수 있게 할지 결정합니다. 감성 분석이 활성화된(ENABLE_SENTIMENT_ANALYZER == true) 경우에만 사용됩니다.
+        /// </summary>
+        public const bool ENABLE_CHANGING_SENTIMENT_AWARENESS = true;
 
         /// <summary>
         /// 작업 시 발생하는 이벤트를 파일에 기록할지 결정합니다.
@@ -217,11 +222,11 @@ namespace ChordingCoding.UI
 
             if (Theme.CurrentTheme.SFX.hasAccompanied)
             {
-                자동반주ToolStripMenuItem.CheckState = CheckState.Checked;
+                autoAccompanimentToolStripMenuItem.CheckState = CheckState.Checked;
             }
             else
             {
-                자동반주ToolStripMenuItem.CheckState = CheckState.Unchecked;
+                autoAccompanimentToolStripMenuItem.CheckState = CheckState.Unchecked;
             }
 
             MarshallingUpdateSplashScreen(10);
@@ -246,7 +251,7 @@ namespace ChordingCoding.UI
             {
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
                 List<TrackBarMenuItem> l = new List<TrackBarMenuItem>();
-                foreach (TrackBarMenuItem i in 불투명도ToolStripMenuItem.DropDownItems)
+                foreach (TrackBarMenuItem i in opacityToolStripMenuItem.DropDownItems)
                 {
                     l.Add(i);
                 }
@@ -255,7 +260,7 @@ namespace ChordingCoding.UI
                     i.TrackBar.Dispose();
                     i.Dispose();
                 }
-                불투명도ToolStripMenuItem.Dispose();
+                opacityToolStripMenuItem.Dispose();
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
 
@@ -263,12 +268,52 @@ namespace ChordingCoding.UI
             SetNoteResolution(resolution);
             if (ENABLE_SENTIMENT_ANALYZER)
             {
-                SetSentimentAwareness((int)Properties.Settings.Default["SentimentAwareness"]);
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                if (ENABLE_CHANGING_SENTIMENT_AWARENESS)
+                {
+                    trackBarMenuItem2.TrackBar.Maximum = 6;
+                    trackBarMenuItem2.TrackBar.Minimum = 0;
+                    trackBarMenuItem2.TrackBar.LargeChange = 1;
+
+                    SetSentimentAwareness((int)Properties.Settings.Default["SentimentAwareness"]);
+                }
+                else
+                {
+                    SetSentimentAwareness(95);
+
+                    List<TrackBarMenuItem> l = new List<TrackBarMenuItem>();
+                    foreach (TrackBarMenuItem i in sentimentAwarenessToolStripMenuItem.DropDownItems)
+                    {
+                        l.Add(i);
+                    }
+                    foreach (TrackBarMenuItem i in l)
+                    {
+                        i.TrackBar.Dispose();
+                        i.Dispose();
+                    }
+                    sentimentAwarenessToolStripMenuItem.Dispose();
+                }
+
                 SentimentState.Initialize();
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
             else
             {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
                 Music.SentimentAwareness = 0;
+
+                List<TrackBarMenuItem> l = new List<TrackBarMenuItem>();
+                foreach (TrackBarMenuItem i in sentimentAwarenessToolStripMenuItem.DropDownItems)
+                {
+                    l.Add(i);
+                }
+                foreach (TrackBarMenuItem i in l)
+                {
+                    i.TrackBar.Dispose();
+                    i.Dispose();
+                }
+                sentimentAwarenessToolStripMenuItem.Dispose();
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
 
             MarshallingUpdateSplashScreen(12);
@@ -585,7 +630,7 @@ namespace ChordingCoding.UI
                     SetTheme(theme);
                 }
             };
-            테마ToolStripMenuItem.DropDownItems.Add(item);
+            themeToolStripMenuItem.DropDownItems.Add(item);
 
             bool hasAddProperties = false;
             try
@@ -664,7 +709,7 @@ namespace ChordingCoding.UI
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
                 opacity = trackBarMenuItem1.Value * 5;
                 Opacity = opacity / 100D;
-                불투명도ToolStripMenuItem.Text = "불투명도 (" + opacity + "%)";
+                opacityToolStripMenuItem.Text = "불투명도 (" + opacity + "%)";
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
         }
@@ -672,13 +717,42 @@ namespace ChordingCoding.UI
 
         private void trackBarMenuItem2_ValueChanged(object sender, EventArgs e)
         {
-            SFXTheme.CurrentSFXTheme.Volume = trackBarMenuItem2.Value * 5;
-            음량ToolStripMenuItem.Text = "음량 (" + SFXTheme.CurrentSFXTheme.Volume + "%)";
+            if (ENABLE_SENTIMENT_ANALYZER && ENABLE_CHANGING_SENTIMENT_AWARENESS)
+            {
+                switch (trackBarMenuItem2.Value)
+                {
+                    case 1:
+                        Music.SentimentAwareness = 20;
+                        break;
+                    case 2:
+                        Music.SentimentAwareness = 33;
+                        break;
+                    case 3:
+                        Music.SentimentAwareness = 50;
+                        break;
+                    case 4:
+                        Music.SentimentAwareness = 67;
+                        break;
+                    case 5:
+                        Music.SentimentAwareness = 80;
+                        break;
+                    case 6:
+                        Music.SentimentAwareness = 95;
+                        break;
+                    default:    // case 0:
+                        Music.SentimentAwareness = 0;
+                        break;
+
+                }
+                sentimentAwarenessToolStripMenuItem.Text = "감성 인식 수준 (" + Music.SentimentAwareness + "%)";
+            }
         }
 
-        private void 종료ToolStripMenuItem_Click(object sender, EventArgs e)
+
+        private void trackBarMenuItem3_ValueChanged(object sender, EventArgs e)
         {
-            Close();
+            SFXTheme.CurrentSFXTheme.Volume = trackBarMenuItem3.Value * 5;
+            volumeToolStripMenuItem.Text = "음량 (" + SFXTheme.CurrentSFXTheme.Volume + "%)";
         }
 
         /// <summary>
@@ -689,7 +763,7 @@ namespace ChordingCoding.UI
         {
             Theme.CurrentTheme = theme;
 
-            foreach (ToolStripMenuItem item in 테마ToolStripMenuItem.DropDownItems)
+            foreach (ToolStripMenuItem item in themeToolStripMenuItem.DropDownItems)
             {
                 if (item.Name.Substring(0,
                     item.Name.IndexOf("ToolStripMenuItem")).Equals(theme.Name))
@@ -701,7 +775,7 @@ namespace ChordingCoding.UI
                     item.CheckState = CheckState.Unchecked;
                 }
             }
-            테마ToolStripMenuItem.Text = "테마 (" + theme.DisplayName + ")";
+            themeToolStripMenuItem.Text = "테마 (" + theme.DisplayName + ")";
 
             Opacity = opacity / 100D;
 
@@ -713,20 +787,20 @@ namespace ChordingCoding.UI
                 particleSystems = new List<ParticleSystem>();
 
                 trackBarMenuItem1.Value = opacity / 5;
-                불투명도ToolStripMenuItem.Text = "불투명도 (" + opacity + "%)";
+                opacityToolStripMenuItem.Text = "불투명도 (" + opacity + "%)";
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
 
-            trackBarMenuItem2.Value = SFXTheme.CurrentSFXTheme.Volume / 5;
-            음량ToolStripMenuItem.Text = "음량 (" + SFXTheme.CurrentSFXTheme.Volume + "%)";
+            trackBarMenuItem3.Value = SFXTheme.CurrentSFXTheme.Volume / 5;
+            volumeToolStripMenuItem.Text = "음량 (" + SFXTheme.CurrentSFXTheme.Volume + "%)";
 
             if (Theme.CurrentTheme.SFX.hasAccompanied)
             {
-                자동반주ToolStripMenuItem.CheckState = CheckState.Checked;
+                autoAccompanimentToolStripMenuItem.CheckState = CheckState.Checked;
             }
             else
             {
-                자동반주ToolStripMenuItem.CheckState = CheckState.Unchecked;
+                autoAccompanimentToolStripMenuItem.CheckState = CheckState.Unchecked;
             }
         }
 
@@ -739,47 +813,83 @@ namespace ChordingCoding.UI
             if (!new int[] { 0, 2, 4, 8, 16 }.Contains(resolution)) return;
 
             Music.NoteResolution = resolution;
-            _4분음표ToolStripMenuItem.CheckState = CheckState.Unchecked;
-            _8분음표ToolStripMenuItem.CheckState = CheckState.Unchecked;
-            _16분음표ToolStripMenuItem.CheckState = CheckState.Unchecked;
-            _32분음표ToolStripMenuItem.CheckState = CheckState.Unchecked;
-            _없음ToolStripMenuItem.CheckState = CheckState.Unchecked;
+            fourthNoteToolStripMenuItem.CheckState = CheckState.Unchecked;
+            eighthNoteToolStripMenuItem.CheckState = CheckState.Unchecked;
+            sixteenthNoteToolStripMenuItem.CheckState = CheckState.Unchecked;
+            thirtysecondNoteToolStripMenuItem.CheckState = CheckState.Unchecked;
+            immediateNoteToolStripMenuItem.CheckState = CheckState.Unchecked;
 
             switch (resolution)
             {
                 case 16:
-                    _4분음표ToolStripMenuItem.CheckState = CheckState.Checked;
-                    단위리듬ToolStripMenuItem.Text = "단위 리듬 (4분음표)";
+                    fourthNoteToolStripMenuItem.CheckState = CheckState.Checked;
+                    noteResolutionToolStripMenuItem.Text = "단위 리듬 (4분음표)";
                     break;
                 case 8:
-                    _8분음표ToolStripMenuItem.CheckState = CheckState.Checked;
-                    단위리듬ToolStripMenuItem.Text = "단위 리듬 (8분음표)";
+                    eighthNoteToolStripMenuItem.CheckState = CheckState.Checked;
+                    noteResolutionToolStripMenuItem.Text = "단위 리듬 (8분음표)";
                     break;
                 case 4:
-                    _16분음표ToolStripMenuItem.CheckState = CheckState.Checked;
-                    단위리듬ToolStripMenuItem.Text = "단위 리듬 (16분음표)";
+                    sixteenthNoteToolStripMenuItem.CheckState = CheckState.Checked;
+                    noteResolutionToolStripMenuItem.Text = "단위 리듬 (16분음표)";
                     break;
                 case 2:
-                    _32분음표ToolStripMenuItem.CheckState = CheckState.Checked;
-                    단위리듬ToolStripMenuItem.Text = "단위 리듬 (32분음표)";
+                    thirtysecondNoteToolStripMenuItem.CheckState = CheckState.Checked;
+                    noteResolutionToolStripMenuItem.Text = "단위 리듬 (32분음표)";
                     break;
                 case 0:
-                    _없음ToolStripMenuItem.CheckState = CheckState.Checked;
-                    단위리듬ToolStripMenuItem.Text = "단위 리듬 (없음)";
+                    immediateNoteToolStripMenuItem.CheckState = CheckState.Checked;
+                    noteResolutionToolStripMenuItem.Text = "단위 리듬 (없음)";
                     break;
             }
         }
 
         private void SetSentimentAwareness(int sentimentAwareness)
         {
-            if (!ENABLE_SENTIMENT_ANALYZER) return;
-            if (sentimentAwareness < 0 || sentimentAwareness > 99) return;
+            if (!ENABLE_SENTIMENT_ANALYZER)
+            {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                return;
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+            }
+            if (sentimentAwareness < 0 || sentimentAwareness > 95) return;
 
             Music.SentimentAwareness = sentimentAwareness;
-            // TODO: UI 만들고 반영하기
+
+            if (ENABLE_CHANGING_SENTIMENT_AWARENESS)
+            {
+                if (sentimentAwareness == 0) {
+                    trackBarMenuItem2.Value = 0;
+                }
+                else if (sentimentAwareness <= 20)
+                {
+                    trackBarMenuItem2.Value = 1;
+                }
+                else if (sentimentAwareness <= 33)
+                {
+                    trackBarMenuItem2.Value = 2;
+                }
+                else if (sentimentAwareness <= 50)
+                {
+                    trackBarMenuItem2.Value = 3;
+                }
+                else if (sentimentAwareness <= 67)
+                {
+                    trackBarMenuItem2.Value = 4;
+                }
+                else if (sentimentAwareness <= 80)
+                {
+                    trackBarMenuItem2.Value = 5;
+                }
+                else
+                {
+                    trackBarMenuItem2.Value = 6;
+                }
+                sentimentAwarenessToolStripMenuItem.Text = "감성 인식 수준 (" + Music.SentimentAwareness + "%)";
+            }
         }
 
-        private void _4분음표ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void fourthNoteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (Music.NoteResolution != 16)
             {
@@ -787,7 +897,7 @@ namespace ChordingCoding.UI
             }
         }
 
-        private void _8분음표ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void eighthNoteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (Music.NoteResolution != 8)
             {
@@ -795,7 +905,7 @@ namespace ChordingCoding.UI
             }
         }
 
-        private void _16분음표ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void sixteenthNoteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (Music.NoteResolution != 4)
             {
@@ -803,7 +913,7 @@ namespace ChordingCoding.UI
             }
         }
 
-        private void _32분음표toolStripMenuItem_Click(object sender, EventArgs e)
+        private void thirtysecondNotetoolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (Music.NoteResolution != 2)
             {
@@ -811,7 +921,7 @@ namespace ChordingCoding.UI
             }
         }
 
-        private void _제한없음ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void immediateNoteToolStripMenuItem_Click(object sender, EventArgs e)
         {
             if (Music.NoteResolution != 0)
             {
@@ -819,22 +929,27 @@ namespace ChordingCoding.UI
             }
         }
 
-        private void 자동반주ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void autoAccompanimentToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Theme.CurrentTheme.SFX.hasAccompanied = !Theme.CurrentTheme.SFX.hasAccompanied;
             if (Theme.CurrentTheme.SFX.hasAccompanied)
             {
-                자동반주ToolStripMenuItem.CheckState = CheckState.Checked;
+                autoAccompanimentToolStripMenuItem.CheckState = CheckState.Checked;
             }
             else
             {
-                자동반주ToolStripMenuItem.CheckState = CheckState.Unchecked;
+                autoAccompanimentToolStripMenuItem.CheckState = CheckState.Unchecked;
             }
         }
 
-        private void 녹음ToolStripMenuItem_Click(object sender, EventArgs e)
+        private void recordToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Util.TaskQueue.Add("MidiTrack", Music.SaveTrack);
+        }
+
+        private void quitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Close();
         }
     }
 }

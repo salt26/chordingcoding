@@ -97,8 +97,11 @@ namespace ChordingCoding.UI
         private static string wordState = "";
         private static string backspaceState = null;
 
-        private const string savePath = "WorkingContext.csv";
+        private const string contextSavePath = "WorkingContext.csv";
         private static long prevTicks = DateTime.Now.Ticks;
+
+        private const string sentimentSavePath = "SentimentLog.csv";
+        private static long prevTicks2 = DateTime.Now.Ticks;
 
         /// <summary>
         /// 키보드 및 마우스 입력 이벤트를 감지하도록 합니다.
@@ -302,7 +305,11 @@ namespace ChordingCoding.UI
         /// <param name="args">없음</param>
         private static void ResetWord(object[] args)
         {
-            if (!MainForm.ENABLE_SENTIMENT_ANALYZER) return;
+            if (!MainForm.ENABLE_SENTIMENT_ANALYZER)
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                return;
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
             if (wordState.Length > 0)
             {
@@ -313,8 +320,8 @@ namespace ChordingCoding.UI
                     //EnglishSentimentAnalyzer.instance.GetSentimentAndFlush().Print();
                     EnglishWordSentiment w = (EnglishWordSentiment)EnglishSentimentAnalyzer.instance.GetSentimentAndFlush();
                     w.Print();
-                    // TODO 음악 생성기에 넘기기
                     SentimentState.UpdateState(w);
+                    AppendSentimentLog(wordState, w.GetValence(), w.GetArousal(), SentimentState.GetShortTermValence(), SentimentState.GetShortTermArousal(), SentimentState.GetLongTermValence(), SentimentState.GetLongTermArousal(), SentimentState.GetShortTermPrevValence(), SentimentState.GetShortTermPrevArousal());
                 }
                 else
                 {
@@ -323,8 +330,8 @@ namespace ChordingCoding.UI
                     //KoreanSentimentAnalyzer.instance.GetSentimentAndFlush().Print();
                     KoreanWordSentiment w = (KoreanWordSentiment)KoreanSentimentAnalyzer.instance.GetSentimentAndFlush();
                     w.Print();
-                    // TODO 음악 생성기에 넘기기
                     SentimentState.UpdateState(w);
+                    AppendSentimentLog(Hangul.Assemble(wordState), w.GetValence(), w.GetArousal(), SentimentState.GetShortTermValence(), SentimentState.GetShortTermArousal(), SentimentState.GetLongTermValence(), SentimentState.GetLongTermArousal(), SentimentState.GetShortTermPrevValence(), SentimentState.GetShortTermPrevArousal());
                 }
             }
             wordState = "";
@@ -337,7 +344,11 @@ namespace ChordingCoding.UI
         /// <param name="args">없음</param>
         private static void BackspaceWord(object[] args)
         {
-            if (!MainForm.ENABLE_SENTIMENT_ANALYZER) return;
+            if (!MainForm.ENABLE_SENTIMENT_ANALYZER)
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                return;
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
             if (wordState.Length > 0)
             {
@@ -734,11 +745,45 @@ namespace ChordingCoding.UI
             }
             try
             {
-                if (!File.Exists(savePath))
+                if (!File.Exists(contextSavePath))
                 {
-                    File.AppendAllText(savePath, "id,year,month,day,hour,minute,second,ms,delta,e,w1,w2,w3\n", Encoding.UTF8);
+                    File.AppendAllText(contextSavePath, "id,year,month,day,hour,minute,second,ms,delta,e,w1,w2,w3\n", Encoding.UTF8);
                 }
-                File.AppendAllText(savePath, s + "\n", Encoding.UTF8);
+                File.AppendAllText(contextSavePath, s + "\n", Encoding.UTF8);
+            }
+            catch (Exception e)
+            {
+                if (!(e is IOException))
+                    throw;
+            }
+        }
+
+        public static void AppendSentimentLog(params object[] messages)
+        {
+            long deltaTicks = DateTime.Now.Ticks - prevTicks2;
+            prevTicks2 = DateTime.Now.Ticks;
+
+            string s = DateTime.Now.Year + "," + DateTime.Now.Month +
+                "," + DateTime.Now.Day + "," + DateTime.Now.Hour + "," + DateTime.Now.Minute +
+                "," + DateTime.Now.Second + "," + DateTime.Now.Millisecond + "," + (deltaTicks / 10000000f);
+            foreach (object message in messages)
+            {
+                if (message is null)
+                {
+                    s += ",";
+                }
+                else
+                {
+                    s += "," + message.ToString();
+                }
+            }
+            try
+            {
+                if (!File.Exists(sentimentSavePath))
+                {
+                    File.AppendAllText(sentimentSavePath, "year,month,day,hour,minute,second,ms,delta,word,valence,arousal,shortValence,shortArousal,longValence,longArousal,prevValence,prevArousal\n", Encoding.UTF8);
+                }
+                File.AppendAllText(sentimentSavePath, s + "\n", Encoding.UTF8);
             }
             catch (Exception e)
             {

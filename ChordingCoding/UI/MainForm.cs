@@ -39,6 +39,7 @@ using ChordingCoding.UI.VFX;
 using ChordingCoding.Sentiment;
 using ChordingCoding.Word.Korean;
 using ChordingCoding.Word.English;
+using System.IO;
 
 namespace ChordingCoding.UI
 {
@@ -344,6 +345,8 @@ namespace ChordingCoding.UI
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
                 ksa.Start();
                 esa.Start();
+
+                //TypingTracker.DvdAnalysis();
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
             Music.Start();

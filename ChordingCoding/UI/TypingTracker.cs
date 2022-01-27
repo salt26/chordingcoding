@@ -103,6 +103,8 @@ namespace ChordingCoding.UI
         private const string sentimentSavePath = "SentimentLog.csv";
         private static long prevTicks2 = DateTime.Now.Ticks;
 
+        private const string sentimentSavePath2 = "SentimentWordLog.csv";
+
         /// <summary>
         /// 키보드 및 마우스 입력 이벤트를 감지하도록 합니다.
         /// </summary>
@@ -789,6 +791,61 @@ namespace ChordingCoding.UI
             {
                 if (!(e is IOException))
                     throw;
+            }
+        }
+
+        public static void AppendSentimentLog2(params object[] messages)
+        {
+            string s = " ";
+            foreach (object message in messages)
+            {
+                if (message is null)
+                {
+                    s += ",";
+                }
+                else
+                {
+                    s += "," + message.ToString();
+                }
+            }
+            try
+            {
+                if (!File.Exists(sentimentSavePath2))
+                {
+                    File.AppendAllText(sentimentSavePath2, "dummy,index,word,valence,valenceValue,arousal,arousalValue,label\n", Encoding.UTF8);
+                }
+                File.AppendAllText(sentimentSavePath2, s + "\n", Encoding.UTF8);
+            }
+            catch (Exception e)
+            {
+                if (!(e is IOException))
+                    throw;
+            }
+        }
+
+        public static void DvdAnalysis()
+        {
+            StreamReader streamReader = new StreamReader("dvd_labeled_2000.csv", Encoding.GetEncoding("UTF-8"));
+            int i = -1;
+            while (!streamReader.EndOfStream)
+            {
+                string s = streamReader.ReadLine();
+                if (i >= 0)
+                {
+                    Console.WriteLine(s);
+                    int lastComma = s.LastIndexOf(',');
+                    string sentence = s.Substring(0, lastComma).Trim('\"');
+                    string label = s.Substring(lastComma + 1).Trim();
+                    foreach (string wordState in sentence.Replace(",", ";").Split(' '))
+                    {
+                        if (wordState == null || wordState == "") continue;
+                        EnglishSentimentAnalyzer.instance.Analyze(wordState);
+                        EnglishWordSentiment w = (EnglishWordSentiment)EnglishSentimentAnalyzer.instance.GetSentimentAndFlush();
+                        //SentimentState.UpdateState(w);
+                        TypingTracker.AppendSentimentLog2(i.ToString(), wordState, w.GetValence(), w.valenceValue, w.GetArousal(), w.arousalValue, label);
+                    }
+                }
+                i++;
             }
         }
     }

@@ -888,7 +888,7 @@ namespace ChordingCoding.SFX
             }
             track.Add(new KeyValuePair<int, IMidiMessage>(TrackEventTime, new ChannelMessage(ChannelCommand.NoteOn,
                 (int)args[0], (int)args[1], (int)args[2])));
-            Console.WriteLine("NoteOn: TrackElapsedTime = " + TrackElapsedTime + ", ET - RT = " + (TrackElapsedTime - TrackResumedTime) + ", TrackEventTime = " + TrackEventTime);
+            //Console.WriteLine("NoteOn: TrackElapsedTime = " + TrackElapsedTime + ", ET - RT = " + (TrackElapsedTime - TrackResumedTime) + ", TrackEventTime = " + TrackEventTime);
 
             if ((int)args[2] > 0)
             {
@@ -912,7 +912,7 @@ namespace ChordingCoding.SFX
             TrackLastTime = TrackElapsedTime;
             track.Add(new KeyValuePair<int, IMidiMessage>(TrackEventTime, new ChannelMessage(ChannelCommand.NoteOff,
                 (int)args[0], (int)args[1], 127)));
-            Console.WriteLine("NoteOff: TrackElapsedTime = " + TrackElapsedTime + ", ET - RT = " + (TrackElapsedTime - TrackResumedTime) + ", TrackEventTime = " + TrackEventTime);
+            //Console.WriteLine("NoteOff: TrackElapsedTime = " + TrackElapsedTime + ", ET - RT = " + (TrackElapsedTime - TrackResumedTime) + ", TrackEventTime = " + TrackEventTime);
 
             TrackNoteOffBuffer.RemoveAll(e => e.Value.Key == (int)args[0] && e.Value.Value == (int)args[1]);
         }

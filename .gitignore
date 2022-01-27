@@ -8,7 +8,7 @@ Builds/WorkingContext.csv
 Builds/Recordings
 ChordingCoding/bin/x64/Debug/WorkingContext.csv
 ChordingCoding/bin/x64/Debug/Recordings
-ChordingCoding/bin/x64/Debug/SentimentLog*.csv
+ChordingCoding/bin/x64/Debug/SentimentLog.csv
 
 # User-specific files
 *.rsuser

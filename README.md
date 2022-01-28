@@ -13,12 +13,11 @@ ChordingCoding은 코딩과 문서 작업에 지친 사람들의 감성을 채�
 Windows Forms로 개발된 응용 프로그램으로, 64-bit Windows에서 사용 가능합니다.
 
 ## How To Use
-1. 커맨드라인에서 `git clone https://github.com/salt26/chordingcoding`을 실행하세요.
-   * 만약 git에 친숙하지 않은 분이라면 [여기](https://github.com/salt26/chordingcoding/archive/master.zip)를 눌러 최신 버전의 파일을 다운로드받으세요.
+1. [여기](https://github.com/salt26/chordingcoding/releases/tag/v.1.4)를 클릭하여 파일 `ChordingCoding.v.1.4.zip`을 다운로드 받으세요.
  
-2. Builds 폴더에 있는 "ChordingCoding.exe"를 실행합니다.
-   * 바로 가기(.lnk)를 만들면 실행하기 편리합니다.
-   * 만약 프로그램의 경로를 옮기고 싶다면 Builds 폴더 내의 모든 파일을 통째로 옮겨주세요.
+2. 압축을 풀고 `ChordingCoding.exe`를 실행합니다.
+   * `ChordingCoding.exe`의 바로 가기(.lnk)를 만들면 실행하기 편리합니다.
+   * 실행이 잘 되지 않으면 [이슈 게시판](https://github.com/salt26/chordingcoding/issues)을 활용해 주세요!
 
 3. 작업 표시줄에 있는 시스템 트레이에 음표 모양 ChordingCoding 아이콘(![Tray](https://raw.githubusercontent.com/salt26/chordingcoding/master/ChordingCoding/Resources/Tray.ico))이 있는 것을 볼 수 있습니다. 이 아이콘을 클릭하면 메뉴가 나타납니다.
 

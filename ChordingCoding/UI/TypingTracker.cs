@@ -323,7 +323,7 @@ namespace ChordingCoding.UI
                     EnglishWordSentiment w = (EnglishWordSentiment)EnglishSentimentAnalyzer.instance.GetSentimentAndFlush();
                     w.Print();
                     SentimentState.UpdateState(w);
-                    AppendSentimentLog(wordState, w.GetValence(), w.GetArousal(), SentimentState.GetShortTermValence(), SentimentState.GetShortTermArousal(), SentimentState.GetLongTermValence(), SentimentState.GetLongTermArousal(), SentimentState.GetShortTermPrevValence(), SentimentState.GetShortTermPrevArousal());
+                    //AppendSentimentLog(wordState, w.GetValence(), w.GetArousal(), SentimentState.GetShortTermValence(), SentimentState.GetShortTermArousal(), SentimentState.GetLongTermValence(), SentimentState.GetLongTermArousal(), SentimentState.GetShortTermPrevValence(), SentimentState.GetShortTermPrevArousal());
                 }
                 else
                 {
@@ -333,7 +333,7 @@ namespace ChordingCoding.UI
                     KoreanWordSentiment w = (KoreanWordSentiment)KoreanSentimentAnalyzer.instance.GetSentimentAndFlush();
                     w.Print();
                     SentimentState.UpdateState(w);
-                    AppendSentimentLog(Hangul.Assemble(wordState), w.GetValence(), w.GetArousal(), SentimentState.GetShortTermValence(), SentimentState.GetShortTermArousal(), SentimentState.GetLongTermValence(), SentimentState.GetLongTermArousal(), SentimentState.GetShortTermPrevValence(), SentimentState.GetShortTermPrevArousal());
+                    //AppendSentimentLog(Hangul.Assemble(wordState), w.GetValence(), w.GetArousal(), SentimentState.GetShortTermValence(), SentimentState.GetShortTermArousal(), SentimentState.GetLongTermValence(), SentimentState.GetLongTermArousal(), SentimentState.GetShortTermPrevValence(), SentimentState.GetShortTermPrevArousal());
                 }
             }
             wordState = "";

@@ -1,5 +1,5 @@
 # ChordingCoding
-![ChordingCoding Logo](https://raw.githubusercontent.com/salt26/chordingcoding/v.1.7/ChordingCoding/Resources/Logos/Logo.gif)
+![ChordingCoding Logo](https://raw.githubusercontent.com/salt26/chordingcoding/master/ChordingCoding/Resources/Logos/Logo.gif)
 
 With ChordingCoding, typing becomes composing music!
 
@@ -15,7 +15,7 @@ ChordingCoding은 코딩과 문서 작업에 지친 사람들의 감성을 채�
 Windows Forms로 개발된 응용 프로그램으로, 64-bit Windows에서 사용 가능합니다.
 
 ## How To Use
-1. [여기](https://github.com/salt26/chordingcoding/releases/tag/v.1.7)에서 파일 `ChordingCoding.v.1.7.zip`을 다운로드 받으세요.
+1. [여기](https://github.com/salt26/chordingcoding/releases/tag/v.1.7)를 클릭하여 파일 `ChordingCoding.v.1.7.zip`을 다운로드 받으세요.
  
 2. 압축을 풀고 `ChordingCoding.exe`를 실행합니다.
    * `ChordingCoding.exe`의 바로 가기(.lnk)를 만들면 실행하기 편리합니다.

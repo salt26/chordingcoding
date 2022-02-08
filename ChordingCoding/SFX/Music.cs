@@ -359,6 +359,19 @@ namespace ChordingCoding.SFX
                 ThemeChanged();
 
                 new Test.SFXTest();   // Run some tests.
+
+                /*
+                // Some simulation
+                List<double> vector = chordTransitionMatrix.RomanNumeralFromAll(8, 0, MusicalKey.Mode.Major, 68, 95);
+                string s = "";
+                for (int i = 0; i < vector.Count; i++)
+                {
+                    s += vector[i] + " ";
+                }
+                Console.WriteLine(s);
+                int c = chordTransitionMatrix.SampleRomanNumeralFromAll(8, 0, MusicalKey.Mode.Major, 68, 95);
+                Console.WriteLine("new chord = " + c);
+                */
             }
         }
 

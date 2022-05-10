@@ -53,7 +53,7 @@ namespace ChordingCoding.UI
         /// <summary>
         /// 감성 분석을 실시할지 결정합니다.
         /// </summary>
-        public const bool ENABLE_SENTIMENT_ANALYZER = true;
+        public const bool ENABLE_SENTIMENT_ANALYZER = false;
 
         /// <summary>
         /// 감성 인식 수준을 변경할 수 있게 할지 결정합니다. 감성 분석이 활성화된(ENABLE_SENTIMENT_ANALYZER == true) 경우에만 사용됩니다.

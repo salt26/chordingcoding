@@ -39,9 +39,9 @@
             this.versionLabel.Font = new System.Drawing.Font("Gultan Bonte", 25.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.versionLabel.Location = new System.Drawing.Point(720, 137);
             this.versionLabel.Name = "versionLabel";
-            this.versionLabel.Size = new System.Drawing.Size(83, 59);
+            this.versionLabel.Size = new System.Drawing.Size(65, 48);
             this.versionLabel.TabIndex = 0;
-            this.versionLabel.Text = "v.1.7";
+            this.versionLabel.Text = "v.1.8";
             this.versionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.versionLabel.UseCompatibleTextRendering = true;
             // 

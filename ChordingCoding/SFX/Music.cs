@@ -28,11 +28,11 @@ using System.IO;
 using System.Diagnostics;
 using Newtonsoft.Json;
 using Sanford.Multimedia.Midi;
-//using NAudio.Wave;
+using NAudio.Wave;
 //using NAudio.MediaFoundation;
-//using NAudio.CoreAudioApi;
-//using NAudio.Dmo.Effect;
-//using NAudio.Dmo;
+using NAudio.CoreAudioApi;
+using NAudio.Dmo.Effect;
+using NAudio.Dmo;
 using NFluidsynth;
 using ChordingCoding.Utility;
 using ChordingCoding.Sentiment;
@@ -241,6 +241,8 @@ namespace ChordingCoding.SFX
             {
                 syn.SoundFontSelect(i, 0);
             }
+            syn.SetReverb(1.0, 1.0, 100.0, 1.0);
+            syn.SetReverbOn(true);
 
             adriver = new AudioDriver(syn.Settings, syn);
             /*

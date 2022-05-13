@@ -26,6 +26,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Newtonsoft.Json;
 using Sanford.Multimedia.Midi;
 using NAudio.Wave;
@@ -128,17 +129,19 @@ namespace ChordingCoding.SFX
         //public static OutputDevice outDevice;
         private static Settings settings;
         private static Synth syn;
-        private static AudioDriver adriver;
+        //private static AudioDriver adriver;
 
         /*
         public static BufferedWaveProvider sound;
         public static RawSourceWaveStream soundStream;
         //public static WaveOutEvent playback;
-        public static DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params> reverb;
-        public static WasapiOut outputDevice;
         public static byte[] buffer;
         public static MemoryStream stream;
         */
+        public static MemoryStream memoryStream;
+        public static RawSourceWaveStream soundStream;
+        public static DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params> reverb;
+        public static DirectSoundOut outputDevice;
 
         public static List<KeyValuePair<int, IMidiMessage>> track;
         public static long TrackElapsedTime // 현재 시점 (프로그램 시작 후 지난 microsecond(1/1000초) 단위의 시간)
@@ -243,8 +246,9 @@ namespace ChordingCoding.SFX
             }
             syn.SetReverb(1.0, 1.0, 100.0, 1.0);
             syn.SetReverbOn(true);
+            outputDevice = new DirectSoundOut();
 
-            adriver = new AudioDriver(syn.Settings, syn);
+            //adriver = new AudioDriver(syn.Settings, syn);
             /*
             WaveInEvent recorder = new WaveInEvent
             {
@@ -413,11 +417,11 @@ namespace ChordingCoding.SFX
                 for (int i = 0; i <= 8; i++) StopPlaying(i);
                 timer.Stop();
                 //outDevice.Close();
-                adriver.Dispose();
+                //adriver.Dispose();
                 //playback.Stop();
-                //outputDevice.Stop();
-                //outputDevice.Dispose();
-                //reverb.Dispose();
+                outputDevice.Stop();
+                outputDevice.Dispose();
+                reverb.Dispose();
                 syn.Dispose();
                 settings.Dispose();
                 mgmt.Stop();
@@ -826,6 +830,10 @@ namespace ChordingCoding.SFX
                     Util.TaskQueue.Add("MidiTrack", ClearTrack);
                 }
                 TrackElapsedTime++;
+                if (TrackElapsedTime % 1000 == 0)
+                {
+                    PlaySound();
+                }
             }
         }
 
@@ -1137,5 +1145,60 @@ namespace ChordingCoding.SFX
 #endregion
         }
         */
+        
+        public static void PlaySound()
+        {
+            // https://stackoverflow.com/questions/890098/converting-from-a-jagged-array-to-double-pointer-in-c-sharp
+            // https://www.fluidsynth.org/api/fluidsynth_process_8c-example.html#a0
+
+            ushort[] left = new ushort[44100 * 2];
+            /*
+            const int channels = 2;
+            ushort[] left = new ushort[44100];
+            ushort[] right = new ushort[44100];
+            ushort[][] dry = new ushort[channels][];
+            dry[0] = left;
+            dry[1] = right;
+
+            GCHandle[] pinnedDryArray = new GCHandle[channels];
+            ushort*[] ptrDryArray = new ushort*[channels];
+
+            for (int i = 0; i < channels; i++)
+            {
+                pinnedDryArray[i] = GCHandle.Alloc(dry[i], GCHandleType.Pinned);
+            }
+            for (int i = 0; i < channels; i++)
+            {
+                ptrDryArray[i] = (ushort*)pinnedDryArray[i].AddrOfPinnedObject();
+            }
+
+            fixed (ushort** dryPtr = &ptrDryArray[0])
+            {
+                syn.WriteSample16(44100, left, 0, 44100, 2, left, 1, 44100, 2);
+            }
+            */
+            syn.WriteSample16(44100, left, 0, 44100 * 2, 2, left, 1, 44100 * 2, 2);
+
+            byte[] leftBytes = new byte[left.Length * sizeof(ushort)];
+            Buffer.BlockCopy(left, 0, leftBytes, 0, leftBytes.Length);
+
+            memoryStream = new MemoryStream();
+            memoryStream.Write(leftBytes, 0, leftBytes.Length);
+            memoryStream.Position = 0;
+            soundStream = new RawSourceWaveStream(memoryStream, new WaveFormat(44100, 2));
+            reverb = new DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params>(soundStream);
+            outputDevice.Init(reverb);
+            outputDevice.Play();
+            Console.WriteLine("playSound");
+
+            /*
+            for (int i = 0; i < channels; i++)
+            {
+                pinnedDryArray[i].Free();
+                pinnedFXArray[i].Free();
+            }
+            */
+        }
+        
     }
 }

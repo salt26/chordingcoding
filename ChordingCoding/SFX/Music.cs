@@ -246,7 +246,14 @@ namespace ChordingCoding.SFX
             }
             syn.SetReverb(1.0, 1.0, 100.0, 1.0);
             syn.SetReverbOn(true);
+
+            memoryStream = new MemoryStream();
+            soundStream = new RawSourceWaveStream(memoryStream, new WaveFormat(44100, 2));
+            reverb = new DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params>(soundStream);
             outputDevice = new DirectSoundOut();
+            outputDevice.PlaybackStopped += outputDevicePlaybackLoop;
+            outputDevice.Init(reverb);
+            outputDevice.Play();
 
             //adriver = new AudioDriver(syn.Settings, syn);
             /*
@@ -350,6 +357,11 @@ namespace ChordingCoding.SFX
             */
         }
 
+        private static void OutputDevice_PlaybackStopped(object sender, NAudio.Wave.StoppedEventArgs e)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// 이 클래스가 작동하기 위해서는
         /// Initialize()가 호출된 후에 반드시 호출되어야 합니다.
@@ -421,7 +433,7 @@ namespace ChordingCoding.SFX
                 //playback.Stop();
                 outputDevice.Stop();
                 outputDevice.Dispose();
-                reverb.Dispose();
+                //reverb.Dispose();
                 syn.Dispose();
                 settings.Dispose();
                 mgmt.Stop();
@@ -830,10 +842,10 @@ namespace ChordingCoding.SFX
                     Util.TaskQueue.Add("MidiTrack", ClearTrack);
                 }
                 TrackElapsedTime++;
-                if (TrackElapsedTime % 1000 == 0)
-                {
-                    PlaySound();
-                }
+
+                // 1/100초마다 441개의 샘플을 버퍼에 추가
+                if (TrackElapsedTime % 10 == 0)
+                    ApplyReverb();
             }
         }
 
@@ -1145,60 +1157,65 @@ namespace ChordingCoding.SFX
 #endregion
         }
         */
-        
+
         public static void PlaySound()
         {
             // https://stackoverflow.com/questions/890098/converting-from-a-jagged-array-to-double-pointer-in-c-sharp
             // https://www.fluidsynth.org/api/fluidsynth_process_8c-example.html#a0
 
-            ushort[] left = new ushort[44100 * 2];
-            /*
-            const int channels = 2;
-            ushort[] left = new ushort[44100];
-            ushort[] right = new ushort[44100];
-            ushort[][] dry = new ushort[channels][];
-            dry[0] = left;
-            dry[1] = right;
+            // https://stackoverflow.com/questions/27801812/naudio-buffer-and-realtime-streaming
 
-            GCHandle[] pinnedDryArray = new GCHandle[channels];
-            ushort*[] ptrDryArray = new ushort*[channels];
+            Console.WriteLine("playSound " + outputDevice.GetPosition());
 
-            for (int i = 0; i < channels; i++)
-            {
-                pinnedDryArray[i] = GCHandle.Alloc(dry[i], GCHandleType.Pinned);
-            }
-            for (int i = 0; i < channels; i++)
-            {
-                ptrDryArray[i] = (ushort*)pinnedDryArray[i].AddrOfPinnedObject();
-            }
+            ushort[] interleavedBuffer = new ushort[(int)(44100 * 2 / tickPerSecond) + 2];
+            syn.WriteSample16((int)(44100 / tickPerSecond) + 1, interleavedBuffer, 0, (int)(44100 * 2 / tickPerSecond) + 2, 2, interleavedBuffer, 1, (int)(44100 * 2 / tickPerSecond) + 2, 2);
 
-            fixed (ushort** dryPtr = &ptrDryArray[0])
-            {
-                syn.WriteSample16(44100, left, 0, 44100, 2, left, 1, 44100, 2);
-            }
-            */
-            syn.WriteSample16(44100, left, 0, 44100 * 2, 2, left, 1, 44100 * 2, 2);
-
-            byte[] leftBytes = new byte[left.Length * sizeof(ushort)];
-            Buffer.BlockCopy(left, 0, leftBytes, 0, leftBytes.Length);
+            byte[] interleavedBytes = new byte[interleavedBuffer.Length * sizeof(ushort)];
+            Buffer.BlockCopy(interleavedBuffer, 0, interleavedBytes, 0, interleavedBytes.Length);
 
             memoryStream = new MemoryStream();
-            memoryStream.Write(leftBytes, 0, leftBytes.Length);
+            memoryStream.Write(interleavedBytes, 0, interleavedBytes.Length);
             memoryStream.Position = 0;
+            soundStream = new RawSourceWaveStream(interleavedBytes, 0, interleavedBytes.Length, new WaveFormat(44100, 2));
+            //soundStream = new RawSourceWaveStream(memoryStream, new WaveFormat(44100, 2));
+            reverb = new DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params>(soundStream);
+            //outputDevice.Init(soundStream);
+            //outputDevice.Play();
+
+        }
+
+        /// <summary>
+        /// 1/100초마다 주기적으로 호출되어, syn이 합성할 소리에 reverb를 적용합니다.
+        /// </summary>
+        public static void ApplyReverb()
+        {
+            ushort[] interleavedBuffer = new ushort[441 * 2];
+            syn.WriteSample16(441, interleavedBuffer, 0, 441 * 2, 2, interleavedBuffer, 1, 441 * 2, 2);
+
+            byte[] interleavedBytes = new byte[interleavedBuffer.Length * sizeof(ushort)];
+            Buffer.BlockCopy(interleavedBuffer, 0, interleavedBytes, 0, interleavedBytes.Length);
+
+            long oldPosition = memoryStream.Position;
+            memoryStream.Seek(0, SeekOrigin.End);
+            memoryStream.Write(interleavedBytes, 0, interleavedBytes.Length);
+
+            memoryStream.Seek(oldPosition, SeekOrigin.Begin);
+
             soundStream = new RawSourceWaveStream(memoryStream, new WaveFormat(44100, 2));
             reverb = new DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params>(soundStream);
+        }
+
+        /// <summary>
+        /// reverb가 적용된 소리를 반복적으로 출력합니다.
+        /// TODO 약간의 끊김 발생 문제 해결 필요
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void outputDevicePlaybackLoop(object sender, NAudio.Wave.StoppedEventArgs e)
+        {
+            outputDevice = sender as DirectSoundOut;
             outputDevice.Init(reverb);
             outputDevice.Play();
-            Console.WriteLine("playSound");
-
-            /*
-            for (int i = 0; i < channels; i++)
-            {
-                pinnedDryArray[i].Free();
-                pinnedFXArray[i].Free();
-            }
-            */
         }
-        
     }
 }

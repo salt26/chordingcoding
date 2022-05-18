@@ -26,14 +26,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
 using Newtonsoft.Json;
 using Sanford.Multimedia.Midi;
 using NAudio.Wave;
 //using NAudio.MediaFoundation;
-using NAudio.CoreAudioApi;
 using NAudio.Dmo.Effect;
-using NAudio.Dmo;
 using NFluidsynth;
 using ChordingCoding.Utility;
 using ChordingCoding.Sentiment;
@@ -126,24 +123,23 @@ namespace ChordingCoding.SFX
             }
         }
 
-        //public static OutputDevice outDevice;
+        private static bool _useReverb;
+
+        // NFluidsynth
         private static Settings settings;
         private static Synth syn;
-        //private static AudioDriver adriver;
+        private static AudioDriver audioDriver;
 
-        /*
-        public static BufferedWaveProvider sound;
-        public static RawSourceWaveStream soundStream;
-        //public static WaveOutEvent playback;
-        public static byte[] buffer;
-        public static MemoryStream stream;
-        */
-        public static MemoryStream memoryStream;
-        public static RawSourceWaveStream soundStream;
-        public static DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params> reverb;
-        public static DirectSoundOut outputDevice;
+        // NAudio
+        private static MemoryStream memoryStream;
+        private static RawSourceWaveStream soundStream;
+        private static DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params> reverb;
+        private static DirectSoundOut outputDevice;
 
-        public static List<KeyValuePair<int, IMidiMessage>> track;
+        // Sanford.Multimedia.Midi
+        //public static OutputDevice outDevice;
+        private static List<KeyValuePair<int, IMidiMessage>> track;
+
         public static long TrackElapsedTime // 현재 시점 (프로그램 시작 후 지난 microsecond(1/1000초) 단위의 시간)
         {
             get;
@@ -207,11 +203,10 @@ namespace ChordingCoding.SFX
 
         private static Timer.TickDelegate tickDelegate;
         private static Timer timer;
-        private static int timerNumber = 0;             // 1/1000초마다 1씩 증가, tick 간격마다 0으로 초기화
+        private static int timerNumber = 0;                                     // 1/1000초마다 1씩 증가, tick 간격마다 0으로 초기화
         private static List<Note> syncPlayBuffer = new List<Note>();
         private static bool syncTransitionBuffer = false;
-        private static List<int> playPitchEventBuffer = new List<int>();                                    // PlayNoteInChord()에서 재생되는 메인 음을 저장
-        //private static long time = 0;
+        private static List<int> playPitchEventBuffer = new List<int>();        // PlayNoteInChord()에서 재생되는 메인 음을 저장
 
         private static PowerManagement mgmt;
 
@@ -227,6 +222,9 @@ namespace ChordingCoding.SFX
             HasStart = false;
 
             //outDevice = new OutputDevice(0);
+
+            #region For synthesizing MIDI with a SoundFont (NFluidsynth)
+
             settings = new Settings();
             settings[ConfigurationKeys.SynthAudioChannels].IntValue = 2;
 
@@ -244,47 +242,20 @@ namespace ChordingCoding.SFX
             {
                 syn.SoundFontSelect(i, 0);
             }
-            syn.SetReverb(1.0, 1.0, 100.0, 1.0);
-            syn.SetReverbOn(true);
+            //syn.SetReverb(1.0, 1.0, 100.0, 1.0);
+            //syn.SetReverbOn(true);
 
-            memoryStream = new MemoryStream();
+            #endregion
+
+            #region For applying reverb effect (NAudio)
+
+            memoryStream = new MemoryStream(44100);
             soundStream = new RawSourceWaveStream(memoryStream, new WaveFormat(44100, 2));
             reverb = new DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params>(soundStream);
-            outputDevice = new DirectSoundOut();
-            outputDevice.PlaybackStopped += outputDevicePlaybackLoop;
-            outputDevice.Init(reverb);
-            outputDevice.Play();
 
-            //adriver = new AudioDriver(syn.Settings, syn);
-            /*
-            WaveInEvent recorder = new WaveInEvent
-            {
-                WaveFormat = new WaveFormat(44100, 2)
-            };
-            BufferedWaveProvider sound = new BufferedWaveProvider(recorder.WaveFormat);
-            recorder.DataAvailable += (object sender, WaveInEventArgs e) =>
-            {
-                sound.AddSamples(e.Buffer, 0, e.BytesRecorded);
-            };
-            recorder.StartRecording();
-            //sound.Read();
-            */
-            //playback = new WaveOutEvent();
-            //playback.Init(sound);
-            //playback.Play();
-            /*
-            sound = new BufferedWaveProvider(new WaveFormat(44100, 2));
-            buffer = new byte[44100 * 4];
-            stream = new MemoryStream();
-            Task.Run(() => {
-                soundStream = new RawSourceWaveStream(stream, new WaveFormat(44100, 2));
-                reverb = new DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params>(soundStream);
-                outputDevice = new WasapiOut();
+            #endregion
 
-                outputDevice.Init(reverb);
-                outputDevice.Play();
-            });
-            */
+            #region For MIDI recording (Sanford.Multimedia.Midi)
 
             track = new List<KeyValuePair<int, IMidiMessage>>();
             TrackElapsedTime = 0;
@@ -293,6 +264,8 @@ namespace ChordingCoding.SFX
             HasTrackCleared = true;
             TrackProgramChanges = new List<KeyValuePair<int, int>>();
             TrackNoteOffBuffer = new List<KeyValuePair<int, KeyValuePair<int, int>>>();
+
+            #endregion
 
             key = new MusicalKey();
 
@@ -306,6 +279,8 @@ namespace ChordingCoding.SFX
             //Console.WriteLine(SFXThemeName + " " + SFXTheme.CurrentSFXTheme.Name);
             NoteResolution = noteResolution;
             Accompaniment.Initialize();
+
+            _useReverb = SFXTheme.CurrentSFXTheme.UseReverb;
 
             tickDelegate += Tick;
             if (timerTickDelegates != null)
@@ -333,33 +308,6 @@ namespace ChordingCoding.SFX
             accompanimentPlayNumber.Add(8, 0);
 
             IsReady = true;
-            /*
-            Task.Run(() =>
-            {
-                var capture = new WasapiLoopbackCapture();
-                var effectProvider = new DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params>(new WaveInProvider(capture));
-
-                PlayEffectorSound(capture, effectProvider);
-                using (var outputDevice = new WasapiOut())
-                {
-                    outputDevice.Init(effectProvider);
-                    capture.StartRecording();
-                    outputDevice.Play();
-                    while (capture.CaptureState != NAudio.CoreAudioApi.CaptureState.Stopped)
-                    {
-                        Thread.Sleep(500);
-                        if (!IsReady) capture.StopRecording();
-                    }
-                    Console.WriteLine("Effector stopped");
-                }
-
-            });
-            */
-        }
-
-        private static void OutputDevice_PlaybackStopped(object sender, NAudio.Wave.StoppedEventArgs e)
-        {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -429,11 +377,17 @@ namespace ChordingCoding.SFX
                 for (int i = 0; i <= 8; i++) StopPlaying(i);
                 timer.Stop();
                 //outDevice.Close();
-                //adriver.Dispose();
-                //playback.Stop();
-                outputDevice.Stop();
-                outputDevice.Dispose();
-                //reverb.Dispose();
+                if (!SFXTheme.CurrentSFXTheme.UseReverb)
+                {
+                    audioDriver?.Dispose();
+                }
+                else
+                {
+                    outputDevice.PlaybackStopped -= OutputDevicePlaybackLoop;
+                    outputDevice?.Stop();
+                    outputDevice?.Dispose();
+                    //reverb.Dispose();
+                }
                 syn.Dispose();
                 settings.Dispose();
                 mgmt.Stop();
@@ -779,7 +733,7 @@ namespace ChordingCoding.SFX
                     {
                         case "Accompaniment":
                             float accompVolume = 1f;
-                            if (!SFXTheme.CurrentSFXTheme.hasAccompanied) accompVolume = 0f;
+                            if (!SFXTheme.CurrentSFXTheme.HasAccompanied) accompVolume = 0f;
                             return SFXTheme.CurrentSFXTheme.Volume / 100f * accompVolume;
                         default:
                             return SFXTheme.CurrentSFXTheme.Volume / 100f;
@@ -792,7 +746,7 @@ namespace ChordingCoding.SFX
             Util.TaskQueue.Add("play", TickPlay);
 
             if (tickNumber % 64 == 0 && (SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(7) || SFXTheme.CurrentSFXTheme.Instruments.ContainsKey(8)) &&
-                SFXTheme.CurrentSFXTheme.hasAccompanied)
+                SFXTheme.CurrentSFXTheme.HasAccompanied)
             {
                 syncTransitionBuffer = false;
                 PlayChordTransition();
@@ -843,8 +797,8 @@ namespace ChordingCoding.SFX
                 }
                 TrackElapsedTime++;
 
-                // 1/100초마다 441개의 샘플을 버퍼에 추가
-                if (TrackElapsedTime % 10 == 0)
+                // 1/100초마다 441개의 raw audio 샘플을 스트림 버퍼에 추가하여 reverb 적용
+                if (SFXTheme.CurrentSFXTheme.UseReverb && TrackElapsedTime % 10 == 0)
                     ApplyReverb();
             }
         }
@@ -1098,97 +1052,48 @@ namespace ChordingCoding.SFX
         }
         */
 
-        /*
-        /// <summary>
-        /// Windows에서 나는 모든 소리를 받아 reverb 효과를 주고 재생합니다.
-        /// </summary>
-        /// <param name="capture"></param>
-        public static void PlayEffectorSound(WasapiLoopbackCapture capture, DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params> reverb)
+        public static void SetReverb(bool use)
         {
-            if (reverb is null) return;
-            capture.DataAvailable += (s, a) =>
+            Console.WriteLine("SetReverb " + use);
+            if (use && !_useReverb)
             {
-                reverb.Read(a.Buffer, 0, a.BytesRecorded);
-            };
+                audioDriver?.Dispose();
 
-            capture.RecordingStopped += (s, a) =>
-            {
-                capture.Dispose();
-                reverb.Dispose();
-            };
-        }
-        */
+                // Apply reverb effect
+                memoryStream = new MemoryStream(44100);
+                soundStream = new RawSourceWaveStream(memoryStream, new WaveFormat(44100, 2));
+                reverb = new DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params>(soundStream);
 
-        /*
-        public static void SynthesizeSound()
-        {
-            using (Settings settings = new Settings())
+                outputDevice = new DirectSoundOut();
+                outputDevice.PlaybackStopped += OutputDevicePlaybackLoop;
+                outputDevice.Init(reverb);
+                outputDevice.Play();
+
+                _useReverb = true;
+            }
+            else if (!use && _useReverb)
             {
-                settings[ConfigurationKeys.SynthAudioChannels].IntValue = 2;
-                using (Synth syn = new Synth(settings))
-                {
-                    syn.LoadSoundFont("FluidR3_GM.sf2", true);
-                    for (int i = 0; i < 16; i++)
-                    {
-                        syn.SoundFontSelect(i, 0);
-                    }
-                }
+                outputDevice.PlaybackStopped -= OutputDevicePlaybackLoop;
+                outputDevice?.Stop();
+                outputDevice?.Dispose();
+
+                // Use original MIDI sound
+                audioDriver = new AudioDriver(syn.Settings, syn);
+
+                _useReverb = false;
             }
         }
-        */
-
-        /*
-        public static void SoundPipeline(byte[] tempLeftBuffer)
-        {
-#region TODO 곧 없어질, 음악을 1초 단위로 합성하는 로직
-            float second_per_tick = 1f / TICK_PER_SECOND;
-            int frameNum = (int)(second_per_tick * 44100 * 2);
-            GCHandle pinnedLeftArray = GCHandle.Alloc(tempLeftBuffer, GCHandleType.Pinned);
-            IntPtr leftPointer = pinnedLeftArray.AddrOfPinnedObject();
-            syn.WriteSample16(frameNum, leftPointer, 0, frameNum * 2, 2, leftPointer, 1, frameNum * 2, 2);
-            stream.Write(tempLeftBuffer, 0, frameNum);
-            //soundStream.Read(tempLeftBuffer, 0, frameNum);
-            //sound.AddSamples(tempLeftBuffer, 0, frameNum);
-
-            reverb.Read(tempLeftBuffer, 0, frameNum);
-            Console.WriteLine();
-
-            pinnedLeftArray.Free();
-#endregion
-        }
-        */
-
-        public static void PlaySound()
-        {
-            // https://stackoverflow.com/questions/890098/converting-from-a-jagged-array-to-double-pointer-in-c-sharp
-            // https://www.fluidsynth.org/api/fluidsynth_process_8c-example.html#a0
-
-            // https://stackoverflow.com/questions/27801812/naudio-buffer-and-realtime-streaming
-
-            Console.WriteLine("playSound " + outputDevice.GetPosition());
-
-            ushort[] interleavedBuffer = new ushort[(int)(44100 * 2 / tickPerSecond) + 2];
-            syn.WriteSample16((int)(44100 / tickPerSecond) + 1, interleavedBuffer, 0, (int)(44100 * 2 / tickPerSecond) + 2, 2, interleavedBuffer, 1, (int)(44100 * 2 / tickPerSecond) + 2, 2);
-
-            byte[] interleavedBytes = new byte[interleavedBuffer.Length * sizeof(ushort)];
-            Buffer.BlockCopy(interleavedBuffer, 0, interleavedBytes, 0, interleavedBytes.Length);
-
-            memoryStream = new MemoryStream();
-            memoryStream.Write(interleavedBytes, 0, interleavedBytes.Length);
-            memoryStream.Position = 0;
-            soundStream = new RawSourceWaveStream(interleavedBytes, 0, interleavedBytes.Length, new WaveFormat(44100, 2));
-            //soundStream = new RawSourceWaveStream(memoryStream, new WaveFormat(44100, 2));
-            reverb = new DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params>(soundStream);
-            //outputDevice.Init(soundStream);
-            //outputDevice.Play();
-
-        }
 
         /// <summary>
-        /// 1/100초마다 주기적으로 호출되어, syn이 합성할 소리에 reverb를 적용합니다.
+        /// 1/100초마다 주기적으로 호출되어, syn이 합성한 raw audio에 reverb를 적용합니다.
         /// </summary>
         public static void ApplyReverb()
         {
+            // https://www.fluidsynth.org/api/fluidsynth_process_8c-example.html#a0
+            // https://stackoverflow.com/questions/27801812/naudio-buffer-and-realtime-streaming
+
+            if (!SFXTheme.CurrentSFXTheme.UseReverb) return;
+
             ushort[] interleavedBuffer = new ushort[441 * 2];
             syn.WriteSample16(441, interleavedBuffer, 0, 441 * 2, 2, interleavedBuffer, 1, 441 * 2, 2);
 
@@ -1206,16 +1111,18 @@ namespace ChordingCoding.SFX
         }
 
         /// <summary>
-        /// reverb가 적용된 소리를 반복적으로 출력합니다.
+        /// reverb가 적용된 audio를 반복적으로 출력합니다.
         /// TODO 약간의 끊김 발생 문제 해결 필요
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private static void outputDevicePlaybackLoop(object sender, NAudio.Wave.StoppedEventArgs e)
+        private static void OutputDevicePlaybackLoop(object sender, NAudio.Wave.StoppedEventArgs e)
         {
+            if (!SFXTheme.CurrentSFXTheme.UseReverb) return;
             outputDevice = sender as DirectSoundOut;
             outputDevice.Init(reverb);
             outputDevice.Play();
+            Console.WriteLine("OutputDevice Loop");
         }
     }
 }

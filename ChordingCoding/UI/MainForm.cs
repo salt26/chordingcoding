@@ -218,16 +218,26 @@ namespace ChordingCoding.UI
             foreach (Theme t in Theme.AvailableThemes)
             {
                 // 이 코드를 위의 foreach문과 합치면 CurrentSFXTheme이 아직 설정되지 않은 상태가 되어 문제가 발생할 수 있음
-                t.SFX.hasAccompanied = (bool)Properties.Settings.Default["Accompaniment" + t.Name];
+                t.SFX.HasAccompanied = (bool)Properties.Settings.Default["Accompaniment" + t.Name];
+                t.SFX.UseReverb = (bool)Properties.Settings.Default["Reverb" + t.Name];
             }
 
-            if (Theme.CurrentTheme.SFX.hasAccompanied)
+            if (Theme.CurrentTheme.SFX.HasAccompanied)
             {
                 autoAccompanimentToolStripMenuItem.CheckState = CheckState.Checked;
             }
             else
             {
                 autoAccompanimentToolStripMenuItem.CheckState = CheckState.Unchecked;
+            }
+
+            if (Theme.CurrentTheme.SFX.UseReverb)
+            {
+                useReverbToolStripMenuItem.CheckState = CheckState.Checked;
+            }
+            else
+            {
+                useReverbToolStripMenuItem.CheckState = CheckState.Unchecked;
             }
 
             MarshallingUpdateSplashScreen(10);
@@ -369,7 +379,8 @@ namespace ChordingCoding.UI
             {
                 Properties.Settings.Default["Opacity" + theme.Name] = _opacity[theme.Name];
                 Properties.Settings.Default["Volume" + theme.Name] = theme.SFX.Volume;
-                Properties.Settings.Default["Accompaniment" + theme.Name] = theme.SFX.hasAccompanied;
+                Properties.Settings.Default["Accompaniment" + theme.Name] = theme.SFX.HasAccompanied;
+                Properties.Settings.Default["Reverb" + theme.Name] = theme.SFX.UseReverb;
             }
             Properties.Settings.Default["NoteResolution"] = Music.NoteResolution;
             Properties.Settings.Default["SentimentAwareness"] = Music.SentimentAwareness;
@@ -675,12 +686,28 @@ namespace ChordingCoding.UI
             catch (SettingsPropertyNotFoundException)
             {
                 SettingsProperty accompanimentProperty = new SettingsProperty("Accompaniment" + theme.Name);
-                accompanimentProperty.DefaultValue = true;
+                accompanimentProperty.DefaultValue = false;
                 accompanimentProperty.IsReadOnly = false;
                 accompanimentProperty.PropertyType = typeof(bool);
                 accompanimentProperty.Provider = Properties.Settings.Default.Providers["LocalFileSettingsProvider"];
                 accompanimentProperty.Attributes.Add(typeof(UserScopedSettingAttribute), new UserScopedSettingAttribute());
                 Properties.Settings.Default.Properties.Add(accompanimentProperty);
+
+                hasAddProperties = true;
+            }
+            try
+            {
+                bool temp = (bool)Properties.Settings.Default["Reverb" + theme.Name];
+            }
+            catch (SettingsPropertyNotFoundException)
+            {
+                SettingsProperty reverbProperty = new SettingsProperty("Reverb" + theme.Name);
+                reverbProperty.DefaultValue = true;
+                reverbProperty.IsReadOnly = false;
+                reverbProperty.PropertyType = typeof(bool);
+                reverbProperty.Provider = Properties.Settings.Default.Providers["LocalFileSettingsProvider"];
+                reverbProperty.Attributes.Add(typeof(UserScopedSettingAttribute), new UserScopedSettingAttribute());
+                Properties.Settings.Default.Properties.Add(reverbProperty);
 
                 hasAddProperties = true;
             }
@@ -722,6 +749,7 @@ namespace ChordingCoding.UI
         {
             if (ENABLE_SENTIMENT_ANALYZER && ENABLE_CHANGING_SENTIMENT_AWARENESS)
             {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
                 switch (trackBarMenuItem2.Value)
                 {
                     case 1:
@@ -748,6 +776,7 @@ namespace ChordingCoding.UI
 
                 }
                 sentimentAwarenessToolStripMenuItem.Text = "감성 인식 수준 (" + Music.SentimentAwareness + "%)";
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
         }
 
@@ -797,13 +826,27 @@ namespace ChordingCoding.UI
             trackBarMenuItem3.Value = SFXTheme.CurrentSFXTheme.Volume / 5;
             volumeToolStripMenuItem.Text = "음량 (" + SFXTheme.CurrentSFXTheme.Volume + "%)";
 
-            if (Theme.CurrentTheme.SFX.hasAccompanied)
+            if (Music.HasStart)
+            {
+                Music.SetReverb(SFXTheme.CurrentSFXTheme.UseReverb);
+            }
+
+            if (Theme.CurrentTheme.SFX.HasAccompanied)
             {
                 autoAccompanimentToolStripMenuItem.CheckState = CheckState.Checked;
             }
             else
             {
                 autoAccompanimentToolStripMenuItem.CheckState = CheckState.Unchecked;
+            }
+
+            if (Theme.CurrentTheme.SFX.UseReverb)
+            {
+                useReverbToolStripMenuItem.CheckState = CheckState.Checked;
+            }
+            else
+            {
+                useReverbToolStripMenuItem.CheckState = CheckState.Unchecked;
             }
         }
 
@@ -934,14 +977,27 @@ namespace ChordingCoding.UI
 
         private void autoAccompanimentToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            Theme.CurrentTheme.SFX.hasAccompanied = !Theme.CurrentTheme.SFX.hasAccompanied;
-            if (Theme.CurrentTheme.SFX.hasAccompanied)
+            Theme.CurrentTheme.SFX.HasAccompanied = !Theme.CurrentTheme.SFX.HasAccompanied;
+            if (Theme.CurrentTheme.SFX.HasAccompanied)
             {
                 autoAccompanimentToolStripMenuItem.CheckState = CheckState.Checked;
             }
             else
             {
                 autoAccompanimentToolStripMenuItem.CheckState = CheckState.Unchecked;
+            }
+        }
+
+        private void useReverbToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Theme.CurrentTheme.SFX.UseReverb = !Theme.CurrentTheme.SFX.UseReverb;
+            if (Theme.CurrentTheme.SFX.UseReverb)
+            {
+                useReverbToolStripMenuItem.CheckState = CheckState.Checked;
+            }
+            else
+            {
+                useReverbToolStripMenuItem.CheckState = CheckState.Unchecked;
             }
         }
 

@@ -87,7 +87,7 @@ namespace ChordingCoding.SFX
         /// <summary>
         /// 자동 반주 여부 (변경 가능)
         /// </summary>
-        public bool hasAccompanied
+        public bool HasAccompanied
         {
             get
             {
@@ -106,6 +106,21 @@ namespace ChordingCoding.SFX
                     Util.TaskQueue.Add("play", StartAccompaniment);
                 }
                 */
+            }
+        }
+
+        private bool _useReverb;
+
+        public bool UseReverb
+        {
+            get
+            {
+                return _useReverb;
+            }
+            set
+            {
+                _useReverb = value;
+                Music.SetReverb(value);
             }
         }
 

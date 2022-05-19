@@ -252,7 +252,7 @@ namespace ChordingCoding.SFX
 
             #region For applying reverb effect (NAudio)
 
-            memoryStream = new MemoryStream(44100);
+            memoryStream = new MemoryStream(4410);
             soundStream = new RawSourceWaveStream(memoryStream, new WaveFormat(44100, 2));
             reverb = new DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params>(soundStream);
 
@@ -1063,7 +1063,7 @@ namespace ChordingCoding.SFX
                 audioDriver?.Dispose();
 
                 // Apply reverb effect
-                memoryStream = new MemoryStream(44100);
+                memoryStream = new MemoryStream(4410);
                 soundStream = new RawSourceWaveStream(memoryStream, new WaveFormat(44100, 2));
                 reverb = new DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params>(soundStream);
 
@@ -1095,7 +1095,7 @@ namespace ChordingCoding.SFX
             // https://www.fluidsynth.org/api/fluidsynth_process_8c-example.html#a0
             // https://stackoverflow.com/questions/27801812/naudio-buffer-and-realtime-streaming
 
-            if (!SFXTheme.CurrentSFXTheme.UseReverb) return;
+            if (!HasStart || !SFXTheme.CurrentSFXTheme.UseReverb) return;
 
             ushort[] interleavedBuffer = new ushort[441 * 2];
             syn.WriteSample16(441, interleavedBuffer, 0, 441 * 2, 2, interleavedBuffer, 1, 441 * 2, 2);
@@ -1111,6 +1111,12 @@ namespace ChordingCoding.SFX
 
             soundStream = new RawSourceWaveStream(memoryStream, new WaveFormat(44100, 2));
             reverb = new DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params>(soundStream);
+
+            if (outputDevice.PlaybackState == PlaybackState.Stopped)
+            {
+                outputDevice.Init(reverb);
+                outputDevice.Play();
+            }
         }
 
         /// <summary>
@@ -1121,7 +1127,7 @@ namespace ChordingCoding.SFX
         /// <param name="e"></param>
         private static void OutputDevicePlaybackLoop(object sender, NAudio.Wave.StoppedEventArgs e)
         {
-            if (!SFXTheme.CurrentSFXTheme.UseReverb) return;
+            if (!HasStart || !SFXTheme.CurrentSFXTheme.UseReverb) return;
             outputDevice = sender as DirectSoundOut;
             outputDevice.Init(reverb);
             outputDevice.Play();

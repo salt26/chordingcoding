@@ -128,7 +128,6 @@ namespace ChordingCoding.SFX
         // NFluidsynth
         private static Settings settings;
         private static Synth syn;
-        private static AudioDriver audioDriver;
 
         // NAudio
         private static MemoryStream memoryStream;
@@ -245,9 +244,6 @@ namespace ChordingCoding.SFX
             //syn.SetReverb(1.0, 1.0, 100.0, 1.0);
             //syn.SetReverbOn(true);
 
-            audioDriver = new AudioDriver(syn.Settings, syn);
-            _useReverb = false;
-
             #endregion
 
             #region For applying reverb effect (NAudio)
@@ -255,6 +251,9 @@ namespace ChordingCoding.SFX
             memoryStream = new MemoryStream(4410);
             soundStream = new RawSourceWaveStream(memoryStream, new WaveFormat(44100, 2));
             reverb = new DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params>(soundStream);
+            outputDevice = new DirectSoundOut();
+            outputDevice.PlaybackStopped += OutputDevicePlaybackLoopWithoutReverb;
+            _useReverb = false;
 
             #endregion
 
@@ -382,15 +381,14 @@ namespace ChordingCoding.SFX
                 //outDevice.Close();
                 if (!SFXTheme.CurrentSFXTheme.UseReverb)
                 {
-                    audioDriver?.Dispose();
+                    outputDevice.PlaybackStopped -= OutputDevicePlaybackLoopWithoutReverb;
                 }
                 else
                 {
-                    outputDevice.PlaybackStopped -= OutputDevicePlaybackLoop;
-                    outputDevice?.Stop();
-                    outputDevice?.Dispose();
-                    //reverb.Dispose();
+                    outputDevice.PlaybackStopped -= OutputDevicePlaybackLoopWithReverb;
                 }
+                outputDevice?.Stop();
+                outputDevice?.Dispose();
                 syn.Dispose();
                 settings.Dispose();
                 mgmt.Stop();
@@ -800,9 +798,12 @@ namespace ChordingCoding.SFX
                 }
                 TrackElapsedTime++;
 
-                // 1/100초마다 441개의 raw audio 샘플을 스트림 버퍼에 추가하여 reverb 적용
-                if (SFXTheme.CurrentSFXTheme.UseReverb && TrackElapsedTime % 10 == 0)
-                    ApplyReverb();
+                // 1/100초마다 441개의 raw audio 샘플을 스트림 버퍼에 추가
+                // SFXTheme.CurrentSFXTheme.UseReverb 값에 따라 reverb 적용 여부 결정
+                if (TrackElapsedTime % 10 == 0)
+                {
+                    SynthesizeAudio();
+                }
             }
         }
 
@@ -1060,15 +1061,9 @@ namespace ChordingCoding.SFX
             Console.WriteLine("SetReverb " + use);
             if (use && !_useReverb)
             {
-                audioDriver?.Dispose();
-
                 // Apply reverb effect
-                memoryStream = new MemoryStream(4410);
-                soundStream = new RawSourceWaveStream(memoryStream, new WaveFormat(44100, 2));
-                reverb = new DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params>(soundStream);
-
-                outputDevice = new DirectSoundOut();
-                outputDevice.PlaybackStopped += OutputDevicePlaybackLoop;
+                outputDevice.PlaybackStopped -= OutputDevicePlaybackLoopWithoutReverb;
+                outputDevice.PlaybackStopped += OutputDevicePlaybackLoopWithReverb;
                 outputDevice.Init(reverb);
                 outputDevice.Play();
 
@@ -1076,26 +1071,26 @@ namespace ChordingCoding.SFX
             }
             else if (!use && _useReverb)
             {
-                outputDevice.PlaybackStopped -= OutputDevicePlaybackLoop;
-                outputDevice?.Stop();
-                outputDevice?.Dispose();
-
                 // Use original MIDI sound
-                audioDriver = new AudioDriver(syn.Settings, syn);
+                outputDevice.PlaybackStopped -= OutputDevicePlaybackLoopWithReverb;
+                outputDevice.PlaybackStopped += OutputDevicePlaybackLoopWithoutReverb;
+                outputDevice.Init(soundStream);
+                outputDevice.Play();
 
                 _useReverb = false;
             }
         }
 
         /// <summary>
-        /// 1/100초마다 주기적으로 호출되어, syn이 합성한 raw audio에 reverb를 적용합니다.
+        /// 1/100초마다 주기적으로 호출되어, SFXTheme.CurrentSFXTheme.UseReverb 값에 따라서
+        /// syn이 합성한 raw audio, 또는 여기에 reverb를 적용한 audio를 스트리밍합니다.
         /// </summary>
-        public static void ApplyReverb()
+        public static void SynthesizeAudio()
         {
             // https://www.fluidsynth.org/api/fluidsynth_process_8c-example.html#a0
             // https://stackoverflow.com/questions/27801812/naudio-buffer-and-realtime-streaming
 
-            if (!HasStart || !SFXTheme.CurrentSFXTheme.UseReverb) return;
+            if (!HasStart) return;
 
             ushort[] interleavedBuffer = new ushort[441 * 2];
             syn.WriteSample16(441, interleavedBuffer, 0, 441 * 2, 2, interleavedBuffer, 1, 441 * 2, 2);
@@ -1106,32 +1101,51 @@ namespace ChordingCoding.SFX
             long oldPosition = memoryStream.Position;
             memoryStream.Seek(0, SeekOrigin.End);
             memoryStream.Write(interleavedBytes, 0, interleavedBytes.Length);
-
             memoryStream.Seek(oldPosition, SeekOrigin.Begin);
 
             soundStream = new RawSourceWaveStream(memoryStream, new WaveFormat(44100, 2));
-            reverb = new DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params>(soundStream);
+
+            if (SFXTheme.CurrentSFXTheme.UseReverb)
+                reverb = new DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params>(soundStream);
 
             if (outputDevice.PlaybackState == PlaybackState.Stopped)
             {
-                outputDevice.Init(reverb);
+                if (SFXTheme.CurrentSFXTheme.UseReverb)
+                    outputDevice.Init(reverb);
+                else
+                    outputDevice.Init(soundStream);
+
                 outputDevice.Play();
             }
         }
 
         /// <summary>
         /// reverb가 적용된 audio를 반복적으로 출력합니다.
-        /// TODO 약간의 끊김 발생 문제 해결 필요
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private static void OutputDevicePlaybackLoop(object sender, NAudio.Wave.StoppedEventArgs e)
+        private static void OutputDevicePlaybackLoopWithReverb(object sender, NAudio.Wave.StoppedEventArgs e)
         {
             if (!HasStart || !SFXTheme.CurrentSFXTheme.UseReverb) return;
             outputDevice = sender as DirectSoundOut;
             outputDevice.Init(reverb);
             outputDevice.Play();
-            Console.WriteLine("OutputDevice Loop");
+            Console.WriteLine("OutputDevice Loop with Reverb");
+        }
+
+
+        /// <summary>
+        /// reverb가 적용되지 않은 audio를 반복적으로 출력합니다.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private static void OutputDevicePlaybackLoopWithoutReverb(object sender, NAudio.Wave.StoppedEventArgs e)
+        {
+            if (!HasStart || SFXTheme.CurrentSFXTheme.UseReverb) return;
+            outputDevice = sender as DirectSoundOut;
+            outputDevice.Init(soundStream);
+            outputDevice.Play();
+            Console.WriteLine("OutputDevice Loop without Reverb");
         }
     }
 }

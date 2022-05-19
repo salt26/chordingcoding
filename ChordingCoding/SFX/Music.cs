@@ -123,7 +123,7 @@ namespace ChordingCoding.SFX
             }
         }
 
-        private static bool _useReverb;
+        private static bool _useReverb = false;
 
         // NFluidsynth
         private static Settings settings;
@@ -245,6 +245,9 @@ namespace ChordingCoding.SFX
             //syn.SetReverb(1.0, 1.0, 100.0, 1.0);
             //syn.SetReverbOn(true);
 
+            audioDriver = new AudioDriver(syn.Settings, syn);
+            _useReverb = false;
+
             #endregion
 
             #region For applying reverb effect (NAudio)
@@ -279,8 +282,6 @@ namespace ChordingCoding.SFX
             //Console.WriteLine(SFXThemeName + " " + SFXTheme.CurrentSFXTheme.Name);
             NoteResolution = noteResolution;
             Accompaniment.Initialize();
-
-            _useReverb = SFXTheme.CurrentSFXTheme.UseReverb;
 
             tickDelegate += Tick;
             if (timerTickDelegates != null)
@@ -323,6 +324,8 @@ namespace ChordingCoding.SFX
                 Accompaniment.Start();
                 HasStart = true;
                 ThemeChanged();
+
+                SetReverb(SFXTheme.CurrentSFXTheme.UseReverb);
 
                 new Test.SFXTest();   // Run some tests.
 

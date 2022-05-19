@@ -352,6 +352,15 @@ namespace ChordingCoding.SFX
             {
                 for (int i = 0; i <= 8; i++) StopPlaying(i);
                 timer.Stop();
+                if (!SFXTheme.CurrentSFXTheme.UseReverb)
+                {
+                    outputDevice.PlaybackStopped -= OutputDevicePlaybackLoopWithoutReverb;
+                }
+                else
+                {
+                    outputDevice.PlaybackStopped -= OutputDevicePlaybackLoopWithReverb;
+                }
+                outputDevice.Stop();
                 IsReady = false;
             }
         }
@@ -365,6 +374,17 @@ namespace ChordingCoding.SFX
             {
                 Util.TaskQueue.Add("MidiTrack", ClearTrack);
                 timer = new Timer(1, TickTimer);
+                if (!SFXTheme.CurrentSFXTheme.UseReverb)
+                {
+                    outputDevice.PlaybackStopped += OutputDevicePlaybackLoopWithoutReverb;
+                    outputDevice.Init(soundStream);
+                }
+                else
+                {
+                    outputDevice.PlaybackStopped += OutputDevicePlaybackLoopWithReverb;
+                    outputDevice.Init(reverb);
+                }
+                outputDevice.Play();
                 IsReady = true;
             }
         }
@@ -1107,16 +1127,6 @@ namespace ChordingCoding.SFX
 
             if (SFXTheme.CurrentSFXTheme.UseReverb)
                 reverb = new DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params>(soundStream);
-
-            if (outputDevice.PlaybackState == PlaybackState.Stopped)
-            {
-                if (SFXTheme.CurrentSFXTheme.UseReverb)
-                    outputDevice.Init(reverb);
-                else
-                    outputDevice.Init(soundStream);
-
-                outputDevice.Play();
-            }
         }
 
         /// <summary>

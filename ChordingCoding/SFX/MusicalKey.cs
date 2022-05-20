@@ -33,32 +33,76 @@ namespace ChordingCoding.SFX
         public enum Tonic { C = 0, Db = 1, D = 2, Eb = 3, E = 4, F = 5,
                             Gb = 6, G = 7, Ab = 8, A = 9, Bb = 10, B = 11 }
 
+        public enum ModePolicy { FavorMinor = 0, FavorMajor = 1, Auto = 2 }
+
         public const bool VERBOSE = true;
 
         public Mode mode;
         public Tonic tonic;
 
-        public MusicalKey()
+        private ModePolicy _policy;
+
+        public ModePolicy Policy
+        {
+            get
+            {
+                return _policy;
+            }
+            set
+            {
+                _policy = value;
+                void ChangeMode(object[] args)
+                {
+                    Transpose();
+                }
+                Utility.Util.TaskQueue.Add("Play", ChangeMode);
+            }
+        }
+
+        public MusicalKey(ModePolicy policy = ModePolicy.Auto)
         {
             Random r = new Random();
 
-            mode = Mode.Major;
-            if (r.NextDouble() < 0.5) mode = Mode.Minor;
+            Policy = policy;
+            switch (Policy) {
+                case ModePolicy.Auto:
+                    mode = Mode.Major;
+                    if (r.NextDouble() < 0.5) mode = Mode.Minor;
+                    break;
+                case ModePolicy.FavorMajor:
+                    mode = Mode.Major;
+                    break;
+                case ModePolicy.FavorMinor:
+                    mode = Mode.Minor;
+                    break;
+            }
 
             tonic = (Tonic)r.Next(0, 12);
             if (VERBOSE)
                 Console.WriteLine("Key: " + tonic.ToString() + " " + mode.ToString());
         }
 
-        public MusicalKey(Mode mode, Tonic tonic)
+        public MusicalKey(Mode mode, Tonic tonic, ModePolicy policy = ModePolicy.Auto)
         {
-            this.mode = mode;
             this.tonic = tonic;
+            Policy = policy;
+
+            switch (Policy)
+            {
+                case ModePolicy.Auto:
+                    this.mode = mode;
+                    break;
+                case ModePolicy.FavorMajor:
+                    this.mode = Mode.Major;
+                    break;
+                case ModePolicy.FavorMinor:
+                    this.mode = Mode.Minor;
+                    break;
+            }
         }
 
         public void Transpose(SentimentState.Valence valence = SentimentState.Valence.NULL)
         {
-
             Random r = new Random();
 
             switch (valence)
@@ -70,16 +114,40 @@ namespace ChordingCoding.SFX
                     mode = Mode.Minor;
                     break;
                 default:
-                    mode = Mode.Major;
-                    if (r.NextDouble() < 0.5) mode = Mode.Minor;
+                    switch (Policy) {
+                        case ModePolicy.Auto:
+                            mode = Mode.Major;
+                            if (r.NextDouble() < 0.5) mode = Mode.Minor;
+                            break;
+                        case ModePolicy.FavorMajor:
+                            mode = Mode.Major;
+                            break;
+                        case ModePolicy.FavorMinor:
+                            mode = Mode.Minor;
+                            break;
+                    }
                     break;
             }
 
             tonic = (Tonic)r.Next(0, 12);
+
             if (VERBOSE)
             {
                 Console.WriteLine("Transpose key!");
                 Console.WriteLine("Key: " + tonic.ToString() + " " + mode.ToString());
+            }
+        }
+
+        public static ModePolicy IntToModePolicy(int policy)
+        {
+            switch (policy)
+            {
+                case 0:
+                    return ModePolicy.FavorMinor;
+                case 1:
+                    return ModePolicy.FavorMajor;
+                default:
+                    return ModePolicy.Auto;
             }
         }
     }

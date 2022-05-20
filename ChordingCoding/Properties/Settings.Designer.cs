@@ -154,5 +154,17 @@ namespace ChordingCoding.Properties {
                 this["SentimentAwareness"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2")]
+        public int ModePolicy {
+            get {
+                return ((int)(this["ModePolicy"]));
+            }
+            set {
+                this["ModePolicy"] = value;
+            }
+        }
     }
 }

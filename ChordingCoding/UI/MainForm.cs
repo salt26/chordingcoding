@@ -209,9 +209,10 @@ namespace ChordingCoding.UI
 
             MarshallingUpdateSplashScreen(7);
             int resolution = (int)Properties.Settings.Default["NoteResolution"];
+            int modePolicy = (int)Properties.Settings.Default["ModePolicy"];
 
             MarshallingUpdateSplashScreen(8);
-            Music.Initialize(Theme.CurrentTheme.SFX.Name, resolution,
+            Music.Initialize(Theme.CurrentTheme.SFX.Name, resolution, modePolicy,
                 new SFX.Timer.TickDelegate[] { MarshallingUpdateFrame });
 
             MarshallingUpdateSplashScreen(9);
@@ -277,6 +278,8 @@ namespace ChordingCoding.UI
 
             MarshallingUpdateSplashScreen(11);
             SetNoteResolution(resolution);
+            SetMusicalModePolicy(MusicalKey.IntToModePolicy(modePolicy));
+
             if (ENABLE_SENTIMENT_ANALYZER)
             {
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
@@ -890,6 +893,30 @@ namespace ChordingCoding.UI
             }
         }
 
+        private void SetMusicalModePolicy(MusicalKey.ModePolicy policy)
+        {
+            Music.Key.Policy = policy;
+            autoModeToolStripMenuItem.CheckState = CheckState.Unchecked;
+            majorModeToolStripMenuItem.CheckState = CheckState.Unchecked;
+            minorModeToolStripMenuItem.CheckState = CheckState.Unchecked;
+
+            switch (policy)
+            {
+                case MusicalKey.ModePolicy.Auto:
+                    autoModeToolStripMenuItem.CheckState = CheckState.Checked;
+                    musicalModeToolStripMenuItem.Text = "선법 (자동)";
+                    break;
+                case MusicalKey.ModePolicy.FavorMajor:
+                    majorModeToolStripMenuItem.CheckState = CheckState.Checked;
+                    musicalModeToolStripMenuItem.Text = "선법 (장조 선호)";
+                    break;
+                case MusicalKey.ModePolicy.FavorMinor:
+                    minorModeToolStripMenuItem.CheckState = CheckState.Checked;
+                    musicalModeToolStripMenuItem.Text = "선법 (단조 선호)";
+                    break;
+            }
+        }
+
         private void SetSentimentAwareness(int sentimentAwareness)
         {
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
@@ -972,6 +999,30 @@ namespace ChordingCoding.UI
             if (Music.NoteResolution != 0)
             {
                 SetNoteResolution(0);
+            }
+        }
+
+        private void autoModeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (Music.Key.Policy != MusicalKey.ModePolicy.Auto)
+            {
+                SetMusicalModePolicy(MusicalKey.ModePolicy.Auto);
+            }
+        }
+
+        private void majorModeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (Music.Key.Policy != MusicalKey.ModePolicy.FavorMajor)
+            {
+                SetMusicalModePolicy(MusicalKey.ModePolicy.FavorMajor);
+            }
+        }
+
+        private void minorModeToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            if (Music.Key.Policy != MusicalKey.ModePolicy.FavorMinor)
+            {
+                SetMusicalModePolicy(MusicalKey.ModePolicy.FavorMinor);
             }
         }
 

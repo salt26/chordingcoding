@@ -70,10 +70,14 @@ namespace ChordingCoding.UI
             this.volumeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.trackBarMenuItem3 = new ChordingCoding.UI.TrackBarMenuItem();
             this.autoAccompanimentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.useReverbToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.recordToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.useReverbToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.musicalModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.autoModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.majorModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.minorModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -94,6 +98,7 @@ namespace ChordingCoding.UI
             this.contextMenuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.themeToolStripMenuItem,
             this.noteResolutionToolStripMenuItem,
+            this.musicalModeToolStripMenuItem,
             this.sentimentAwarenessToolStripMenuItem,
             this.toolStripSeparator2,
             this.opacityToolStripMenuItem,
@@ -105,7 +110,7 @@ namespace ChordingCoding.UI
             this.quitToolStripMenuItem});
             this.contextMenuStrip1.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Table;
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(191, 236);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(191, 258);
             // 
             // themeToolStripMenuItem
             // 
@@ -128,35 +133,35 @@ namespace ChordingCoding.UI
             // fourthNoteToolStripMenuItem
             // 
             this.fourthNoteToolStripMenuItem.Name = "fourthNoteToolStripMenuItem";
-            this.fourthNoteToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.fourthNoteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.fourthNoteToolStripMenuItem.Text = "4분음표";
             this.fourthNoteToolStripMenuItem.Click += new System.EventHandler(this.fourthNoteToolStripMenuItem_Click);
             // 
             // eighthNoteToolStripMenuItem
             // 
             this.eighthNoteToolStripMenuItem.Name = "eighthNoteToolStripMenuItem";
-            this.eighthNoteToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.eighthNoteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.eighthNoteToolStripMenuItem.Text = "8분음표";
             this.eighthNoteToolStripMenuItem.Click += new System.EventHandler(this.eighthNoteToolStripMenuItem_Click);
             // 
             // sixteenthNoteToolStripMenuItem
             // 
             this.sixteenthNoteToolStripMenuItem.Name = "sixteenthNoteToolStripMenuItem";
-            this.sixteenthNoteToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.sixteenthNoteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.sixteenthNoteToolStripMenuItem.Text = "16분음표";
             this.sixteenthNoteToolStripMenuItem.Click += new System.EventHandler(this.sixteenthNoteToolStripMenuItem_Click);
             // 
             // thirtysecondNoteToolStripMenuItem
             // 
             this.thirtysecondNoteToolStripMenuItem.Name = "thirtysecondNoteToolStripMenuItem";
-            this.thirtysecondNoteToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.thirtysecondNoteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.thirtysecondNoteToolStripMenuItem.Text = "32분음표";
             this.thirtysecondNoteToolStripMenuItem.Click += new System.EventHandler(this.thirtysecondNotetoolStripMenuItem_Click);
             // 
             // immediateNoteToolStripMenuItem
             // 
             this.immediateNoteToolStripMenuItem.Name = "immediateNoteToolStripMenuItem";
-            this.immediateNoteToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
+            this.immediateNoteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.immediateNoteToolStripMenuItem.Text = "없음 (즉시 반응)";
             this.immediateNoteToolStripMenuItem.Click += new System.EventHandler(this.immediateNoteToolStripMenuItem_Click);
             // 
@@ -226,6 +231,13 @@ namespace ChordingCoding.UI
             this.autoAccompanimentToolStripMenuItem.Text = "자동 반주";
             this.autoAccompanimentToolStripMenuItem.Click += new System.EventHandler(this.autoAccompanimentToolStripMenuItem_Click);
             // 
+            // useReverbToolStripMenuItem
+            // 
+            this.useReverbToolStripMenuItem.Name = "useReverbToolStripMenuItem";
+            this.useReverbToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.useReverbToolStripMenuItem.Text = "반향";
+            this.useReverbToolStripMenuItem.Click += new System.EventHandler(this.useReverbToolStripMenuItem_Click);
+            // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
@@ -247,12 +259,36 @@ namespace ChordingCoding.UI
             this.quitToolStripMenuItem.Text = "종료                       ";
             this.quitToolStripMenuItem.Click += new System.EventHandler(this.quitToolStripMenuItem_Click);
             // 
-            // useReverbToolStripMenuItem
+            // musicalModeToolStripMenuItem
             // 
-            this.useReverbToolStripMenuItem.Name = "useReverbToolStripMenuItem";
-            this.useReverbToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
-            this.useReverbToolStripMenuItem.Text = "반향 적용";
-            this.useReverbToolStripMenuItem.Click += new System.EventHandler(this.useReverbToolStripMenuItem_Click);
+            this.musicalModeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.autoModeToolStripMenuItem,
+            this.majorModeToolStripMenuItem,
+            this.minorModeToolStripMenuItem});
+            this.musicalModeToolStripMenuItem.Name = "musicalModeToolStripMenuItem";
+            this.musicalModeToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.musicalModeToolStripMenuItem.Text = "선법";
+            // 
+            // autoModeToolStripMenuItem
+            // 
+            this.autoModeToolStripMenuItem.Name = "autoModeToolStripMenuItem";
+            this.autoModeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.autoModeToolStripMenuItem.Text = "자동";
+            this.autoModeToolStripMenuItem.Click += new System.EventHandler(this.autoModeToolStripMenuItem_Click);
+            // 
+            // majorModeToolStripMenuItem
+            // 
+            this.majorModeToolStripMenuItem.Name = "majorModeToolStripMenuItem";
+            this.majorModeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.majorModeToolStripMenuItem.Text = "장조 선호";
+            this.majorModeToolStripMenuItem.Click += new System.EventHandler(this.majorModeToolStripMenuItem_Click);
+            // 
+            // minorModeToolStripMenuItem
+            // 
+            this.minorModeToolStripMenuItem.Name = "minorModeToolStripMenuItem";
+            this.minorModeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.minorModeToolStripMenuItem.Text = "단조 선호";
+            this.minorModeToolStripMenuItem.Click += new System.EventHandler(this.minorModeToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -309,6 +345,10 @@ namespace ChordingCoding.UI
         private System.Windows.Forms.ToolStripMenuItem autoAccompanimentToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem recordToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem useReverbToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem musicalModeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem autoModeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem majorModeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem minorModeToolStripMenuItem;
     }
 }
 

@@ -214,8 +214,9 @@ namespace ChordingCoding.SFX
         /// </summary>
         /// <param name="SFXThemeName">설정할 음악 테마 이름</param>
         /// <param name="noteResolution">단위 리듬</param>
+        /// <param name="modePolicy">선법</param>
         /// <param name="timerTickDelegates">타이머의 틱마다 추가로 실행할 메서드의 대리자 목록</param>
-        public static void Initialize(string SFXThemeName, int noteResolution, Timer.TickDelegate[] timerTickDelegates = null)
+        public static void Initialize(string SFXThemeName, int noteResolution, int modePolicy, Timer.TickDelegate[] timerTickDelegates = null)
         {
             IsReady = false;
             HasStart = false;
@@ -269,7 +270,7 @@ namespace ChordingCoding.SFX
 
             #endregion
 
-            Key = new MusicalKey();
+            Key = new MusicalKey(MusicalKey.IntToModePolicy(modePolicy));
 
             using (StreamReader r = new StreamReader("ChordTransition.json"))
             {

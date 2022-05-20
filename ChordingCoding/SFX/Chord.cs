@@ -72,7 +72,7 @@ namespace ChordingCoding.SFX
             Chord newChord = ChordTransitionMatrix.RomanNumeralToChord(Music.chordTransitionMatrix.SampleRomanNumeralFromAll(
                 SentimentState.SentimentIndexFromVA(SentimentState.GetShortTermPrevValence(), SentimentState.GetShortTermPrevArousal()),
                 SentimentState.SentimentIndexFromVA(SentimentState.GetShortTermValence(), SentimentState.GetShortTermArousal()),
-                Music.key.mode, 0, Music.SentimentAwareness), Music.key.tonic);
+                Music.Key.mode, 0, Music.SentimentAwareness), Music.Key.tonic);
 
             root = newChord.root;
             type = newChord.type;
@@ -373,13 +373,13 @@ namespace ChordingCoding.SFX
 
             if (c.type == Type.NULL)
             {
-                Music.key.Transpose(SentimentState.GetLongTermValence());
+                Music.Key.Transpose(SentimentState.GetLongTermValence());
             }
 
             Chord newChord = ChordTransitionMatrix.RomanNumeralToChord(Music.chordTransitionMatrix.SampleRomanNumeralFromAll(
                 SentimentState.SentimentIndexFromVA(SentimentState.GetShortTermPrevValence(), SentimentState.GetShortTermPrevArousal()),
                 SentimentState.SentimentIndexFromVA(SentimentState.GetShortTermValence(), SentimentState.GetShortTermArousal()),
-                Music.key.mode, ChordTransitionMatrix.ChordToRomanNumeral(c, Music.key.tonic), Music.SentimentAwareness), Music.key.tonic);
+                Music.Key.mode, ChordTransitionMatrix.ChordToRomanNumeral(c, Music.Key.tonic), Music.SentimentAwareness), Music.Key.tonic);
 
             root = newChord.root;
             type = newChord.type;

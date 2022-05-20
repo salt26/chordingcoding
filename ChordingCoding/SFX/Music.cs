@@ -80,12 +80,12 @@ namespace ChordingCoding.SFX
         // 같은 반주를 연속으로 재생한 횟수 (Key는 staff 번호)
         private static Dictionary<int, int> accompanimentPlayNumber = new Dictionary<int, int>();
 
-        public static MusicalKey key { get; private set; }
+        public static MusicalKey Key { get; private set; }
 
         /// <summary>
         /// 현재 화음
         /// </summary>
-        public static Chord chord { get; private set; }
+        public static Chord Chord { get; private set; }
 
         public static ChordTransitionMatrix chordTransitionMatrix = null;
 
@@ -269,7 +269,7 @@ namespace ChordingCoding.SFX
 
             #endregion
 
-            key = new MusicalKey();
+            Key = new MusicalKey();
 
             using (StreamReader r = new StreamReader("ChordTransition.json"))
             {
@@ -407,8 +407,10 @@ namespace ChordingCoding.SFX
                 {
                     outputDevice.PlaybackStopped -= OutputDevicePlaybackLoopWithReverb;
                 }
-                outputDevice?.Stop();
-                outputDevice?.Dispose();
+                outputDevice.Stop();
+                outputDevice.Dispose();
+                soundStream.Dispose();
+                memoryStream.Dispose();
                 syn.Dispose();
                 settings.Dispose();
                 mgmt.Stop();
@@ -468,8 +470,8 @@ namespace ChordingCoding.SFX
                     catch (ObjectDisposedException) { }
                     //catch (OutputDeviceException) { }
                 }
-                //chord = new Chord(SFXTheme.CurrentSFXTheme.ChordTransition);
-                chord = new Chord();
+                //Chord = new Chord(SFXTheme.CurrentSFXTheme.ChordTransition);
+                Chord = new Chord();
                 tickNumber = 0;
 
                 ResetAccompaniment();
@@ -558,7 +560,7 @@ namespace ChordingCoding.SFX
         {
             // ChordingCoding에서 일반 문자를 입력할 때 호출됨
 
-            int pitch = chord.NextNote();
+            int pitch = Chord.NextNote();
             playPitchEventBuffer.Add(pitch);
             foreach (KeyValuePair<int, SFXTheme.InstrumentInfo> pair in SFXTheme.CurrentSFXTheme.Instruments)
             {
@@ -583,8 +585,8 @@ namespace ChordingCoding.SFX
             int pitch;
             StopPlaying(0);
             //chord = new Chord(SFXTheme.CurrentSFXTheme.ChordTransition, chord);
-            chord = new Chord(chord);
-            pitch = chord.NextNote();
+            Chord = new Chord(Chord);
+            pitch = Chord.NextNote();
             syncPlayBuffer = new List<Note>();
             Random r = new Random();
 
@@ -592,7 +594,7 @@ namespace ChordingCoding.SFX
             {
                 // TPS 29 기준으로 한 마디에 한 번씩 시도할 때 1분에 한 번 꼴로 발생하는 확률로 채널(staff) 0의 악기를 재생하지 않음
                 SFXTheme.InstrumentInfo ii = SFXTheme.CurrentSFXTheme.Instruments[0];
-                foreach (int p in chord.NotesInChord())
+                foreach (int p in Chord.NotesInChord())
                 {
                     if (p != pitch)
                     {

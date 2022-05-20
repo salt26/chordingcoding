@@ -185,7 +185,7 @@ namespace ChordingCoding.UI
                                    /*velX*/ 2, /*velY*/ 8, /*life*/ 38,
                                    /*cNum*/ 7, /*cRange*/ 4,
                                    ParticleSystem.CreateFunction.Gaussian,
-                                   Particle.Type.dot, () => Music.chord.ChordColor(),
+                                   Particle.Type.dot, () => Music.Chord.ChordColor(),
                                    /*pSize*/ 1, /*pLife*/ 10),
                 new Theme.ParticleInfo(Particle.Type.star, 32, (pitch) => Chord.PitchColor(pitch), 1f),
                 "Star"));
@@ -219,7 +219,7 @@ namespace ChordingCoding.UI
                                    /*velX*/ 0, /*velY*/ 16, /*life*/ 38,
                                    /*cNum*/ 2, /*cRange*/ 200,
                                    ParticleSystem.CreateFunction.Gaussian,
-                                   Particle.Type.leaf, () => Music.chord.ChordColor(),
+                                   Particle.Type.leaf, () => Music.Chord.ChordColor(),
                                    /*pSize*/ 0.7f, /*pLife*/ 40),
                 new Theme.ParticleInfo(Particle.Type.rain, (MainForm.instance.Size.Height + 150) / 4, (pitch) => Color.White, 0.2f),
                 "Pianoforte"));
@@ -235,7 +235,7 @@ namespace ChordingCoding.UI
                                    /*velX*/ 2, /*velY*/ 8, /*life*/ 38,
                                    /*cNum*/ 7, /*cRange*/ 4,
                                    ParticleSystem.CreateFunction.Gaussian,
-                                   Particle.Type.dot, () => Music.chord.ChordColor(),
+                                   Particle.Type.dot, () => Music.Chord.ChordColor(),
                                    /*pSize*/ 1, /*pLife*/ 10),
                 new Theme.ParticleInfo(Particle.Type.star, 32, (pitch) => Chord.PitchColor(pitch), 1f),
                 "Sky"));

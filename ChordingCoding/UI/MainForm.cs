@@ -892,11 +892,10 @@ namespace ChordingCoding.UI
 
         private void SetSentimentAwareness(int sentimentAwareness)
         {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
             if (!ENABLE_SENTIMENT_ANALYZER)
             {
-#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
                 return;
-#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
             if (sentimentAwareness < 0 || sentimentAwareness > 95) return;
 
@@ -933,6 +932,7 @@ namespace ChordingCoding.UI
                 }
                 sentimentAwarenessToolStripMenuItem.Text = "감성 인식 수준 (" + Music.SentimentAwareness + "%)";
             }
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
         }
 
         private void fourthNoteToolStripMenuItem_Click(object sender, EventArgs e)

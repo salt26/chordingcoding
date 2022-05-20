@@ -775,7 +775,9 @@ namespace ChordingCoding.SFX
                         var list = new List<KeyValuePair<int, OperationInfo.Type>>();
                         distanceTable[i][j] = new DistanceTable(0, list);
                         if (DISTANCE_DEBUG)
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
                             Console.Write(distanceTable[i][j].Distance + "\t");     // TODO
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
                         continue;
                     }
 
@@ -918,13 +920,17 @@ namespace ChordingCoding.SFX
                         }
                     }
                     if (DISTANCE_DEBUG)
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
                         Console.Write(distanceTable[i][j].Distance + "\t");  // TODO
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
 
                     #endregion
                 }
 
                 if (DISTANCE_DEBUG)
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
                     Console.WriteLine();
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
 
             #region Delay 연산
@@ -937,6 +943,8 @@ namespace ChordingCoding.SFX
 
             if (DISTANCE_DEBUG)
             {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+
                 #region 위에서 계산한 연산들의 비용과 수행 가능 여부가 실제와 같은지 테스트
 
                 RhythmPattern rpForTest = this.Copy();
@@ -964,6 +972,8 @@ namespace ChordingCoding.SFX
                 rpForTest2.Print();
 
                 #endregion
+
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
 
             return distanceTable[lenThis][lenOther].Distance + delayCost;

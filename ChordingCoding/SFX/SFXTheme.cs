@@ -516,6 +516,9 @@ namespace ChordingCoding.SFX
             availableInstruments.Add(new AccompanimentInstrumentInfo(47, (pitch) => ((pitch + 6) % 12) + 18, 64, 100));                                         // [26] Choir channel 7, Timpani
             availableInstruments.Add(new AccompanimentInstrumentInfo(-1, (pitch) => pitch, 0, 72));                                                 // [27] channel 7 또는 8에서 1번 악기를 참조하여 재생할 때 사용
             availableInstruments.Add(new AccompanimentInstrumentInfo(-1, (pitch) => pitch, 0, 112));                                                // [28] channel 7 또는 8에서 1번 악기를 참조하여 재생할 때 사용
+            availableInstruments.Add(new CharacterInstrumentInfo(41, (pitch) => pitch, 64, 127, (pitch) => pitch, 64, 127));                        // [29] ??? channel 0, Viola
+            availableInstruments.Add(new CharacterInstrumentInfo(40, (pitch) => pitch, 64, 127, (pitch) => pitch, 64, 127));                        // [30] ??? channel 1, Violin
+            availableInstruments.Add(new CharacterInstrumentInfo(42, (pitch) => pitch, 64, 127, (pitch) => pitch, 64, 127));                        // [31] ??? channel 2, Cello
 
             Dictionary<int, InstrumentInfo> instruments;
 
@@ -567,6 +570,12 @@ namespace ChordingCoding.SFX
             instruments.Add(1, availableInstruments[24]);
             instruments.Add(2, availableInstruments[25]);
             availableInstrumentSets.Add(new InstrumentSet("Choir", "합창", instruments, InstrumentSet.Type.character, 4, 5));
+
+            instruments = new Dictionary<int, InstrumentInfo>();
+            instruments.Add(0, availableInstruments[29]);
+            instruments.Add(1, availableInstruments[30]);
+            instruments.Add(2, availableInstruments[31]);
+            availableInstrumentSets.Add(new InstrumentSet("Bow", "현악기", instruments, InstrumentSet.Type.character, 3, 6));
 
             /* 
              * InstrumentSet.Type.whitespace
@@ -632,6 +641,7 @@ namespace ChordingCoding.SFX
             availableSFXThemes.Add(new SFXTheme("Sky", "구름 너머", ChordTransitionType.SomewhatHappy, "Sky", null, "Melody"));
             availableSFXThemes.Add(new SFXTheme("Medieval", "중세 탐방", ChordTransitionType.SomewhatBlue, "Medieval", "Bell", "Piano"));                   // Disabled
             availableSFXThemes.Add(new SFXTheme("Medieval_ruins", "중세 유적지", ChordTransitionType.SomewhatBlue, "Choir", "Bell", "Timpani"));
+            availableSFXThemes.Add(new SFXTheme("Smooth", "부드러운", ChordTransitionType.SomewhatHappy, "Bow", null, "Melody"));
 
             IsReady = true;
         }

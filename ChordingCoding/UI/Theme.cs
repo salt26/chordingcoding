@@ -150,7 +150,7 @@ namespace ChordingCoding.UI
             _availableThemes = new List<Theme>();
 
             _availableThemes.Add(new Theme(
-                "Smooth", "부드러운",
+                "Antique", "골동품",
                 new ParticleSystem(/*cNum*/ 1, /*cRange*/ 0,
                                    ParticleSystem.CreateFunction.Random,
                                    Particle.Type.star, () => Color.Black,
@@ -163,7 +163,7 @@ namespace ChordingCoding.UI
                                    Particle.Type.dot, () => Music.Chord.ChordColor(),
                                    /*pSize*/ 1, /*pLife*/ 10),
                 new Theme.ParticleInfo(Particle.Type.star, 32, (pitch) => Chord.PitchColor(pitch), 1f),
-                "Smooth"));
+                "Antique"));
 
             _availableThemes.Add(new Theme(
                 "Autumn", "가을 산책",
@@ -289,6 +289,15 @@ namespace ChordingCoding.UI
                                    0.1f, (MainForm.instance.Size.Height + 150) / 30),
                 new Theme.ParticleInfo(Particle.Type.note, (MainForm.instance.Size.Height + 150) / 15, (pitch) => Chord.PitchColor(pitch), 0.1f),
                 "Medieval_ruins"));
+
+            _availableThemes.Add(new Theme(
+                "Circuit", "전자 회로",
+                new ParticleSystem(/*cNum*/ 1, /*cRange*/ 0,
+                                   ParticleSystem.CreateFunction.TopRandom,
+                                   Particle.Type.note, () => Color.White,
+                                   /*pSize*/ 1f, /*pLife*/ 128),
+                null, new Theme.ParticleInfo(Particle.Type.note, (MainForm.instance.Size.Height + 150) / 15, (pitch) => Chord.PitchColor(pitch), 0.1f),
+                "Circuit"));
 
             IsReady = true;
         }

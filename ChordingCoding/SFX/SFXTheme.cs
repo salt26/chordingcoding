@@ -510,15 +510,21 @@ namespace ChordingCoding.SFX
             availableInstruments.Add(new AccompanimentInstrumentInfo(-1, (pitch) => pitch, 0, 48));                                                 // [20] channel 7 또는 8에서 1번 악기를 참조하여 재생할 때 사용
             availableInstruments.Add(new AccompanimentInstrumentInfo(-1, (pitch) => pitch, 0, 96));                                                 // [21] channel 7 또는 8에서 1번 악기를 참조하여 재생할 때 사용
             availableInstruments.Add(new CharacterInstrumentInfo(101, (pitch) => pitch - 12, 56, 0, (pitch) => (pitch + 6) % 12 + 66, 56, 72));     // [22] Medieval channel 0, SFX(goblin)
-            availableInstruments.Add(new CharacterInstrumentInfo(19, (pitch) => (pitch + 8) % 12 + 40, 64, 60, (pitch) => (pitch) % 12 + 48, 64, 72));          // [23] Choir channel 0, Church organ
+            availableInstruments.Add(new CharacterInstrumentInfo(19, (pitch) => (pitch + 8) % 12 + 40, 64, 72, (pitch) => (pitch) % 12 + 48, 64, 96));          // [23] Choir channel 0, Church organ
             availableInstruments.Add(new CharacterInstrumentInfo(52, (pitch) => (pitch + 19) % 24 + 53, 48, 127, (pitch) => (pitch + 19) % 24 + 53, 48, 0));    // [24] Choir channel 1, Choir aahs (Alto)
             availableInstruments.Add(new CharacterInstrumentInfo(52, (pitch) => (pitch + 5) % 24 + 43, 48, 127, (pitch) => (pitch + 5) % 24 + 43, 48, 0));      // [25] Choir channel 2, Choir aahs (Bariton)
             availableInstruments.Add(new AccompanimentInstrumentInfo(47, (pitch) => ((pitch + 6) % 12) + 18, 64, 100));                                         // [26] Choir channel 7, Timpani
             availableInstruments.Add(new AccompanimentInstrumentInfo(-1, (pitch) => pitch, 0, 72));                                                 // [27] channel 7 또는 8에서 1번 악기를 참조하여 재생할 때 사용
             availableInstruments.Add(new AccompanimentInstrumentInfo(-1, (pitch) => pitch, 0, 112));                                                // [28] channel 7 또는 8에서 1번 악기를 참조하여 재생할 때 사용
-            availableInstruments.Add(new CharacterInstrumentInfo(41, (pitch) => pitch, 64, 127, (pitch) => pitch, 64, 127));                        // [29] ??? channel 0, Viola
-            availableInstruments.Add(new CharacterInstrumentInfo(40, (pitch) => pitch, 64, 127, (pitch) => pitch, 64, 127));                        // [30] ??? channel 1, Violin
-            availableInstruments.Add(new CharacterInstrumentInfo(42, (pitch) => pitch, 64, 127, (pitch) => pitch, 64, 127));                        // [31] ??? channel 2, Cello
+            availableInstruments.Add(new CharacterInstrumentInfo(41, (pitch) => pitch, 64, 108, (pitch) => pitch, 64, 64));                         // [29] Bow channel 0, Viola
+            availableInstruments.Add(new CharacterInstrumentInfo(40, (pitch) => pitch, 64, 108, (pitch) => pitch, 64, 64));                         // [30] Bow channel 1, Violin
+            availableInstruments.Add(new CharacterInstrumentInfo(42, (pitch) => pitch, 64, 108, (pitch) => pitch, 64, 64));                         // [31] Bow channel 2, Cello
+            availableInstruments.Add(new WhitespaceInstrumentInfo(47, (pitch) => ((pitch + 6) % 12) + 18, 64, 127));                                // [32] Choir channel 3, Timpani
+            availableInstruments.Add(new CharacterInstrumentInfo(81, (pitch) => pitch, 64, 100, (pitch) => pitch, 64, 72));                         // [33] Electro channel 0, Lead 2 (sawtooth)
+            availableInstruments.Add(new CharacterInstrumentInfo(80, (pitch) => pitch, 64, 100, (pitch) => pitch, 64, 72));                         // [34] Electro channel 1, Lead 1 (square)
+            availableInstruments.Add(new CharacterInstrumentInfo(33, (pitch) => pitch % 24 + 24, 64, 108, (pitch) => pitch % 12 + 24, 64, 0));      // [35] Electro channel 2, Electric Bass (finger)
+            availableInstruments.Add(new AccompanimentInstrumentInfo(33, (pitch) => pitch % 24 + 24, 64, 127));                                     // [36] Electro channel 7, Electric Bass (finger)
+
 
             Dictionary<int, InstrumentInfo> instruments;
 
@@ -575,7 +581,13 @@ namespace ChordingCoding.SFX
             instruments.Add(0, availableInstruments[29]);
             instruments.Add(1, availableInstruments[30]);
             instruments.Add(2, availableInstruments[31]);
-            availableInstrumentSets.Add(new InstrumentSet("Bow", "현악기", instruments, InstrumentSet.Type.character, 3, 6));
+            availableInstrumentSets.Add(new InstrumentSet("Bow", "현악기", instruments, InstrumentSet.Type.character, 3, 5));
+
+            instruments = new Dictionary<int, InstrumentInfo>();
+            instruments.Add(0, availableInstruments[33]);
+            instruments.Add(1, availableInstruments[34]);
+            instruments.Add(2, availableInstruments[35]);
+            availableInstrumentSets.Add(new InstrumentSet("Electro", "전자", instruments, InstrumentSet.Type.character, 4, 5));
 
             /* 
              * InstrumentSet.Type.whitespace
@@ -596,6 +608,10 @@ namespace ChordingCoding.SFX
             instruments.Add(3, availableInstruments[14]);
             instruments.Add(4, availableInstruments[15]);
             availableInstrumentSets.Add(new InstrumentSet("Bell", "종", instruments, InstrumentSet.Type.whitespace));
+
+            instruments = new Dictionary<int, InstrumentInfo>();
+            instruments.Add(3, availableInstruments[32]);
+            availableInstrumentSets.Add(new InstrumentSet("Timpani", "팀파니", instruments, InstrumentSet.Type.whitespace, 1, 3));
 
             /* 
              * InstrumentSet.Type.accompaniment
@@ -621,7 +637,11 @@ namespace ChordingCoding.SFX
 
             instruments = new Dictionary<int, InstrumentInfo>();
             instruments.Add(7, availableInstruments[21]);
-            availableInstrumentSets.Add(new InstrumentSet("Star", "별", instruments, InstrumentSet.Type.accompaniment, 5, 6));   // 1번 채널의 악기를 사용, 밑반주 패턴이 "멜로디"와 다름
+            availableInstrumentSets.Add(new InstrumentSet("Star", "별", instruments, InstrumentSet.Type.accompaniment, 5, 6));       // 1번 채널의 악기를 사용, 밑반주 패턴이 "멜로디"와 다름
+
+            instruments = new Dictionary<int, InstrumentInfo>();
+            instruments.Add(7, availableInstruments[36]);
+            availableInstrumentSets.Add(new InstrumentSet("Bass", "베이스", instruments, InstrumentSet.Type.accompaniment, 2, 3));         // 밑반주 패턴이 "멜로디"와 다름
 
             // TODO
             isInstrumentsReady = true;
@@ -640,8 +660,9 @@ namespace ChordingCoding.SFX
             availableSFXThemes.Add(new SFXTheme("Pianoforte_high", "피아노포르테 고음", ChordTransitionType.SomewhatHappy, "Piano_high", null, "Piano"));   // Disabled
             availableSFXThemes.Add(new SFXTheme("Sky", "구름 너머", ChordTransitionType.SomewhatHappy, "Sky", null, "Melody"));
             availableSFXThemes.Add(new SFXTheme("Medieval", "중세 탐방", ChordTransitionType.SomewhatBlue, "Medieval", "Bell", "Piano"));                   // Disabled
-            availableSFXThemes.Add(new SFXTheme("Medieval_ruins", "중세 유적지", ChordTransitionType.SomewhatBlue, "Choir", "Bell", "Timpani"));
-            availableSFXThemes.Add(new SFXTheme("Smooth", "부드러운", ChordTransitionType.SomewhatHappy, "Bow", null, "Melody"));
+            availableSFXThemes.Add(new SFXTheme("Medieval_ruins", "중세 유적지", ChordTransitionType.SomewhatBlue, "Choir", "Timpani", "Timpani"));
+            availableSFXThemes.Add(new SFXTheme("Antique", "골동품", ChordTransitionType.SomewhatHappy, "Bow", null, "Melody"));
+            availableSFXThemes.Add(new SFXTheme("Circuit", "전자 회로", ChordTransitionType.SomewhatBlue, "Electro", null, "Bass"));
 
             IsReady = true;
         }

@@ -668,6 +668,55 @@ namespace ChordingCoding.SFX
             score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 0), 64, 0, 0, 7);
             availablePatterns.Add(new Pattern("1 rest", "1 쉼표", score, 128, 1), "Star");
 
+            //
+
+            score = new Score();
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 16, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 32, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 48, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 64, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 80, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 96, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 112, 7);
+            availablePatterns.Add(new Pattern("4 4 4 4 4 4 4 4 Bass", "4 4 4 4 4 4 4 4 베이스", score, 128, 1), "Bass");
+
+            score = new Score();
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 16, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 32, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 48, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 8, 0, 64, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 72, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 88, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 104, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 8, 0, 120, 7);
+            availablePatterns.Add(new Pattern("4 4 4 4 8 4 4 4 8 Bass", "4 4 4 4 8 4 4 4 8 베이스", score, 128, 1), "Bass");
+
+            score = new Score();
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 16, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 32, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 48, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 64, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 8, 0, 80, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 88, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 8, 0, 104, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 8, 0, 112, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 8, 0, 120, 7);
+            availablePatterns.Add(new Pattern("4 4 4 4 4 8 4 8 8 8 Bass", "4 4 4 4 4 8 4 8 8 8 베이스", score, 128, 1), "Bass");
+
+            score = new Score();
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 0, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 16, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 32, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 48, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 64, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 8, 0, 80, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 24, 0, 88, 7);
+            score.AddNoteInAccompaniment(() => Music.Chord.GetNoteInAccompaniment(0, 1), 16, 0, 112, 7);
+            availablePatterns.Add(new Pattern("4 4 4 4 4 8 4. 4 Bass", "4 4 4 4 4 8 4. 4 베이스", score, 128, 1), "Bass");
+
             SetNewCurrentPattern(7);
             SetNewCurrentPattern(8);
 

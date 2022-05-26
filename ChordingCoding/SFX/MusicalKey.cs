@@ -23,6 +23,7 @@ SOFTWARE.
 */
 using System;
 using ChordingCoding.Sentiment;
+using ChordingCoding.Utility;
 
 namespace ChordingCoding.SFX
 {
@@ -55,7 +56,7 @@ namespace ChordingCoding.SFX
                 {
                     Transpose();
                 }
-                Utility.Util.TaskQueue.Add("Play", ChangeMode);
+                Util.TaskQueue.Add("Play", ChangeMode);
             }
         }
 

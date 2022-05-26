@@ -387,6 +387,7 @@ namespace ChordingCoding.UI
             }
             Properties.Settings.Default["NoteResolution"] = Music.NoteResolution;
             Properties.Settings.Default["SentimentAwareness"] = Music.SentimentAwareness;
+            Properties.Settings.Default["ModePolicy"] = (int)Music.Key.Policy;
             Properties.Settings.Default.Save();
             notifyIcon1.Dispose();
             TypingTracker.DestroyIMEContext();

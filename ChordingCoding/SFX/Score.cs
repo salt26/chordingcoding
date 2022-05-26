@@ -519,7 +519,7 @@ namespace ChordingCoding.SFX
                             syn.NoteOff(staff, pitch);
                         }
                         catch (ObjectDisposedException) { }
-                        catch (FluidSynthInteropException) { }
+                        catch (FluidSynthInteropException) { Console.WriteLine("PlayANote NoteOff"); }
                         noteOffBuffer_[staff].RemoveAt(i);
                     }
                 }
@@ -544,7 +544,7 @@ namespace ChordingCoding.SFX
                         noteOffBuffer_[staff].Add(note_);
                     }
                     catch (ObjectDisposedException) { }
-                    catch (FluidSynthInteropException) { }
+                    catch (FluidSynthInteropException) { Console.WriteLine("PlayANote NoteOn"); }
                 }
             }
 
@@ -636,7 +636,7 @@ namespace ChordingCoding.SFX
                         syn.NoteOff(staff, p);
                     }
                     catch (ObjectDisposedException) { }
-                    catch (FluidSynthInteropException) { }
+                    catch (FluidSynthInteropException) { Console.WriteLine("Stop NoteOff"); }
                 }
                 noteOffBuffer_[staff].Clear();
             }
@@ -730,7 +730,7 @@ namespace ChordingCoding.SFX
                                 syn_.NoteOff(-p.Value >> 16, -p.Value & 65535);
                             }
                             catch (ObjectDisposedException) { }
-                            catch (FluidSynthInteropException) { }
+                            catch (FluidSynthInteropException) { Console.WriteLine("NoteOff NoteOff " + (-p.Value >> 16)); }
                             finally
                             {
                                 deadBuffer.Add(l[i]);

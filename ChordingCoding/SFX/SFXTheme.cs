@@ -491,7 +491,7 @@ namespace ChordingCoding.SFX
             availableInstruments.Add(new CharacterInstrumentInfo(24, (pitch) => pitch, 64, 127, (pitch) => pitch, 64, 127));                        // [1] Autumn channel 1, Acoustic guitar(nylon)
             availableInstruments.Add(new WhitespaceInstrumentInfo(123, (pitch) => pitch % 12 + 54, 16, 0));                                         // [2] Autumn channel 3, Bird tweet => Disabled
             availableInstruments.Add(new CharacterInstrumentInfo(101, (pitch) => pitch - 12, 56, 80, (pitch) => (pitch + 6) % 12 + 54, 56, 80));    // [3] Rain channel 0, SFX(goblin)
-            availableInstruments.Add(new CharacterInstrumentInfo(12, (pitch) => pitch, 64, 127, (pitch) => pitch, 64, 127));                        // [4] Rain channel 1, Marimba
+            availableInstruments.Add(new CharacterInstrumentInfo(12, (pitch) => pitch, 64, 127, (pitch) => pitch, 64, 127));                        // [4] Star channel 1, Marimba
             availableInstruments.Add(new WhitespaceInstrumentInfo(126, (pitch) => (pitch + 5) % 7 + 46, 256, 24));                                  // [5] Rain channel 3, Applause
             availableInstruments.Add(new SFXInstrumentInfo(126, (pitch) => 45, 4, 24));                                                             // [6] Rain channel 5/6, Applause
             availableInstruments.Add(new CharacterInstrumentInfo(49, (pitch) => pitch - 12, 64, 60, (pitch) => (pitch + 6) % 12 + 54, 64, 48));     // [7] Star channel 0, String ensemble 2
@@ -511,19 +511,23 @@ namespace ChordingCoding.SFX
             availableInstruments.Add(new AccompanimentInstrumentInfo(-1, (pitch) => pitch, 0, 96));                                                 // [21] channel 7 또는 8에서 1번 악기를 참조하여 재생할 때 사용
             availableInstruments.Add(new CharacterInstrumentInfo(101, (pitch) => pitch - 12, 56, 0, (pitch) => (pitch + 6) % 12 + 66, 56, 72));     // [22] Medieval channel 0, SFX(goblin)
             availableInstruments.Add(new CharacterInstrumentInfo(19, (pitch) => (pitch + 8) % 12 + 40, 64, 72, (pitch) => (pitch) % 12 + 48, 64, 96));          // [23] Choir channel 0, Church organ
-            availableInstruments.Add(new CharacterInstrumentInfo(52, (pitch) => (pitch + 19) % 24 + 53, 48, 127, (pitch) => (pitch + 19) % 24 + 53, 48, 0));    // [24] Choir channel 1, Choir aahs (Alto)
-            availableInstruments.Add(new CharacterInstrumentInfo(52, (pitch) => (pitch + 5) % 24 + 43, 48, 127, (pitch) => (pitch + 5) % 24 + 43, 48, 0));      // [25] Choir channel 2, Choir aahs (Bariton)
+            availableInstruments.Add(new CharacterInstrumentInfo(52, (pitch) => (pitch + 19) % 24 + 53, 32, 127, (pitch) => (pitch + 19) % 24 + 53, 48, 0));    // [24] Choir channel 1, Choir aahs (Alto)
+            availableInstruments.Add(new CharacterInstrumentInfo(52, (pitch) => (pitch + 5) % 24 + 43, 32, 127, (pitch) => (pitch + 5) % 24 + 43, 48, 0));      // [25] Choir channel 2, Choir aahs (Bariton)
             availableInstruments.Add(new AccompanimentInstrumentInfo(47, (pitch) => ((pitch + 6) % 12) + 18, 64, 100));                                         // [26] Choir channel 7, Timpani
             availableInstruments.Add(new AccompanimentInstrumentInfo(-1, (pitch) => pitch, 0, 72));                                                 // [27] channel 7 또는 8에서 1번 악기를 참조하여 재생할 때 사용
             availableInstruments.Add(new AccompanimentInstrumentInfo(-1, (pitch) => pitch, 0, 112));                                                // [28] channel 7 또는 8에서 1번 악기를 참조하여 재생할 때 사용
-            availableInstruments.Add(new CharacterInstrumentInfo(41, (pitch) => pitch, 64, 108, (pitch) => pitch, 64, 64));                         // [29] Bow channel 0, Viola
-            availableInstruments.Add(new CharacterInstrumentInfo(40, (pitch) => pitch, 64, 108, (pitch) => pitch, 64, 64));                         // [30] Bow channel 1, Violin
-            availableInstruments.Add(new CharacterInstrumentInfo(42, (pitch) => pitch, 64, 108, (pitch) => pitch, 64, 64));                         // [31] Bow channel 2, Cello
+            availableInstruments.Add(new CharacterInstrumentInfo(41, (pitch) => pitch, 32, 108, (pitch) => pitch, 64, 64));                         // [29] Bow channel 0, Viola
+            availableInstruments.Add(new CharacterInstrumentInfo(40, (pitch) => pitch, 32, 108, (pitch) => pitch, 64, 64));                         // [30] Bow channel 1, Violin
+            availableInstruments.Add(new CharacterInstrumentInfo(42, (pitch) => pitch, 32, 108, (pitch) => pitch, 64, 64));                         // [31] Bow channel 2, Cello
             availableInstruments.Add(new WhitespaceInstrumentInfo(47, (pitch) => ((pitch + 6) % 12) + 18, 64, 127));                                // [32] Choir channel 3, Timpani
-            availableInstruments.Add(new CharacterInstrumentInfo(81, (pitch) => pitch, 64, 100, (pitch) => pitch, 64, 72));                         // [33] Electro channel 0, Lead 2 (sawtooth)
-            availableInstruments.Add(new CharacterInstrumentInfo(80, (pitch) => pitch, 64, 100, (pitch) => pitch, 64, 72));                         // [34] Electro channel 1, Lead 1 (square)
-            availableInstruments.Add(new CharacterInstrumentInfo(33, (pitch) => pitch % 24 + 24, 64, 108, (pitch) => pitch % 12 + 24, 64, 0));      // [35] Electro channel 2, Electric Bass (finger)
-            availableInstruments.Add(new AccompanimentInstrumentInfo(33, (pitch) => pitch % 24 + 24, 64, 127));                                     // [36] Electro channel 7, Electric Bass (finger)
+            availableInstruments.Add(new CharacterInstrumentInfo(81, (pitch) => pitch, 32, 100, (pitch) => pitch, 64, 72));                         // [33] Electro channel 0, Lead 2 (sawtooth)
+            availableInstruments.Add(new CharacterInstrumentInfo(80, (pitch) => pitch, 32, 100, (pitch) => pitch, 64, 72));                         // [34] Electro channel 1, Lead 1 (square)
+            availableInstruments.Add(new CharacterInstrumentInfo(33, (pitch) => pitch % 24 + 24, 16, 108, (pitch) => pitch % 24 + 24, 16, 0));      // [35] Electro channel 2, Electric Bass (finger)
+            availableInstruments.Add(new AccompanimentInstrumentInfo(33, (pitch) => pitch % 24 + 24, 16, 127));                                     // [36] Electro channel 7, Electric Bass (finger)
+            availableInstruments.Add(new CharacterInstrumentInfo(68, (pitch) => pitch, 32, 127, (pitch) => pitch, 64, 96));                         // [37] Pipe channel 0, Oboe
+            availableInstruments.Add(new CharacterInstrumentInfo(73, (pitch) => pitch, 32, 127, (pitch) => pitch, 64, 96));                         // [38] Pipe channel 1, Flute
+
+
 
 
             Dictionary<int, InstrumentInfo> instruments;
@@ -543,7 +547,7 @@ namespace ChordingCoding.SFX
 
             instruments = new Dictionary<int, InstrumentInfo>();
             instruments.Add(0, availableInstruments[7]);
-            instruments.Add(1, availableInstruments[8]);
+            instruments.Add(1, availableInstruments[4]);
             availableInstrumentSets.Add(new InstrumentSet("Star", "별", instruments, InstrumentSet.Type.character, 5, 7));
 
             instruments = new Dictionary<int, InstrumentInfo>();
@@ -581,22 +585,25 @@ namespace ChordingCoding.SFX
             instruments.Add(0, availableInstruments[29]);
             instruments.Add(1, availableInstruments[30]);
             instruments.Add(2, availableInstruments[31]);
-            availableInstrumentSets.Add(new InstrumentSet("Bow", "현악기", instruments, InstrumentSet.Type.character, 3, 5));
+            availableInstrumentSets.Add(new InstrumentSet("String", "현악기", instruments, InstrumentSet.Type.character, 3, 5));
 
             instruments = new Dictionary<int, InstrumentInfo>();
             instruments.Add(0, availableInstruments[33]);
             instruments.Add(1, availableInstruments[34]);
             instruments.Add(2, availableInstruments[35]);
-            availableInstrumentSets.Add(new InstrumentSet("Electro", "전자", instruments, InstrumentSet.Type.character, 4, 5));
+            availableInstrumentSets.Add(new InstrumentSet("Electric", "전자", instruments, InstrumentSet.Type.character, 4, 6));
+
+            instruments = new Dictionary<int, InstrumentInfo>();
+            instruments.Add(0, availableInstruments[37]);
+            instruments.Add(1, availableInstruments[38]);
+            availableInstrumentSets.Add(new InstrumentSet("Pipe", "관악기", instruments, InstrumentSet.Type.character, 4, 6));
 
             /* 
              * InstrumentSet.Type.whitespace
              */
-            /*
             instruments = new Dictionary<int, InstrumentInfo>();
             instruments.Add(3, availableInstruments[2]);
             availableInstrumentSets.Add(new InstrumentSet("Bird", "새", instruments, InstrumentSet.Type.whitespace));
-            */
 
             instruments = new Dictionary<int, InstrumentInfo>();
             instruments.Add(3, availableInstruments[5]);
@@ -661,8 +668,9 @@ namespace ChordingCoding.SFX
             availableSFXThemes.Add(new SFXTheme("Sky", "구름 너머", ChordTransitionType.SomewhatHappy, "Sky", null, "Melody"));
             availableSFXThemes.Add(new SFXTheme("Medieval", "중세 탐방", ChordTransitionType.SomewhatBlue, "Medieval", "Bell", "Piano"));                   // Disabled
             availableSFXThemes.Add(new SFXTheme("Medieval_ruins", "중세 유적지", ChordTransitionType.SomewhatBlue, "Choir", "Timpani", "Timpani"));
-            availableSFXThemes.Add(new SFXTheme("Antique", "골동품", ChordTransitionType.SomewhatHappy, "Bow", null, "Melody"));
-            availableSFXThemes.Add(new SFXTheme("Circuit", "전자 회로", ChordTransitionType.SomewhatBlue, "Electro", null, "Bass"));
+            availableSFXThemes.Add(new SFXTheme("Antique", "골동품", ChordTransitionType.SomewhatHappy, "String", null, "Melody"));
+            availableSFXThemes.Add(new SFXTheme("Party", "파티 타임", ChordTransitionType.SomewhatBlue, "Electric", null, "Bass"));
+            availableSFXThemes.Add(new SFXTheme("Breeze", "바람의 속삭임", ChordTransitionType.SomewhatHappy, "Pipe", "Bird", "Melody"));
 
             IsReady = true;
         }

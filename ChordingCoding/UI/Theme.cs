@@ -150,6 +150,22 @@ namespace ChordingCoding.UI
             _availableThemes = new List<Theme>();
 
             _availableThemes.Add(new Theme(
+                "Antique", "골동품",
+                new ParticleSystem(/*cNum*/ 1, /*cRange*/ 0,
+                                   ParticleSystem.CreateFunction.Random,
+                                   Particle.Type.star, () => Color.Black,
+                                   /*pSize*/ 1f, /*pLife*/ 64),
+                new ParticleSystem(/*posX*/ () => (float)(new Random().NextDouble() * MainForm.instance.Size.Width),
+                                   /*posY*/ () => (float)(new Random().NextDouble() * MainForm.instance.Size.Height * 5 / 6 - MainForm.instance.Size.Height / 12),
+                                   /*velX*/ 2, /*velY*/ 8, /*life*/ 38,
+                                   /*cNum*/ 7, /*cRange*/ 4,
+                                   ParticleSystem.CreateFunction.Gaussian,
+                                   Particle.Type.dot, () => Music.Chord.ChordColor(),
+                                   /*pSize*/ 1, /*pLife*/ 10),
+                new Theme.ParticleInfo(Particle.Type.star, 32, (pitch) => Chord.PitchColor(pitch), 1f),
+                "Antique"));
+
+            _availableThemes.Add(new Theme(
                 "Sky", "구름 너머",
                 new ParticleSystem(/*cNum*/ 1, /*cRange*/ 0,
                                    ParticleSystem.CreateFunction.Random,
@@ -258,22 +274,6 @@ namespace ChordingCoding.UI
                 new Theme.ParticleInfo(Particle.Type.note, (Form1.form1.Size.Height + 150) / 15, (pitch) => Chord.PitchColor(pitch), 0.1f),
                 "Medieval"));
             */
-
-            _availableThemes.Add(new Theme(
-                "Antique", "골동품",
-                new ParticleSystem(/*cNum*/ 1, /*cRange*/ 0,
-                                   ParticleSystem.CreateFunction.Random,
-                                   Particle.Type.star, () => Color.Black,
-                                   /*pSize*/ 1f, /*pLife*/ 64),
-                new ParticleSystem(/*posX*/ () => (float)(new Random().NextDouble() * MainForm.instance.Size.Width),
-                                   /*posY*/ () => (float)(new Random().NextDouble() * MainForm.instance.Size.Height * 5 / 6 - MainForm.instance.Size.Height / 12),
-                                   /*velX*/ 2, /*velY*/ 8, /*life*/ 38,
-                                   /*cNum*/ 7, /*cRange*/ 4,
-                                   ParticleSystem.CreateFunction.Gaussian,
-                                   Particle.Type.dot, () => Music.Chord.ChordColor(),
-                                   /*pSize*/ 1, /*pLife*/ 10),
-                new Theme.ParticleInfo(Particle.Type.star, 32, (pitch) => Chord.PitchColor(pitch), 1f),
-                "Antique"));
 
             _availableThemes.Add(new Theme(
                 "Breeze", "바람의 속삭임",

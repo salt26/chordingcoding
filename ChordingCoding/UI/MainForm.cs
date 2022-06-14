@@ -177,6 +177,13 @@ namespace ChordingCoding.UI
             MarshallingUpdateSplashScreen(3);
             TypingTracker.NewIMEContext();
 
+            if (ENABLE_CONTEXT_LOGGING)
+            {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                TypingTracker.AppendContextLog(3, "Initialize");
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+            }
+
             MarshallingUpdateSplashScreen(4);
             Theme.Initialize();
 
@@ -226,19 +233,47 @@ namespace ChordingCoding.UI
             if (Theme.CurrentTheme.SFX.HasAccompanied)
             {
                 autoAccompanimentToolStripMenuItem.CheckState = CheckState.Checked;
+
+                if (ENABLE_CONTEXT_LOGGING)
+                {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                    TypingTracker.AppendContextLog(3, "AutoAccompaniment", "Enable", Theme.CurrentTheme.Name);
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+                }
             }
             else
             {
                 autoAccompanimentToolStripMenuItem.CheckState = CheckState.Unchecked;
+
+                if (ENABLE_CONTEXT_LOGGING)
+                {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                    TypingTracker.AppendContextLog(3, "AutoAccompaniment", "Disable", Theme.CurrentTheme.Name);
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+                }
             }
 
             if (Theme.CurrentTheme.SFX.UseReverb)
             {
                 useReverbToolStripMenuItem.CheckState = CheckState.Checked;
+
+                if (ENABLE_CONTEXT_LOGGING)
+                {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                    TypingTracker.AppendContextLog(3, "UseReverb", "Enable", Theme.CurrentTheme.Name);
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+                }
             }
             else
             {
                 useReverbToolStripMenuItem.CheckState = CheckState.Unchecked;
+
+                if (ENABLE_CONTEXT_LOGGING)
+                {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                    TypingTracker.AppendContextLog(3, "UseReverb", "Disable", Theme.CurrentTheme.Name);
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+                }
             }
 
             MarshallingUpdateSplashScreen(10);
@@ -744,6 +779,11 @@ namespace ChordingCoding.UI
                 opacity = trackBarMenuItem1.Value * 5;
                 Opacity = opacity / 100D;
                 opacityToolStripMenuItem.Text = "불투명도 (" + opacity + "%)";
+
+                if (ENABLE_CONTEXT_LOGGING)
+                {
+                    TypingTracker.AppendContextLog(3, "Opacity", opacity, Theme.CurrentTheme.Name);
+                }
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
         }
@@ -780,6 +820,11 @@ namespace ChordingCoding.UI
 
                 }
                 sentimentAwarenessToolStripMenuItem.Text = "감성 인식 수준 (" + Music.SentimentAwareness + "%)";
+
+                if (ENABLE_CONTEXT_LOGGING)
+                {
+                    TypingTracker.AppendContextLog(3, "SentimentAwareness", Music.SentimentAwareness);
+                }
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
         }
@@ -789,6 +834,13 @@ namespace ChordingCoding.UI
         {
             SFXTheme.CurrentSFXTheme.Volume = trackBarMenuItem3.Value * 5;
             volumeToolStripMenuItem.Text = "음량 (" + SFXTheme.CurrentSFXTheme.Volume + "%)";
+
+            if (ENABLE_CONTEXT_LOGGING)
+            {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                TypingTracker.AppendContextLog(3, "Volume", SFXTheme.CurrentSFXTheme.Volume, Theme.CurrentTheme.Name);
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+            }
         }
 
         /// <summary>
@@ -813,6 +865,13 @@ namespace ChordingCoding.UI
             }
             themeToolStripMenuItem.Text = "테마 (" + theme.DisplayName + ")";
 
+            if (ENABLE_CONTEXT_LOGGING)
+            {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                TypingTracker.AppendContextLog(3, "Theme", Theme.CurrentTheme.Name);
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+            }
+
             Opacity = opacity / 100D;
 
             if (ENABLE_VFX)
@@ -824,14 +883,49 @@ namespace ChordingCoding.UI
 
                 trackBarMenuItem1.Value = opacity / 5;
                 opacityToolStripMenuItem.Text = "불투명도 (" + opacity + "%)";
+
+                if (ENABLE_CONTEXT_LOGGING)
+                {
+                    TypingTracker.AppendContextLog(3, "Opacity", opacity, Theme.CurrentTheme.Name);
+                }
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
 
             trackBarMenuItem3.Value = SFXTheme.CurrentSFXTheme.Volume / 5;
             volumeToolStripMenuItem.Text = "음량 (" + SFXTheme.CurrentSFXTheme.Volume + "%)";
 
+            if (ENABLE_CONTEXT_LOGGING)
+            {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                TypingTracker.AppendContextLog(3, "Volume", SFXTheme.CurrentSFXTheme.Volume, Theme.CurrentTheme.Name);
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+            }
+
             if (Music.HasStart)
             {
+                if (ENABLE_CONTEXT_LOGGING)
+                {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                    if (SFXTheme.CurrentSFXTheme.HasAccompanied)
+                    {
+                        TypingTracker.AppendContextLog(3, "AutoAccompaniment", "Enable", Theme.CurrentTheme.Name);
+                    }
+                    else
+                    {
+                        TypingTracker.AppendContextLog(3, "AutoAccompaniment", "Disable", Theme.CurrentTheme.Name);
+                    }
+
+                    if (SFXTheme.CurrentSFXTheme.UseReverb)
+                    {
+                        TypingTracker.AppendContextLog(3, "UseReverb", "Enable", Theme.CurrentTheme.Name);
+                    }
+                    else
+                    {
+                        TypingTracker.AppendContextLog(3, "UseReverb", "Disable", Theme.CurrentTheme.Name);
+                    }
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+                }
+
                 Music.SetReverb(SFXTheme.CurrentSFXTheme.UseReverb);
             }
 
@@ -892,6 +986,29 @@ namespace ChordingCoding.UI
                     noteResolutionToolStripMenuItem.Text = "단위 리듬 (없음)";
                     break;
             }
+
+            if (ENABLE_CONTEXT_LOGGING)
+            {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                switch (resolution) {
+                    case 16:
+                        TypingTracker.AppendContextLog(3, "NoteResolution", "4th");
+                        break;
+                    case 8:
+                        TypingTracker.AppendContextLog(3, "NoteResolution", "8th");
+                        break;
+                    case 4:
+                        TypingTracker.AppendContextLog(3, "NoteResolution", "16th");
+                        break;
+                    case 2:
+                        TypingTracker.AppendContextLog(3, "NoteResolution", "32nd");
+                        break;
+                    case 0:
+                        TypingTracker.AppendContextLog(3, "NoteResolution", "Immediate");
+                        break;
+                }
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+            }
         }
 
         private void SetMusicalModePolicy(MusicalKey.ModePolicy policy)
@@ -909,12 +1026,30 @@ namespace ChordingCoding.UI
                     break;
                 case MusicalKey.ModePolicy.FavorMajor:
                     majorModeToolStripMenuItem.CheckState = CheckState.Checked;
-                    musicalModeToolStripMenuItem.Text = "선법 (장조 선호)";
+                    musicalModeToolStripMenuItem.Text = "선법 (밝은 음악)";
                     break;
                 case MusicalKey.ModePolicy.FavorMinor:
                     minorModeToolStripMenuItem.CheckState = CheckState.Checked;
-                    musicalModeToolStripMenuItem.Text = "선법 (단조 선호)";
+                    musicalModeToolStripMenuItem.Text = "선법 (어두운 음악)";
                     break;
+            }
+
+            if (ENABLE_CONTEXT_LOGGING)
+            {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                switch (policy)
+                {
+                    case MusicalKey.ModePolicy.Auto:
+                        TypingTracker.AppendContextLog(3, "ModePolicy", "Auto");
+                        break;
+                    case MusicalKey.ModePolicy.FavorMajor:
+                        TypingTracker.AppendContextLog(3, "ModePolicy", "Major");
+                        break;
+                    case MusicalKey.ModePolicy.FavorMinor:
+                        TypingTracker.AppendContextLog(3, "ModePolicy", "Minor");
+                        break;
+                }
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
         }
 
@@ -959,6 +1094,11 @@ namespace ChordingCoding.UI
                     trackBarMenuItem2.Value = 6;
                 }
                 sentimentAwarenessToolStripMenuItem.Text = "감성 인식 수준 (" + Music.SentimentAwareness + "%)";
+            }
+
+            if (ENABLE_CONTEXT_LOGGING)
+            {
+                TypingTracker.AppendContextLog(3, "SentimentAwareness", Music.SentimentAwareness);
             }
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
         }
@@ -1033,10 +1173,22 @@ namespace ChordingCoding.UI
             if (Theme.CurrentTheme.SFX.HasAccompanied)
             {
                 autoAccompanimentToolStripMenuItem.CheckState = CheckState.Checked;
+                if (ENABLE_CONTEXT_LOGGING)
+                {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                    TypingTracker.AppendContextLog(3, "AutoAccompaniment", "Enable", Theme.CurrentTheme.Name);
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+                }
             }
             else
             {
                 autoAccompanimentToolStripMenuItem.CheckState = CheckState.Unchecked;
+                if (ENABLE_CONTEXT_LOGGING)
+                {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                    TypingTracker.AppendContextLog(3, "AutoAccompaniment", "Disable", Theme.CurrentTheme.Name);
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+                }
             }
         }
 
@@ -1046,20 +1198,46 @@ namespace ChordingCoding.UI
             if (Theme.CurrentTheme.SFX.UseReverb)
             {
                 useReverbToolStripMenuItem.CheckState = CheckState.Checked;
+                if (ENABLE_CONTEXT_LOGGING)
+                {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                    TypingTracker.AppendContextLog(3, "UseReverb", "Enable", Theme.CurrentTheme.Name);
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+                }
             }
             else
             {
                 useReverbToolStripMenuItem.CheckState = CheckState.Unchecked;
+                if (ENABLE_CONTEXT_LOGGING)
+                {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                    TypingTracker.AppendContextLog(3, "UseReverb", "Disable", Theme.CurrentTheme.Name);
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+                }
             }
         }
 
         private void recordToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Util.TaskQueue.Add("MidiTrack", Music.SaveTrack);
+
+            if (ENABLE_CONTEXT_LOGGING)
+            {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                TypingTracker.AppendContextLog(3, "SaveTrack");
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+            }
         }
 
         private void quitToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            if (ENABLE_CONTEXT_LOGGING)
+            {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+                TypingTracker.AppendContextLog(3, "Quit");
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+            }
+
             Close();
         }
     }

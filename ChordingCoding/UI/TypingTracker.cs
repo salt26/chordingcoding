@@ -46,6 +46,8 @@ namespace ChordingCoding.UI
         // https://docs.microsoft.com/en-us/windows/win32/learnwin32/mouse-clicks
         // https://stackoverflow.com/questions/4372055/detect-active-window-changed-using-c-sharp-without-polling
 
+        public enum LogType { Process = 0, KeyStroke = 1, Mouse = 2, UI = 3 }
+
         private const int WH_KEYBOARD_LL = 13;
         private const int WH_MOUSE_LL = 14;
 
@@ -291,7 +293,7 @@ namespace ChordingCoding.UI
 
                     if (MainForm.ENABLE_CONTEXT_LOGGING)
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                        AppendContextLog(1, "Backspace");
+                        AppendContextLog(1, (Keys)vkCode); // "Back"
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
                 }
                 else if ((vkCode == 32) || (vkCode == 9) || (vkCode == 13))
@@ -350,7 +352,7 @@ namespace ChordingCoding.UI
 
                     if (MainForm.ENABLE_CONTEXT_LOGGING)
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                        AppendContextLog(1, "F12(SaveTrack)");
+                        AppendContextLog(1, (Keys)vkCode, "SaveTrack");
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
                 }
                 else if (MainForm.ENABLE_CONTEXT_LOGGING)
@@ -793,7 +795,7 @@ namespace ChordingCoding.UI
             long deltaTicks = DateTime.Now.Ticks - prevTicks;
             prevTicks = DateTime.Now.Ticks;
 
-            string s = type + "," + DateTime.Now.Year + "," + DateTime.Now.Month + 
+            string s = ((LogType)type).ToString() + "," + DateTime.Now.Year + "," + DateTime.Now.Month + 
                 "," + DateTime.Now.Day + "," + DateTime.Now.Hour + "," + DateTime.Now.Minute +
                 "," + DateTime.Now.Second + "," + DateTime.Now.Millisecond + "," + (deltaTicks / 10000000f);
             foreach (object message in messages)

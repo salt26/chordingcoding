@@ -189,10 +189,20 @@ namespace ChordingCoding.UI
                 else if (vkCode >= 21 && vkCode <= 25)
                 {
                     // IME Mode Change (Hangul/Kana mode, Junja mode, Final mode, Hanja/Kanji mode)
+                    Logger.AppendContextLog(Logger.LogType.Key, "IMEChange");
+
+                    // The mode is about to change...
+                    if (IsIMESetToEnglish())
+                    {
+                        Logger.AppendContextLog(Logger.LogType.IME, "Korean");
+                    }
+                    else
+                    {
+                        Logger.AppendContextLog(Logger.LogType.IME, "English");
+                    }
+
                     Util.TaskQueue.Add("wordState", ResetWord);
                     Util.TaskQueue.Add("wordState", BackspaceStateToNull);
-
-                    Logger.AppendContextLog(Logger.LogType.Key, "IMEChange");
                 }
                 else if ((vkCode == 91 || vkCode == 92) &&
                     (Control.ModifierKeys & Keys.Alt) == Keys.Alt)
@@ -622,6 +632,14 @@ namespace ChordingCoding.UI
         public static void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
             Logger.AppendContextLog(Logger.LogType.Process, GetForegroundProcessName(), GetActiveWindowTitle());
+            if (IsIMESetToEnglish())
+            {
+                Logger.AppendContextLog(Logger.LogType.IME, "English");
+            }
+            else
+            {
+                Logger.AppendContextLog(Logger.LogType.IME, "Korean");
+            }
         }
 
         private const int WM_IME_CONTROL = 643;
@@ -634,7 +652,7 @@ namespace ChordingCoding.UI
         /// 이외의 운영체제에서는 true를 반환합니다.
         /// </summary>
         /// <returns></returns>
-        private static bool IsIMESetToEnglish()
+        public static bool IsIMESetToEnglish()
         {
             IntPtr hwnd = GetForegroundWindow();
             if (hwnd == IntPtr.Zero)

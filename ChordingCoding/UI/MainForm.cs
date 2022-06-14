@@ -177,6 +177,14 @@ namespace ChordingCoding.UI
             TypingTracker.NewIMEContext();
 
             Logger.AppendContextLog(Logger.LogType.UI, "Initialize");
+            if (TypingTracker.IsIMESetToEnglish())
+            {
+                Logger.AppendContextLog(Logger.LogType.IME, "English");
+            }
+            else
+            {
+                Logger.AppendContextLog(Logger.LogType.IME, "Korean");
+            }
 
             MarshallingUpdateSplashScreen(4);
             Theme.Initialize();

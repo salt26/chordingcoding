@@ -29,7 +29,7 @@ namespace ChordingCoding.UI.Logging
 {
     public class Logger
     {
-        public enum LogType { Process = 0, Key = 1, Mouse = 2, UI = 3, Music = 4 }
+        public enum LogType { Process = 0, Key = 1, Mouse = 2, UI = 3, Music = 4, IME = 5 }
 
         private const string contextSavePath = "WorkingContext.csv";
         private static long prevTicks = DateTime.Now.Ticks;
@@ -39,10 +39,20 @@ namespace ChordingCoding.UI.Logging
 
         private const string sentimentSavePath2 = "SentimentWordLog.csv";
 
+        private static string IMECache = "";
+
         public static void AppendContextLog(LogType type, params object[] messages)
         {
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
             if (!MainForm.ENABLE_CONTEXT_LOGGING) return;
+
+            if (type == LogType.IME && messages.Length > 0)
+            {
+                if (messages[0].ToString().Equals(IMECache))
+                    return;
+                else
+                    IMECache = messages[0].ToString();
+            }
 
             long deltaTicks = DateTime.Now.Ticks - prevTicks;
             prevTicks = DateTime.Now.Ticks;

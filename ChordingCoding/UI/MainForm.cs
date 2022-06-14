@@ -180,7 +180,7 @@ namespace ChordingCoding.UI
             if (ENABLE_CONTEXT_LOGGING)
             {
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                TypingTracker.AppendContextLog(3, "Initialize");
+                Logger.AppendContextLog(3, "Initialize");
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
 
@@ -237,7 +237,7 @@ namespace ChordingCoding.UI
                 if (ENABLE_CONTEXT_LOGGING)
                 {
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                    TypingTracker.AppendContextLog(3, "AutoAccompaniment", "Enable", Theme.CurrentTheme.Name);
+                    Logger.AppendContextLog(3, "AutoAccompaniment", "Enable", Theme.CurrentTheme.Name);
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
                 }
             }
@@ -248,7 +248,7 @@ namespace ChordingCoding.UI
                 if (ENABLE_CONTEXT_LOGGING)
                 {
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                    TypingTracker.AppendContextLog(3, "AutoAccompaniment", "Disable", Theme.CurrentTheme.Name);
+                    Logger.AppendContextLog(3, "AutoAccompaniment", "Disable", Theme.CurrentTheme.Name);
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
                 }
             }
@@ -260,7 +260,7 @@ namespace ChordingCoding.UI
                 if (ENABLE_CONTEXT_LOGGING)
                 {
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                    TypingTracker.AppendContextLog(3, "UseReverb", "Enable", Theme.CurrentTheme.Name);
+                    Logger.AppendContextLog(3, "UseReverb", "Enable", Theme.CurrentTheme.Name);
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
                 }
             }
@@ -271,7 +271,7 @@ namespace ChordingCoding.UI
                 if (ENABLE_CONTEXT_LOGGING)
                 {
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                    TypingTracker.AppendContextLog(3, "UseReverb", "Disable", Theme.CurrentTheme.Name);
+                    Logger.AppendContextLog(3, "UseReverb", "Disable", Theme.CurrentTheme.Name);
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
                 }
             }
@@ -782,7 +782,7 @@ namespace ChordingCoding.UI
 
                 if (ENABLE_CONTEXT_LOGGING)
                 {
-                    TypingTracker.AppendContextLog(3, "Opacity", opacity, Theme.CurrentTheme.Name);
+                    Logger.AppendContextLog(3, "Opacity", opacity, Theme.CurrentTheme.Name);
                 }
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
@@ -823,7 +823,7 @@ namespace ChordingCoding.UI
 
                 if (ENABLE_CONTEXT_LOGGING)
                 {
-                    TypingTracker.AppendContextLog(3, "SentimentAwareness", Music.SentimentAwareness);
+                    Logger.AppendContextLog(3, "SentimentAwareness", Music.SentimentAwareness);
                 }
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
@@ -838,7 +838,7 @@ namespace ChordingCoding.UI
             if (ENABLE_CONTEXT_LOGGING)
             {
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                TypingTracker.AppendContextLog(3, "Volume", SFXTheme.CurrentSFXTheme.Volume, Theme.CurrentTheme.Name);
+                Logger.AppendContextLog(3, "Volume", SFXTheme.CurrentSFXTheme.Volume, Theme.CurrentTheme.Name);
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
         }
@@ -868,7 +868,7 @@ namespace ChordingCoding.UI
             if (ENABLE_CONTEXT_LOGGING)
             {
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                TypingTracker.AppendContextLog(3, "Theme", Theme.CurrentTheme.Name);
+                Logger.AppendContextLog(3, "Theme", Theme.CurrentTheme.Name);
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
 
@@ -886,7 +886,7 @@ namespace ChordingCoding.UI
 
                 if (ENABLE_CONTEXT_LOGGING)
                 {
-                    TypingTracker.AppendContextLog(3, "Opacity", opacity, Theme.CurrentTheme.Name);
+                    Logger.AppendContextLog(3, "Opacity", opacity, Theme.CurrentTheme.Name);
                 }
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
@@ -897,7 +897,7 @@ namespace ChordingCoding.UI
             if (ENABLE_CONTEXT_LOGGING)
             {
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                TypingTracker.AppendContextLog(3, "Volume", SFXTheme.CurrentSFXTheme.Volume, Theme.CurrentTheme.Name);
+                Logger.AppendContextLog(3, "Volume", SFXTheme.CurrentSFXTheme.Volume, Theme.CurrentTheme.Name);
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
 
@@ -908,20 +908,20 @@ namespace ChordingCoding.UI
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
                     if (SFXTheme.CurrentSFXTheme.HasAccompanied)
                     {
-                        TypingTracker.AppendContextLog(3, "AutoAccompaniment", "Enable", Theme.CurrentTheme.Name);
+                        Logger.AppendContextLog(3, "AutoAccompaniment", "Enable", Theme.CurrentTheme.Name);
                     }
                     else
                     {
-                        TypingTracker.AppendContextLog(3, "AutoAccompaniment", "Disable", Theme.CurrentTheme.Name);
+                        Logger.AppendContextLog(3, "AutoAccompaniment", "Disable", Theme.CurrentTheme.Name);
                     }
 
                     if (SFXTheme.CurrentSFXTheme.UseReverb)
                     {
-                        TypingTracker.AppendContextLog(3, "UseReverb", "Enable", Theme.CurrentTheme.Name);
+                        Logger.AppendContextLog(3, "UseReverb", "Enable", Theme.CurrentTheme.Name);
                     }
                     else
                     {
-                        TypingTracker.AppendContextLog(3, "UseReverb", "Disable", Theme.CurrentTheme.Name);
+                        Logger.AppendContextLog(3, "UseReverb", "Disable", Theme.CurrentTheme.Name);
                     }
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
                 }
@@ -992,19 +992,19 @@ namespace ChordingCoding.UI
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
                 switch (resolution) {
                     case 16:
-                        TypingTracker.AppendContextLog(3, "NoteResolution", "4th");
+                        Logger.AppendContextLog(3, "NoteResolution", "4th");
                         break;
                     case 8:
-                        TypingTracker.AppendContextLog(3, "NoteResolution", "8th");
+                        Logger.AppendContextLog(3, "NoteResolution", "8th");
                         break;
                     case 4:
-                        TypingTracker.AppendContextLog(3, "NoteResolution", "16th");
+                        Logger.AppendContextLog(3, "NoteResolution", "16th");
                         break;
                     case 2:
-                        TypingTracker.AppendContextLog(3, "NoteResolution", "32nd");
+                        Logger.AppendContextLog(3, "NoteResolution", "32nd");
                         break;
                     case 0:
-                        TypingTracker.AppendContextLog(3, "NoteResolution", "Immediate");
+                        Logger.AppendContextLog(3, "NoteResolution", "Immediate");
                         break;
                 }
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
@@ -1040,13 +1040,13 @@ namespace ChordingCoding.UI
                 switch (policy)
                 {
                     case MusicalKey.ModePolicy.Auto:
-                        TypingTracker.AppendContextLog(3, "ModePolicy", "Auto");
+                        Logger.AppendContextLog(3, "ModePolicy", "Auto");
                         break;
                     case MusicalKey.ModePolicy.FavorMajor:
-                        TypingTracker.AppendContextLog(3, "ModePolicy", "Major");
+                        Logger.AppendContextLog(3, "ModePolicy", "Major");
                         break;
                     case MusicalKey.ModePolicy.FavorMinor:
-                        TypingTracker.AppendContextLog(3, "ModePolicy", "Minor");
+                        Logger.AppendContextLog(3, "ModePolicy", "Minor");
                         break;
                 }
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
@@ -1098,7 +1098,7 @@ namespace ChordingCoding.UI
 
             if (ENABLE_CONTEXT_LOGGING)
             {
-                TypingTracker.AppendContextLog(3, "SentimentAwareness", Music.SentimentAwareness);
+                Logger.AppendContextLog(3, "SentimentAwareness", Music.SentimentAwareness);
             }
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
         }
@@ -1176,7 +1176,7 @@ namespace ChordingCoding.UI
                 if (ENABLE_CONTEXT_LOGGING)
                 {
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                    TypingTracker.AppendContextLog(3, "AutoAccompaniment", "Enable", Theme.CurrentTheme.Name);
+                    Logger.AppendContextLog(3, "AutoAccompaniment", "Enable", Theme.CurrentTheme.Name);
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
                 }
             }
@@ -1186,7 +1186,7 @@ namespace ChordingCoding.UI
                 if (ENABLE_CONTEXT_LOGGING)
                 {
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                    TypingTracker.AppendContextLog(3, "AutoAccompaniment", "Disable", Theme.CurrentTheme.Name);
+                    Logger.AppendContextLog(3, "AutoAccompaniment", "Disable", Theme.CurrentTheme.Name);
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
                 }
             }
@@ -1201,7 +1201,7 @@ namespace ChordingCoding.UI
                 if (ENABLE_CONTEXT_LOGGING)
                 {
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                    TypingTracker.AppendContextLog(3, "UseReverb", "Enable", Theme.CurrentTheme.Name);
+                    Logger.AppendContextLog(3, "UseReverb", "Enable", Theme.CurrentTheme.Name);
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
                 }
             }
@@ -1211,7 +1211,7 @@ namespace ChordingCoding.UI
                 if (ENABLE_CONTEXT_LOGGING)
                 {
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                    TypingTracker.AppendContextLog(3, "UseReverb", "Disable", Theme.CurrentTheme.Name);
+                    Logger.AppendContextLog(3, "UseReverb", "Disable", Theme.CurrentTheme.Name);
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
                 }
             }
@@ -1224,7 +1224,7 @@ namespace ChordingCoding.UI
             if (ENABLE_CONTEXT_LOGGING)
             {
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                TypingTracker.AppendContextLog(3, "SaveTrack");
+                Logger.AppendContextLog(3, "SaveTrack");
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
         }
@@ -1234,7 +1234,7 @@ namespace ChordingCoding.UI
             if (ENABLE_CONTEXT_LOGGING)
             {
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                TypingTracker.AppendContextLog(3, "Quit");
+                Logger.AppendContextLog(3, "Quit");
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
 

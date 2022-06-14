@@ -46,8 +46,6 @@ namespace ChordingCoding.UI
         // https://docs.microsoft.com/en-us/windows/win32/learnwin32/mouse-clicks
         // https://stackoverflow.com/questions/4372055/detect-active-window-changed-using-c-sharp-without-polling
 
-        public enum LogType { Process = 0, KeyStroke = 1, Mouse = 2, UI = 3 }
-
         private const int WH_KEYBOARD_LL = 13;
         private const int WH_MOUSE_LL = 14;
 
@@ -98,14 +96,6 @@ namespace ChordingCoding.UI
 
         private static string wordState = "";
         private static string backspaceState = null;
-
-        private const string contextSavePath = "WorkingContext.csv";
-        private static long prevTicks = DateTime.Now.Ticks;
-
-        private const string sentimentSavePath = "SentimentLog.csv";
-        private static long prevTicks2 = DateTime.Now.Ticks;
-
-        private const string sentimentSavePath2 = "SentimentWordLog.csv";
 
         /// <summary>
         /// 키보드 및 마우스 입력 이벤트를 감지하도록 합니다.
@@ -203,7 +193,7 @@ namespace ChordingCoding.UI
 
                     if (MainForm.ENABLE_CONTEXT_LOGGING)
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                        AppendContextLog(1, "IMEChange");
+                        Logger.AppendContextLog(1, "IMEChange");
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
                 }
                 else if ((vkCode == 91 || vkCode == 92) &&
@@ -239,7 +229,7 @@ namespace ChordingCoding.UI
 
                     if (MainForm.ENABLE_CONTEXT_LOGGING)
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                        AppendContextLog(1, "Alphabet");
+                        Logger.AppendContextLog(1, "Alphabet");
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
                 }
                 else if (vkCode == 109 || 
@@ -255,7 +245,7 @@ namespace ChordingCoding.UI
 
                     if (MainForm.ENABLE_CONTEXT_LOGGING)
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                        AppendContextLog(1, "SymbolInWord");
+                        Logger.AppendContextLog(1, "SymbolInWord");
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
                 }
                 else if ((vkCode >= 48 && vkCode <= 57) ||
@@ -277,11 +267,11 @@ namespace ChordingCoding.UI
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
                         if (((vkCode >= 48 && vkCode <= 57) || (vkCode >= 96 && vkCode <= 105)) &&
                             (Control.ModifierKeys & Keys.Shift) != Keys.Shift) {
-                            AppendContextLog(1, "Number");
+                            Logger.AppendContextLog(1, "Number");
                         }
                         else
                         {
-                            AppendContextLog(1, "Symbol");
+                            Logger.AppendContextLog(1, "Symbol");
                         }
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
                     }
@@ -293,7 +283,7 @@ namespace ChordingCoding.UI
 
                     if (MainForm.ENABLE_CONTEXT_LOGGING)
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                        AppendContextLog(1, (Keys)vkCode); // "Back"
+                        Logger.AppendContextLog(1, (Keys)vkCode); // "Back"
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
                 }
                 else if ((vkCode == 32) || (vkCode == 9) || (vkCode == 13))
@@ -307,7 +297,7 @@ namespace ChordingCoding.UI
 
                     if (MainForm.ENABLE_CONTEXT_LOGGING)
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                        AppendContextLog(1, (Keys)vkCode);
+                        Logger.AppendContextLog(1, (Keys)vkCode);
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
                 }
                 else if ((vkCode >= 33 && vkCode <= 40) || (vkCode == 27) ||
@@ -319,7 +309,7 @@ namespace ChordingCoding.UI
 
                     if (MainForm.ENABLE_CONTEXT_LOGGING)
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                        AppendContextLog(1, (Keys)vkCode);
+                        Logger.AppendContextLog(1, (Keys)vkCode);
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
                 }
                 else if (vkCode == 18 || vkCode == 164 || vkCode == 165)
@@ -330,7 +320,7 @@ namespace ChordingCoding.UI
 
                     if (MainForm.ENABLE_CONTEXT_LOGGING)
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                        AppendContextLog(1, (Keys)vkCode);
+                        Logger.AppendContextLog(1, (Keys)vkCode);
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
                 }
                 else if (vkCode == 45 || vkCode == 46 ||
@@ -341,7 +331,7 @@ namespace ChordingCoding.UI
 
                     if (MainForm.ENABLE_CONTEXT_LOGGING)
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                        AppendContextLog(1, (Keys)vkCode);
+                        Logger.AppendContextLog(1, (Keys)vkCode);
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
                 }
                 else if (vkCode == 123)
@@ -352,13 +342,13 @@ namespace ChordingCoding.UI
 
                     if (MainForm.ENABLE_CONTEXT_LOGGING)
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                        AppendContextLog(1, (Keys)vkCode, "SaveTrack");
+                        Logger.AppendContextLog(1, (Keys)vkCode, "SaveTrack");
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
                 }
                 else if (MainForm.ENABLE_CONTEXT_LOGGING)
                 {
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                    AppendContextLog(1, (Keys)vkCode);
+                    Logger.AppendContextLog(1, (Keys)vkCode);
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
                 }
             }
@@ -488,16 +478,16 @@ namespace ChordingCoding.UI
                     switch ((MouseMessages)wParam)
                     {
                         case MouseMessages.WM_LBUTTONDOWN:
-                            AppendContextLog(2, "MouseLeftDown");
+                            Logger.AppendContextLog(2, "MouseLeftDown");
                             break;
                         case MouseMessages.WM_RBUTTONDOWN:
-                            AppendContextLog(2, "MouseRightDown");
+                            Logger.AppendContextLog(2, "MouseRightDown");
                             break;
                         case MouseMessages.WM_MBUTTONDOWN:
-                            AppendContextLog(2, "MouseMiddleDown");
+                            Logger.AppendContextLog(2, "MouseMiddleDown");
                             break;
                         case MouseMessages.WM_MOUSEWHEEL:
-                            //AppendContextLog(2, "MouseWheel");
+                            //Logger.AppendContextLog(2, "MouseWheel");
                             break;
                     }
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
@@ -672,7 +662,7 @@ namespace ChordingCoding.UI
             if (MainForm.ENABLE_CONTEXT_LOGGING)
             {
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                AppendContextLog(0, GetForegroundProcessName(), GetActiveWindowTitle());
+                Logger.AppendContextLog(0, GetForegroundProcessName(), GetActiveWindowTitle());
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
         }
@@ -790,103 +780,6 @@ namespace ChordingCoding.UI
             }
         }
 
-        public static void AppendContextLog(int type, params object[] messages)
-        {
-            long deltaTicks = DateTime.Now.Ticks - prevTicks;
-            prevTicks = DateTime.Now.Ticks;
-
-            string s = ((LogType)type).ToString() + "," + DateTime.Now.Year + "," + DateTime.Now.Month + 
-                "," + DateTime.Now.Day + "," + DateTime.Now.Hour + "," + DateTime.Now.Minute +
-                "," + DateTime.Now.Second + "," + DateTime.Now.Millisecond + "," + (deltaTicks / 10000000f);
-            foreach (object message in messages)
-            {
-                if (message is null)
-                {
-                    s += ",";
-                }
-                else
-                {
-                    s += "," + message.ToString();
-                }
-            }
-            try
-            {
-                if (!File.Exists(contextSavePath))
-                {
-                    File.AppendAllText(contextSavePath, "id,year,month,day,hour,minute,second,ms,delta,e,w1,w2,w3\n", Encoding.UTF8);
-                }
-                File.AppendAllText(contextSavePath, s + "\n", Encoding.UTF8);
-            }
-            catch (Exception e)
-            {
-                if (!(e is IOException))
-                    throw;
-            }
-        }
-
-        public static void AppendSentimentLog(params object[] messages)
-        {
-            long deltaTicks = DateTime.Now.Ticks - prevTicks2;
-            prevTicks2 = DateTime.Now.Ticks;
-
-            string s = DateTime.Now.Year + "," + DateTime.Now.Month +
-                "," + DateTime.Now.Day + "," + DateTime.Now.Hour + "," + DateTime.Now.Minute +
-                "," + DateTime.Now.Second + "," + DateTime.Now.Millisecond + "," + (deltaTicks / 10000000f);
-            foreach (object message in messages)
-            {
-                if (message is null)
-                {
-                    s += ",";
-                }
-                else
-                {
-                    s += "," + message.ToString();
-                }
-            }
-            try
-            {
-                if (!File.Exists(sentimentSavePath))
-                {
-                    File.AppendAllText(sentimentSavePath, "year,month,day,hour,minute,second,ms,delta,word,valence,arousal,shortValence,shortArousal,longValence,longArousal,prevValence,prevArousal\n", Encoding.UTF8);
-                }
-                File.AppendAllText(sentimentSavePath, s + "\n", Encoding.UTF8);
-            }
-            catch (Exception e)
-            {
-                if (!(e is IOException))
-                    throw;
-            }
-        }
-
-        public static void AppendSentimentLog2(params object[] messages)
-        {
-            string s = " ";
-            foreach (object message in messages)
-            {
-                if (message is null)
-                {
-                    s += ",";
-                }
-                else
-                {
-                    s += "," + message.ToString();
-                }
-            }
-            try
-            {
-                if (!File.Exists(sentimentSavePath2))
-                {
-                    File.AppendAllText(sentimentSavePath2, "dummy,index,word,valence,valenceValue,arousal,arousalValue,label\n", Encoding.UTF8);
-                }
-                File.AppendAllText(sentimentSavePath2, s + "\n", Encoding.UTF8);
-            }
-            catch (Exception e)
-            {
-                if (!(e is IOException))
-                    throw;
-            }
-        }
-
         public static void DvdAnalysis()
         {
             StreamReader streamReader = new StreamReader("dvd_labeled_2000.csv", Encoding.GetEncoding("UTF-8"));
@@ -906,7 +799,7 @@ namespace ChordingCoding.UI
                         EnglishSentimentAnalyzer.instance.Analyze(wordState);
                         EnglishWordSentiment w = (EnglishWordSentiment)EnglishSentimentAnalyzer.instance.GetSentimentAndFlush();
                         //SentimentState.UpdateState(w);
-                        TypingTracker.AppendSentimentLog2(i.ToString(), wordState, w.GetValence(), w.valenceValue, w.GetArousal(), w.arousalValue, label);
+                        Logger.AppendSentimentLog2(i.ToString(), wordState, w.GetValence(), w.valenceValue, w.GetArousal(), w.arousalValue, label);
                     }
                 }
                 i++;

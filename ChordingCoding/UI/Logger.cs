@@ -29,7 +29,7 @@ namespace ChordingCoding.UI
 {
     public class Logger
     {
-        public enum LogType { Process = 0, KeyStroke = 1, Mouse = 2, UI = 3 }
+        public enum LogType { Process = 0, Key = 1, Mouse = 2, UI = 3, Music = 4 }
 
         private const string contextSavePath = "WorkingContext.csv";
         private static long prevTicks = DateTime.Now.Ticks;
@@ -39,12 +39,15 @@ namespace ChordingCoding.UI
 
         private const string sentimentSavePath2 = "SentimentWordLog.csv";
 
-        public static void AppendContextLog(int type, params object[] messages)
+        public static void AppendContextLog(LogType type, params object[] messages)
         {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+            if (!MainForm.ENABLE_CONTEXT_LOGGING) return;
+
             long deltaTicks = DateTime.Now.Ticks - prevTicks;
             prevTicks = DateTime.Now.Ticks;
 
-            string s = ((LogType)type).ToString() + "," + DateTime.Now.Year + "," + DateTime.Now.Month +
+            string s = type.ToString() + "," + DateTime.Now.Year + "," + DateTime.Now.Month +
                 "," + DateTime.Now.Day + "," + DateTime.Now.Hour + "," + DateTime.Now.Minute +
                 "," + DateTime.Now.Second + "," + DateTime.Now.Millisecond + "," + (deltaTicks / 10000000f);
             foreach (object message in messages)
@@ -71,6 +74,7 @@ namespace ChordingCoding.UI
                 if (!(e is IOException))
                     throw;
             }
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
         }
 
         public static void AppendSentimentLog(params object[] messages)

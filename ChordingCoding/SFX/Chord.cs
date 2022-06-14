@@ -25,6 +25,7 @@ using System;
 using System.Drawing;
 using System.Collections.Generic;
 using ChordingCoding.Sentiment;
+using static ChordingCoding.UI.Logger;
 
 namespace ChordingCoding.SFX
 {
@@ -78,6 +79,8 @@ namespace ChordingCoding.SFX
             type = newChord.type;
             if (VERBOSE)
                 Console.WriteLine(root.ToString() + type.ToString());
+
+            AppendContextLog(LogType.Music, "Chord", root.ToString() + type.ToString());
 
             rand = r.Next(16);
             octave = (minOctave + maxOctave) / 2;
@@ -385,6 +388,8 @@ namespace ChordingCoding.SFX
             type = newChord.type;
             if (VERBOSE)
                 Console.WriteLine(root.ToString() + type.ToString());
+
+            AppendContextLog(LogType.Music, "Chord", root.ToString() + type.ToString());
 
             rand = r.Next(16);
             octave = c.octave;

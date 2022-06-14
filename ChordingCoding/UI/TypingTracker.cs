@@ -191,10 +191,7 @@ namespace ChordingCoding.UI
                     Util.TaskQueue.Add("wordState", ResetWord);
                     Util.TaskQueue.Add("wordState", BackspaceStateToNull);
 
-                    if (MainForm.ENABLE_CONTEXT_LOGGING)
-#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                        Logger.AppendContextLog(1, "IMEChange");
-#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+                    Logger.AppendContextLog(Logger.LogType.Key, "IMEChange");
                 }
                 else if ((vkCode == 91 || vkCode == 92) &&
                     (Control.ModifierKeys & Keys.Alt) == Keys.Alt)
@@ -227,10 +224,7 @@ namespace ChordingCoding.UI
                     Music.PlayNoteInChord();
                     // 음표 재생 후에 Music.OnPlayNotes()가 호출되면서 시각 효과 발생
 
-                    if (MainForm.ENABLE_CONTEXT_LOGGING)
-#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                        Logger.AppendContextLog(1, "Alphabet");
-#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+                    Logger.AppendContextLog(Logger.LogType.Key, "Alphabet");
                 }
                 else if (vkCode == 109 || 
                     ((vkCode == 189 || vkCode == 222) &&
@@ -243,10 +237,7 @@ namespace ChordingCoding.UI
                     Music.PlayNoteInChord();
                     // 음표 재생 후에 Music.OnPlayNotes()가 호출되면서 시각 효과 발생
 
-                    if (MainForm.ENABLE_CONTEXT_LOGGING)
-#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                        Logger.AppendContextLog(1, "SymbolInWord");
-#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+                    Logger.AppendContextLog(Logger.LogType.Key, "SymbolInWord");
                 }
                 else if ((vkCode >= 48 && vkCode <= 57) ||
                     (vkCode >= 96 && vkCode <= 111) ||
@@ -261,19 +252,14 @@ namespace ChordingCoding.UI
                     Music.PlayNoteInChord();
                     // 음표 재생 후에 Music.OnPlayNotes()가 호출되면서 시각 효과 발생
 
-
-                    if (MainForm.ENABLE_CONTEXT_LOGGING)
+                    if (((vkCode >= 48 && vkCode <= 57) || (vkCode >= 96 && vkCode <= 105)) &&
+                        (Control.ModifierKeys & Keys.Shift) != Keys.Shift)
                     {
-#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                        if (((vkCode >= 48 && vkCode <= 57) || (vkCode >= 96 && vkCode <= 105)) &&
-                            (Control.ModifierKeys & Keys.Shift) != Keys.Shift) {
-                            Logger.AppendContextLog(1, "Number");
-                        }
-                        else
-                        {
-                            Logger.AppendContextLog(1, "Symbol");
-                        }
-#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+                        Logger.AppendContextLog(Logger.LogType.Key, "Number");
+                    }
+                    else
+                    {
+                        Logger.AppendContextLog(Logger.LogType.Key, "Symbol");
                     }
                 }
                 else if (vkCode == 8)
@@ -281,10 +267,7 @@ namespace ChordingCoding.UI
                     // Backspace
                     Util.TaskQueue.Add("wordState", BackspaceWord);
 
-                    if (MainForm.ENABLE_CONTEXT_LOGGING)
-#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                        Logger.AppendContextLog(1, (Keys)vkCode); // "Back"
-#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+                    Logger.AppendContextLog(Logger.LogType.Key, (Keys)vkCode); // "Back"
                 }
                 else if ((vkCode == 32) || (vkCode == 9) || (vkCode == 13))
                 {
@@ -295,10 +278,7 @@ namespace ChordingCoding.UI
                     Music.PlayChordTransitionSync();
                     // 화음 전이 후에 Music.OnChordTransition()이 호출되면서 시각 효과 발생
 
-                    if (MainForm.ENABLE_CONTEXT_LOGGING)
-#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                        Logger.AppendContextLog(1, (Keys)vkCode);
-#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+                    Logger.AppendContextLog(Logger.LogType.Key, (Keys)vkCode);
                 }
                 else if ((vkCode >= 33 && vkCode <= 40) || (vkCode == 27) ||
                     (vkCode >= 91 && vkCode <= 95))
@@ -307,10 +287,7 @@ namespace ChordingCoding.UI
                     Util.TaskQueue.Add("wordState", ResetWord);
                     Util.TaskQueue.Add("wordState", BackspaceStateToNull);
 
-                    if (MainForm.ENABLE_CONTEXT_LOGGING)
-#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                        Logger.AppendContextLog(1, (Keys)vkCode);
-#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+                    Logger.AppendContextLog(Logger.LogType.Key, (Keys)vkCode);
                 }
                 else if (vkCode == 18 || vkCode == 164 || vkCode == 165)
                 {
@@ -318,10 +295,7 @@ namespace ChordingCoding.UI
                     // This key input may not be detected...
                     Util.TaskQueue.Add("wordState", BackspaceStateToNull);
 
-                    if (MainForm.ENABLE_CONTEXT_LOGGING)
-#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                        Logger.AppendContextLog(1, (Keys)vkCode);
-#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+                    Logger.AppendContextLog(Logger.LogType.Key, (Keys)vkCode);
                 }
                 else if (vkCode == 45 || vkCode == 46 ||
                     vkCode == 20 || vkCode == 144 || vkCode == 145)
@@ -329,10 +303,7 @@ namespace ChordingCoding.UI
                     // Insert, Delete, Caps Lock, Num Lock, Scroll Lock
                     Util.TaskQueue.Add("wordState", BackspaceStateToNull);
 
-                    if (MainForm.ENABLE_CONTEXT_LOGGING)
-#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                        Logger.AppendContextLog(1, (Keys)vkCode);
-#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+                    Logger.AppendContextLog(Logger.LogType.Key, (Keys)vkCode);
                 }
                 else if (vkCode == 123)
                 {
@@ -340,16 +311,11 @@ namespace ChordingCoding.UI
                     // Save MIDI recording file
                     Util.TaskQueue.Add("MidiTrack", Music.SaveTrack);
 
-                    if (MainForm.ENABLE_CONTEXT_LOGGING)
-#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                        Logger.AppendContextLog(1, (Keys)vkCode, "SaveTrack");
-#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+                    Logger.AppendContextLog(Logger.LogType.Key, (Keys)vkCode, "SaveTrack");
                 }
-                else if (MainForm.ENABLE_CONTEXT_LOGGING)
+                else
                 {
-#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                    Logger.AppendContextLog(1, (Keys)vkCode);
-#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+                    Logger.AppendContextLog(Logger.LogType.Key, (Keys)vkCode);
                 }
             }
             return CallNextHookEx(_keyboardHookID, nCode, wParam, lParam);
@@ -472,25 +438,20 @@ namespace ChordingCoding.UI
         {
             if (nCode >= 0)
             {
-                if (MainForm.ENABLE_CONTEXT_LOGGING)
+                switch ((MouseMessages)wParam)
                 {
-#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                    switch ((MouseMessages)wParam)
-                    {
-                        case MouseMessages.WM_LBUTTONDOWN:
-                            Logger.AppendContextLog(2, "MouseLeftDown");
-                            break;
-                        case MouseMessages.WM_RBUTTONDOWN:
-                            Logger.AppendContextLog(2, "MouseRightDown");
-                            break;
-                        case MouseMessages.WM_MBUTTONDOWN:
-                            Logger.AppendContextLog(2, "MouseMiddleDown");
-                            break;
-                        case MouseMessages.WM_MOUSEWHEEL:
-                            //Logger.AppendContextLog(2, "MouseWheel");
-                            break;
-                    }
-#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+                    case MouseMessages.WM_LBUTTONDOWN:
+                        Logger.AppendContextLog(Logger.LogType.Mouse, "MouseLeftDown");
+                        break;
+                    case MouseMessages.WM_RBUTTONDOWN:
+                        Logger.AppendContextLog(Logger.LogType.Mouse, "MouseRightDown");
+                        break;
+                    case MouseMessages.WM_MBUTTONDOWN:
+                        Logger.AppendContextLog(Logger.LogType.Mouse, "MouseMiddleDown");
+                        break;
+                    case MouseMessages.WM_MOUSEWHEEL:
+                        //Logger.AppendContextLog(Logger.LogType.Mouse, "MouseWheel");
+                        break;
                 }
 
                 if ((MouseMessages)wParam == MouseMessages.WM_LBUTTONDOWN ||
@@ -659,12 +620,7 @@ namespace ChordingCoding.UI
         /// <param name="dwmsEventTime"></param>
         public static void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
-            if (MainForm.ENABLE_CONTEXT_LOGGING)
-            {
-#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
-                Logger.AppendContextLog(0, GetForegroundProcessName(), GetActiveWindowTitle());
-#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
-            }
+            Logger.AppendContextLog(Logger.LogType.Process, GetForegroundProcessName(), GetActiveWindowTitle());
         }
 
         private const int WM_IME_CONTROL = 643;

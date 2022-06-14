@@ -24,6 +24,7 @@ SOFTWARE.
 using System;
 using ChordingCoding.Sentiment;
 using ChordingCoding.Utility;
+using static ChordingCoding.UI.Logger;
 
 namespace ChordingCoding.SFX
 {
@@ -79,8 +80,11 @@ namespace ChordingCoding.SFX
             }
 
             tonic = (Tonic)r.Next(0, 12);
+
             if (VERBOSE)
                 Console.WriteLine("Key: " + tonic.ToString() + " " + mode.ToString());
+
+            AppendContextLog(LogType.Music, "MusicalKey", tonic.ToString() + " " + mode.ToString());
         }
 
         public MusicalKey(Mode mode, Tonic tonic, ModePolicy policy = ModePolicy.Auto)
@@ -137,6 +141,8 @@ namespace ChordingCoding.SFX
                 Console.WriteLine("Transpose key!");
                 Console.WriteLine("Key: " + tonic.ToString() + " " + mode.ToString());
             }
+
+            AppendContextLog(LogType.Music, "MusicalKey", tonic.ToString() + " " + mode.ToString());
         }
 
         public static ModePolicy IntToModePolicy(int policy)

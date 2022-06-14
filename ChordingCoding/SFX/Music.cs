@@ -1081,7 +1081,7 @@ namespace ChordingCoding.SFX
 
         public static void SetReverb(bool use)
         {
-            Console.WriteLine("SetReverb " + use);
+            //Console.WriteLine("SetReverb " + use);
             if (use && !_useReverb)
             {
                 // Apply reverb effect

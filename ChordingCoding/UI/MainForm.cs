@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2019 salt26
+Copyright (c) 2019 Dantae An
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -32,14 +32,13 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Reflection;
 using System.Configuration;
-using System.Media;
 using ChordingCoding.Utility;
 using ChordingCoding.SFX;
 using ChordingCoding.UI.VFX;
+using ChordingCoding.UI.Logging;
 using ChordingCoding.Sentiment;
 using ChordingCoding.Word.Korean;
 using ChordingCoding.Word.English;
-using System.IO;
 
 namespace ChordingCoding.UI
 {
@@ -63,7 +62,7 @@ namespace ChordingCoding.UI
         /// <summary>
         /// 작업 시 발생하는 이벤트를 파일에 기록할지 결정합니다.
         /// </summary>
-        public const bool ENABLE_CONTEXT_LOGGING = false;
+        public const bool ENABLE_CONTEXT_LOGGING = true;
 
         static Dictionary<string, int> _opacity = new Dictionary<string, int>();
         static List<ParticleSystem> particleSystems = new List<ParticleSystem>();
@@ -177,6 +176,16 @@ namespace ChordingCoding.UI
             MarshallingUpdateSplashScreen(3);
             TypingTracker.NewIMEContext();
 
+            Logger.AppendContextLog(Logger.LogType.UI, "Initialize");
+            if (TypingTracker.IsIMESetToEnglish())
+            {
+                Logger.AppendContextLog(Logger.LogType.IME, "English");
+            }
+            else
+            {
+                Logger.AppendContextLog(Logger.LogType.IME, "Korean");
+            }
+
             MarshallingUpdateSplashScreen(4);
             Theme.Initialize();
 
@@ -226,19 +235,27 @@ namespace ChordingCoding.UI
             if (Theme.CurrentTheme.SFX.HasAccompanied)
             {
                 autoAccompanimentToolStripMenuItem.CheckState = CheckState.Checked;
+
+                Logger.AppendContextLog(Logger.LogType.UI, "AutoAccompaniment", "Enable", Theme.CurrentTheme.Name);
             }
             else
             {
                 autoAccompanimentToolStripMenuItem.CheckState = CheckState.Unchecked;
+
+                Logger.AppendContextLog(Logger.LogType.UI, "AutoAccompaniment", "Disable", Theme.CurrentTheme.Name);
             }
 
             if (Theme.CurrentTheme.SFX.UseReverb)
             {
                 useReverbToolStripMenuItem.CheckState = CheckState.Checked;
+
+                Logger.AppendContextLog(Logger.LogType.UI, "UseReverb", "Enable", Theme.CurrentTheme.Name);
             }
             else
             {
                 useReverbToolStripMenuItem.CheckState = CheckState.Unchecked;
+
+                Logger.AppendContextLog(Logger.LogType.UI, "UseReverb", "Disable", Theme.CurrentTheme.Name);
             }
 
             MarshallingUpdateSplashScreen(10);
@@ -744,6 +761,8 @@ namespace ChordingCoding.UI
                 opacity = trackBarMenuItem1.Value * 5;
                 Opacity = opacity / 100D;
                 opacityToolStripMenuItem.Text = "불투명도 (" + opacity + "%)";
+
+                Logger.AppendContextLog(Logger.LogType.UI, "Opacity", opacity, Theme.CurrentTheme.Name);
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
         }
@@ -780,6 +799,8 @@ namespace ChordingCoding.UI
 
                 }
                 sentimentAwarenessToolStripMenuItem.Text = "감성 인식 수준 (" + Music.SentimentAwareness + "%)";
+
+                Logger.AppendContextLog(Logger.LogType.UI, "SentimentAwareness", Music.SentimentAwareness);
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
         }
@@ -789,6 +810,8 @@ namespace ChordingCoding.UI
         {
             SFXTheme.CurrentSFXTheme.Volume = trackBarMenuItem3.Value * 5;
             volumeToolStripMenuItem.Text = "음량 (" + SFXTheme.CurrentSFXTheme.Volume + "%)";
+
+            Logger.AppendContextLog(Logger.LogType.UI, "Volume", SFXTheme.CurrentSFXTheme.Volume, Theme.CurrentTheme.Name);
         }
 
         /// <summary>
@@ -813,6 +836,8 @@ namespace ChordingCoding.UI
             }
             themeToolStripMenuItem.Text = "테마 (" + theme.DisplayName + ")";
 
+            Logger.AppendContextLog(Logger.LogType.UI, "Theme", Theme.CurrentTheme.Name);
+
             Opacity = opacity / 100D;
 
             if (ENABLE_VFX)
@@ -824,14 +849,36 @@ namespace ChordingCoding.UI
 
                 trackBarMenuItem1.Value = opacity / 5;
                 opacityToolStripMenuItem.Text = "불투명도 (" + opacity + "%)";
+
+                Logger.AppendContextLog(Logger.LogType.UI, "Opacity", opacity, Theme.CurrentTheme.Name);
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
             }
 
             trackBarMenuItem3.Value = SFXTheme.CurrentSFXTheme.Volume / 5;
             volumeToolStripMenuItem.Text = "음량 (" + SFXTheme.CurrentSFXTheme.Volume + "%)";
 
+            Logger.AppendContextLog(Logger.LogType.UI, "Volume", SFXTheme.CurrentSFXTheme.Volume, Theme.CurrentTheme.Name);
+
             if (Music.HasStart)
             {
+                if (SFXTheme.CurrentSFXTheme.HasAccompanied)
+                {
+                    Logger.AppendContextLog(Logger.LogType.UI, "AutoAccompaniment", "Enable", Theme.CurrentTheme.Name);
+                }
+                else
+                {
+                    Logger.AppendContextLog(Logger.LogType.UI, "AutoAccompaniment", "Disable", Theme.CurrentTheme.Name);
+                }
+
+                if (SFXTheme.CurrentSFXTheme.UseReverb)
+                {
+                    Logger.AppendContextLog(Logger.LogType.UI, "UseReverb", "Enable", Theme.CurrentTheme.Name);
+                }
+                else
+                {
+                    Logger.AppendContextLog(Logger.LogType.UI, "UseReverb", "Disable", Theme.CurrentTheme.Name);
+                }
+
                 Music.SetReverb(SFXTheme.CurrentSFXTheme.UseReverb);
             }
 
@@ -874,22 +921,27 @@ namespace ChordingCoding.UI
                 case 16:
                     fourthNoteToolStripMenuItem.CheckState = CheckState.Checked;
                     noteResolutionToolStripMenuItem.Text = "단위 리듬 (4분음표)";
+                    Logger.AppendContextLog(Logger.LogType.UI, "NoteResolution", "4th");
                     break;
                 case 8:
                     eighthNoteToolStripMenuItem.CheckState = CheckState.Checked;
                     noteResolutionToolStripMenuItem.Text = "단위 리듬 (8분음표)";
+                    Logger.AppendContextLog(Logger.LogType.UI, "NoteResolution", "8th");
                     break;
                 case 4:
                     sixteenthNoteToolStripMenuItem.CheckState = CheckState.Checked;
                     noteResolutionToolStripMenuItem.Text = "단위 리듬 (16분음표)";
+                    Logger.AppendContextLog(Logger.LogType.UI, "NoteResolution", "16th");
                     break;
                 case 2:
                     thirtysecondNoteToolStripMenuItem.CheckState = CheckState.Checked;
                     noteResolutionToolStripMenuItem.Text = "단위 리듬 (32분음표)";
+                    Logger.AppendContextLog(Logger.LogType.UI, "NoteResolution", "32nd");
                     break;
                 case 0:
                     immediateNoteToolStripMenuItem.CheckState = CheckState.Checked;
                     noteResolutionToolStripMenuItem.Text = "단위 리듬 (없음)";
+                    Logger.AppendContextLog(Logger.LogType.UI, "NoteResolution", "Immediate");
                     break;
             }
         }
@@ -906,14 +958,17 @@ namespace ChordingCoding.UI
                 case MusicalKey.ModePolicy.Auto:
                     autoModeToolStripMenuItem.CheckState = CheckState.Checked;
                     musicalModeToolStripMenuItem.Text = "선법 (자동)";
+                    Logger.AppendContextLog(Logger.LogType.UI, "ModePolicy", "Auto");
                     break;
                 case MusicalKey.ModePolicy.FavorMajor:
                     majorModeToolStripMenuItem.CheckState = CheckState.Checked;
-                    musicalModeToolStripMenuItem.Text = "선법 (장조 선호)";
+                    musicalModeToolStripMenuItem.Text = "선법 (밝은 음악)";
+                    Logger.AppendContextLog(Logger.LogType.UI, "ModePolicy", "Major");
                     break;
                 case MusicalKey.ModePolicy.FavorMinor:
                     minorModeToolStripMenuItem.CheckState = CheckState.Checked;
-                    musicalModeToolStripMenuItem.Text = "선법 (단조 선호)";
+                    musicalModeToolStripMenuItem.Text = "선법 (어두운 음악)";
+                    Logger.AppendContextLog(Logger.LogType.UI, "ModePolicy", "Minor");
                     break;
             }
         }
@@ -960,6 +1015,8 @@ namespace ChordingCoding.UI
                 }
                 sentimentAwarenessToolStripMenuItem.Text = "감성 인식 수준 (" + Music.SentimentAwareness + "%)";
             }
+
+            Logger.AppendContextLog(Logger.LogType.UI, "SentimentAwareness", Music.SentimentAwareness);
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
         }
 
@@ -1033,10 +1090,12 @@ namespace ChordingCoding.UI
             if (Theme.CurrentTheme.SFX.HasAccompanied)
             {
                 autoAccompanimentToolStripMenuItem.CheckState = CheckState.Checked;
+                Logger.AppendContextLog(Logger.LogType.UI, "AutoAccompaniment", "Enable", Theme.CurrentTheme.Name);
             }
             else
             {
                 autoAccompanimentToolStripMenuItem.CheckState = CheckState.Unchecked;
+                Logger.AppendContextLog(Logger.LogType.UI, "AutoAccompaniment", "Disable", Theme.CurrentTheme.Name);
             }
         }
 
@@ -1046,20 +1105,26 @@ namespace ChordingCoding.UI
             if (Theme.CurrentTheme.SFX.UseReverb)
             {
                 useReverbToolStripMenuItem.CheckState = CheckState.Checked;
+                Logger.AppendContextLog(Logger.LogType.UI, "UseReverb", "Enable", Theme.CurrentTheme.Name);
             }
             else
             {
                 useReverbToolStripMenuItem.CheckState = CheckState.Unchecked;
+                Logger.AppendContextLog(Logger.LogType.UI, "UseReverb", "Disable", Theme.CurrentTheme.Name);
             }
         }
 
         private void recordToolStripMenuItem_Click(object sender, EventArgs e)
         {
             Util.TaskQueue.Add("MidiTrack", Music.SaveTrack);
+
+            Logger.AppendContextLog(Logger.LogType.UI, "SaveTrack");
         }
 
         private void quitToolStripMenuItem_Click(object sender, EventArgs e)
         {
+            Logger.AppendContextLog(Logger.LogType.UI, "Quit");
+
             Close();
         }
     }

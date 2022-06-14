@@ -15,7 +15,7 @@ ChordingCoding은 코딩과 문서 작업에 지친 사람들의 감성을 채�
 Windows Forms로 개발된 응용 프로그램으로, 64-bit Windows에서 사용 가능합니다.
 
 ## How To Use
-1. [여기](https://github.com/salt26/chordingcoding/releases/tag/v.1.8)를 클릭하여 파일 `ChordingCoding.v.1.8.zip`을 다운로드 받으세요.
+1. [여기](https://github.com/salt26/chordingcoding/releases/tag/v.1.8.1)를 클릭하여 파일 `ChordingCoding.v.1.8.1.zip`을 다운로드 받으세요.
  
 2. 압축을 풀고 `ChordingCoding.exe`를 실행합니다.
    * `ChordingCoding.exe`의 바로 가기(.lnk)를 만들면 실행하기 편리합니다.
@@ -40,7 +40,18 @@ Windows Forms로 개발된 응용 프로그램으로, 64-bit Windows에서 사�
    * 최근에 생성된 음악을 즉시 파일로 저장할 수 있습니다.
    * 1분 이상 사용하지 않아 침묵이 유지되면 그 이전의 음악은 저장되지 않으니 주의 바랍니다.
 
+8. ChordingCoding을 사용하는 동안 사용자의 작업 맥락을 추적하여 기록합니다.
+   * 사용했던 프로그램 이름, 키보드 입력, 마우스 클릭, ChordingCoding 설정 상태, 생성된 음악 등이 기록됩니다.
+     * 키보드 입력 중 글자는 "Alphabet"으로, 숫자는 "Number"로, 특수문자는 "Symbol" 또는 "SymbolInWord"로 비식별화되어 기록됩니다. **즉, 비밀번호 유출은 걱정하지 않아도 됩니다.**
+   * 종료 후 `ChordingCoding.exe`가 있는 폴더 안에 `WorkingContext.csv` 파일이 생성됩니다. 이것의 이름을 바꾸고 원하는 경로에 옮겨서 보관하세요.
+     * 주의: ChordingCoding을 사용할 때에는 `WorkingContext.csv`를 닫아주세요.
+   * **기록한 데이터는 사용자의 컴퓨터에만 남으며, 외부로는 전송되지 않습니다.**
+
 ## Update Log
+### [v.1.8.1](https://github.com/salt26/chordingcoding/tree/v.1.8.1) - 22/06/14
+* 사용자 작업 맥락 추적 기능 활성화 및 개선 (보안 강화)
+* 소스코드 라이선스 업데이트
+
 ### [v.1.8](https://github.com/salt26/chordingcoding/tree/v.1.8) - 22/05/26
 * 반향 효과 추가
 * 선법 선택 기능 추가 (장조, 단조)

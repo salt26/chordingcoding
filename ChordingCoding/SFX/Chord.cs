@@ -1,7 +1,7 @@
 ﻿/*
 MIT License
 
-Copyright (c) 2019 salt26
+Copyright (c) 2019 Dantae An
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -25,6 +25,7 @@ using System;
 using System.Drawing;
 using System.Collections.Generic;
 using ChordingCoding.Sentiment;
+using ChordingCoding.UI.Logging;
 
 namespace ChordingCoding.SFX
 {
@@ -78,6 +79,8 @@ namespace ChordingCoding.SFX
             type = newChord.type;
             if (VERBOSE)
                 Console.WriteLine(root.ToString() + type.ToString());
+
+            Logger.AppendContextLog(Logger.LogType.Music, "Chord", root.ToString() + type.ToString());
 
             rand = r.Next(16);
             octave = (minOctave + maxOctave) / 2;
@@ -385,6 +388,8 @@ namespace ChordingCoding.SFX
             type = newChord.type;
             if (VERBOSE)
                 Console.WriteLine(root.ToString() + type.ToString());
+
+            Logger.AppendContextLog(Logger.LogType.Music, "Chord", root.ToString() + type.ToString());
 
             rand = r.Next(16);
             octave = c.octave;

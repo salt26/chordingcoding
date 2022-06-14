@@ -32,14 +32,13 @@ using System.Text;
 using System.Runtime.InteropServices;
 using System.Reflection;
 using System.Configuration;
-using System.Media;
 using ChordingCoding.Utility;
 using ChordingCoding.SFX;
 using ChordingCoding.UI.VFX;
+using ChordingCoding.UI.Logging;
 using ChordingCoding.Sentiment;
 using ChordingCoding.Word.Korean;
 using ChordingCoding.Word.English;
-using System.IO;
 
 namespace ChordingCoding.UI
 {

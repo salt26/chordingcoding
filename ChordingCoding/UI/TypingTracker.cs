@@ -32,6 +32,7 @@ using ChordingCoding.SFX;
 using ChordingCoding.Sentiment;
 using ChordingCoding.Word.English;
 using ChordingCoding.Word.Korean;
+using ChordingCoding.UI.Logging;
 
 namespace ChordingCoding.UI
 {

@@ -24,7 +24,7 @@ SOFTWARE.
 using System;
 using ChordingCoding.Sentiment;
 using ChordingCoding.Utility;
-using static ChordingCoding.UI.Logger;
+using ChordingCoding.UI.Logging;
 
 namespace ChordingCoding.SFX
 {
@@ -84,7 +84,7 @@ namespace ChordingCoding.SFX
             if (VERBOSE)
                 Console.WriteLine("Key: " + tonic.ToString() + " " + mode.ToString());
 
-            AppendContextLog(LogType.Music, "MusicalKey", tonic.ToString() + " " + mode.ToString());
+            Logger.AppendContextLog(Logger.LogType.Music, "MusicalKey", tonic.ToString() + " " + mode.ToString());
         }
 
         public MusicalKey(Mode mode, Tonic tonic, ModePolicy policy = ModePolicy.Auto)
@@ -142,7 +142,7 @@ namespace ChordingCoding.SFX
                 Console.WriteLine("Key: " + tonic.ToString() + " " + mode.ToString());
             }
 
-            AppendContextLog(LogType.Music, "MusicalKey", tonic.ToString() + " " + mode.ToString());
+            Logger.AppendContextLog(Logger.LogType.Music, "MusicalKey", tonic.ToString() + " " + mode.ToString());
         }
 
         public static ModePolicy IntToModePolicy(int policy)

@@ -25,7 +25,7 @@ using System;
 using System.Text;
 using System.IO;
 
-namespace ChordingCoding.UI
+namespace ChordingCoding.UI.Logging
 {
     public class Logger
     {
@@ -79,6 +79,9 @@ namespace ChordingCoding.UI
 
         public static void AppendSentimentLog(params object[] messages)
         {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+            if (!MainForm.ENABLE_CONTEXT_LOGGING) return;
+
             long deltaTicks = DateTime.Now.Ticks - prevTicks2;
             prevTicks2 = DateTime.Now.Ticks;
 
@@ -109,10 +112,14 @@ namespace ChordingCoding.UI
                 if (!(e is IOException))
                     throw;
             }
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
         }
 
         public static void AppendSentimentLog2(params object[] messages)
         {
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+            if (!MainForm.ENABLE_CONTEXT_LOGGING) return;
+
             string s = " ";
             foreach (object message in messages)
             {
@@ -138,6 +145,7 @@ namespace ChordingCoding.UI
                 if (!(e is IOException))
                     throw;
             }
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
         }
     }
 }

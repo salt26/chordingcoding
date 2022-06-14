@@ -41,11 +41,11 @@ Windows Forms로 개발된 응용 프로그램으로, 64-bit Windows에서 사�
    * 1분 이상 사용하지 않아 침묵이 유지되면 그 이전의 음악은 저장되지 않으니 주의 바랍니다.
 
 8. ChordingCoding을 사용하는 동안 사용자의 작업 맥락을 추적하여 기록합니다.
-  * 사용했던 프로그램 이름, 키보드 입력, 마우스 클릭, ChordingCoding 설정 상태, 생성된 음악 등이 기록됩니다.
-    * 키보드 입력 중 글자는 "Alphabet"으로, 숫자는 "Number"로, 특수문자는 "Symbol" 또는 "SymbolInWord"로 비식별화되어 기록됩니다. **즉, 비밀번호 유출은 걱정하지 않아도 됩니다.**
-  * 종료 후 `ChordingCoding.exe`가 있는 폴더 안에 `WorkingContext.csv` 파일이 생성됩니다. 이것의 이름을 바꾸고 원하는 경로에 옮겨서 보관하세요.
-    * 주의: ChordingCoding을 사용할 때에는 `WorkingContext.csv`를 닫아주세요.
-  * **기록한 데이터는 사용자의 컴퓨터에만 남으며, 외부로는 전송되지 않습니다.**
+   * 사용했던 프로그램 이름, 키보드 입력, 마우스 클릭, ChordingCoding 설정 상태, 생성된 음악 등이 기록됩니다.
+     * 키보드 입력 중 글자는 "Alphabet"으로, 숫자는 "Number"로, 특수문자는 "Symbol" 또는 "SymbolInWord"로 비식별화되어 기록됩니다. **즉, 비밀번호 유출은 걱정하지 않아도 됩니다.**
+   * 종료 후 `ChordingCoding.exe`가 있는 폴더 안에 `WorkingContext.csv` 파일이 생성됩니다. 이것의 이름을 바꾸고 원하는 경로에 옮겨서 보관하세요.
+     * 주의: ChordingCoding을 사용할 때에는 `WorkingContext.csv`를 닫아주세요.
+   * **기록한 데이터는 사용자의 컴퓨터에만 남으며, 외부로는 전송되지 않습니다.**
 
 ## Update Log
 ### [v.1.8.1](https://github.com/salt26/chordingcoding/tree/v.1.8.1) - 22/06/14

@@ -63,7 +63,7 @@ namespace ChordingCoding.UI
         /// <summary>
         /// 작업 시 발생하는 이벤트를 파일에 기록할지 결정합니다.
         /// </summary>
-        public const bool ENABLE_CONTEXT_LOGGING = false;
+        public const bool ENABLE_CONTEXT_LOGGING = true;
 
         static Dictionary<string, int> _opacity = new Dictionary<string, int>();
         static List<ParticleSystem> particleSystems = new List<ParticleSystem>();

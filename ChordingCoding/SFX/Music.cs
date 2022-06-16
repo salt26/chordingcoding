@@ -933,6 +933,10 @@ namespace ChordingCoding.SFX
             TrackNoteOffBuffer.RemoveAll(e => e.Value.Key == (int)args[0] && e.Value.Value == (int)args[1]);
         }
 
+        /// <summary>
+        /// 트랙을 MIDI 파일로 저장합니다.
+        /// </summary>
+        /// <param name="args">인자 없음</param>
         public static void SaveTrack(object[] args)
         {
             if (!HasStart || HasTrackCleared) return;
@@ -1116,12 +1120,13 @@ namespace ChordingCoding.SFX
             if (!HasStart) return;
 
             ushort[] interleavedBuffer = new ushort[441 * 2];
-            syn.WriteSample16(441, interleavedBuffer, 0, 441 * 2, 2, interleavedBuffer, 1, 441 * 2, 2);
+            syn.WriteSample16(441, interleavedBuffer, 0, 441, 2, interleavedBuffer, 1, 441, 2);
 
             byte[] interleavedBytes = new byte[interleavedBuffer.Length * sizeof(ushort)];
             Buffer.BlockCopy(interleavedBuffer, 0, interleavedBytes, 0, interleavedBytes.Length);
 
             long oldPosition = memoryStream.Position;
+            Console.WriteLine("pos1: " + oldPosition);
             memoryStream.Seek(0, SeekOrigin.End);
             memoryStream.Write(interleavedBytes, 0, interleavedBytes.Length);
             memoryStream.Seek(oldPosition, SeekOrigin.Begin);
@@ -1130,6 +1135,8 @@ namespace ChordingCoding.SFX
 
             if (SFXTheme.CurrentSFXTheme.UseReverb)
                 reverb = new DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params>(soundStream);
+
+            Console.WriteLine("pos2: " + outputDevice.GetPosition());
         }
 
         /// <summary>

@@ -1126,17 +1126,18 @@ namespace ChordingCoding.SFX
             Buffer.BlockCopy(interleavedBuffer, 0, interleavedBytes, 0, interleavedBytes.Length);
 
             long oldPosition = memoryStream.Position;
-            Console.WriteLine("pos1: " + oldPosition);
+            //Console.WriteLine("pos1: " + oldPosition);
             memoryStream.Seek(0, SeekOrigin.End);
+            //Console.WriteLine("    : " + memoryStream.Position);
             memoryStream.Write(interleavedBytes, 0, interleavedBytes.Length);
-            memoryStream.Seek(oldPosition, SeekOrigin.Begin);
+            memoryStream.Seek(oldPosition + 4, SeekOrigin.Begin);
 
             soundStream = new RawSourceWaveStream(memoryStream, new WaveFormat(44100, 2));
 
             if (SFXTheme.CurrentSFXTheme.UseReverb)
                 reverb = new DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params>(soundStream);
 
-            Console.WriteLine("pos2: " + outputDevice.GetPosition());
+            //Console.WriteLine("pos2: " + outputDevice.GetPosition());
         }
 
         /// <summary>

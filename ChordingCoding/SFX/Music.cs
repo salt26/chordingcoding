@@ -250,8 +250,8 @@ namespace ChordingCoding.SFX
             #region For applying reverb effect (NAudio)
 
             memoryStream = new MemoryStream(106000000);
-            soundStreamSamplingRate = 44100;
-            soundStream = new RawSourceWaveStream(memoryStream, new WaveFormat(44100, 2));
+            soundStreamSamplingRate = 44000;
+            soundStream = new RawSourceWaveStream(memoryStream, new WaveFormat(44000, 2));
             reverb = new DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params>(soundStream);
             outputDevice = new DirectSoundOut();
             outputDevicePositions = new Queue<long>(10);
@@ -1130,37 +1130,42 @@ namespace ChordingCoding.SFX
             memoryStream.Write(interleavedBytes, 0, interleavedBytes.Length);
             memoryStream.Seek(oldPosition, SeekOrigin.Begin);    // 15876 = 44100 * 4 / 10 - 1764 = 0.09 seconds
                                                                  // Allowed maximum delay = 0.1 seconds
-            
+
+            bool disposeAndReinit = false;
             if (endPosition - oldPosition >= 30090)
             {
-                //if (soundStreamSamplingRate != 44500) reinit = true;
+                if (soundStreamSamplingRate != 44500) disposeAndReinit = true;
                 soundStreamSamplingRate = 44500;
                 soundStream.Dispose();
                 soundStream = new RawSourceWaveStream(memoryStream, new WaveFormat(44500, 2));
             }
             else if (endPosition - oldPosition >= 15876 && endPosition - oldPosition <= 17656)
             {
-                //if (soundStreamSamplingRate != 44250) reinit = true;
+                if (soundStreamSamplingRate != 44250) disposeAndReinit = true;
                 soundStreamSamplingRate = 44250;
                 soundStream.Dispose();
                 soundStream = new RawSourceWaveStream(memoryStream, new WaveFormat(44250, 2));
             }
             else if (endPosition - oldPosition <= 1780)
             {
-                //if (soundStreamSamplingRate != 44100) reinit = true;
-                soundStreamSamplingRate = 44100;
+                if (soundStreamSamplingRate != 44000) disposeAndReinit = true;
+                soundStreamSamplingRate = 44000;
                 soundStream.Dispose();
-                soundStream = new RawSourceWaveStream(memoryStream, new WaveFormat(44100, 2));
+                soundStream = new RawSourceWaveStream(memoryStream, new WaveFormat(44000, 2));
             }
 
-            if (reinit)
+            if (disposeAndReinit)
             {
-                OutputDevicePlaybackLoop();
+                OutputDevicePlaybackLoop(true);
+            }
+            else if (reinit)
+            {
+                OutputDevicePlaybackLoop(false);
             }
             
             if (outputDevice.PlaybackState != PlaybackState.Playing)
             {
-                OutputDevicePlaybackLoop();
+                OutputDevicePlaybackLoop(false);
             }
             else if (outputDevice.PlaybackState == PlaybackState.Playing && outputDevicePositions.Count >= 10)
             {
@@ -1177,10 +1182,7 @@ namespace ChordingCoding.SFX
                 if (abnormal && outputDevice.GetPosition() == l)
                 {
                     Console.WriteLine("Abnormal state detected in outputDevice!");
-                    outputDevice.Stop();
-                    outputDevice.Dispose();
-                    outputDevice = new DirectSoundOut();
-                    OutputDevicePlaybackLoop();
+                    OutputDevicePlaybackLoop(true);
                 }
             }
             outputDevicePositions.Enqueue(outputDevice.GetPosition());
@@ -1188,8 +1190,15 @@ namespace ChordingCoding.SFX
             Console.WriteLine(DateTime.Now + "," + oldPosition + "," + endPosition + "," + (endPosition - oldPosition) + "," + outputDevice.GetPosition() + "," + outputDevice.PlaybackState.ToString() + "," + memoryStream.Length + "," + memoryStream.Capacity + "," + soundStreamSamplingRate);
         }
 
-        private static void OutputDevicePlaybackLoop()
+        private static void OutputDevicePlaybackLoop(bool hasDispose)
         {
+            if (hasDispose)
+            {
+                outputDevice.Stop();
+                outputDevice.Dispose();
+                outputDevice = new DirectSoundOut();
+            }
+
             if (SFXTheme.CurrentSFXTheme.UseReverb)
             {
                 reverb = new DmoEffectWaveProvider<DmoWavesReverb, DmoWavesReverb.Params>(soundStream);

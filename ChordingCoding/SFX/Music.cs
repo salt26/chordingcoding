@@ -34,6 +34,7 @@ using NAudio.Dmo.Effect;
 using NFluidsynth;
 using ChordingCoding.Utility;
 using ChordingCoding.Sentiment;
+using ChordingCoding.UI.Logging;
 
 namespace ChordingCoding.SFX
 {
@@ -1182,12 +1183,13 @@ namespace ChordingCoding.SFX
                 if (abnormal && outputDevice.GetPosition() == l)
                 {
                     Console.WriteLine("Abnormal state detected in outputDevice!");
+                    UI.Logging.Logger.AppendContextLog(UI.Logging.Logger.ContextLogType.Warning, "Abnormal state detected in outputDevice!");
                     OutputDevicePlaybackLoop(true);
                 }
             }
             outputDevicePositions.Enqueue(outputDevice.GetPosition());
 
-            Console.WriteLine(DateTime.Now + "," + oldPosition + "," + endPosition + "," + (endPosition - oldPosition) + "," + outputDevice.GetPosition() + "," + outputDevice.PlaybackState.ToString() + "," + memoryStream.Length + "," + memoryStream.Capacity + "," + soundStreamSamplingRate);
+            //Console.WriteLine(DateTime.Now + "," + oldPosition + "," + endPosition + "," + (endPosition - oldPosition) + "," + outputDevice.GetPosition() + "," + outputDevice.PlaybackState.ToString() + "," + memoryStream.Length + "," + memoryStream.Capacity + "," + soundStreamSamplingRate);
         }
 
         private static void OutputDevicePlaybackLoop(bool hasDispose)
@@ -1213,36 +1215,5 @@ namespace ChordingCoding.SFX
             outputDevicePositions.Clear();
             Console.WriteLine("OutputDevice Loop");
         }
-
-        /*
-        /// <summary>
-        /// reverb가 적용된 audio를 반복적으로 출력합니다.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private static void OutputDevicePlaybackLoopWithReverb(object sender, NAudio.Wave.StoppedEventArgs e)
-        {
-            if (!HasStart || !SFXTheme.CurrentSFXTheme.UseReverb) return;
-            outputDevice = sender as DirectSoundOut;
-            outputDevice.Init(reverb);
-            outputDevice.Play();
-            Console.WriteLine("OutputDevice Loop with Reverb");
-        }
-
-
-        /// <summary>
-        /// reverb가 적용되지 않은 audio를 반복적으로 출력합니다.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private static void OutputDevicePlaybackLoopWithoutReverb(object sender, NAudio.Wave.StoppedEventArgs e)
-        {
-            if (!HasStart || SFXTheme.CurrentSFXTheme.UseReverb) return;
-            outputDevice = sender as DirectSoundOut;
-            outputDevice.Init(soundStream);
-            outputDevice.Play();
-            Console.WriteLine("OutputDevice Loop without Reverb");
-        }
-        */
     }
 }

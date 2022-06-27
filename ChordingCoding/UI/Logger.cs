@@ -29,7 +29,7 @@ namespace ChordingCoding.UI.Logging
 {
     public class Logger
     {
-        public enum ContextLogType { Process = 0, Key = 1, Mouse = 2, UI = 3, Music = 4, IME = 5 }
+        public enum ContextLogType { Process = 0, Key = 1, Mouse = 2, UI = 3, Music = 4, IME = 5, Warning = 6 }
 
         private static string IMECache = "";
 

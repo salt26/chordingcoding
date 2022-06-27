@@ -671,6 +671,7 @@ namespace ChordingCoding.UI
             {
                 if (e is DllNotFoundException || e is EntryPointNotFoundException)
                     return true;
+                Logger.AppendContextLog(Logger.ContextLogType.Warning, e.GetType().ToString(), e.Message);
                 throw;
             }
         }
@@ -723,7 +724,10 @@ namespace ChordingCoding.UI
             catch (Exception e)
             {
                 if (!(e is DllNotFoundException || e is EntryPointNotFoundException))
+                {
+                    Logger.AppendContextLog(Logger.ContextLogType.Warning, e.GetType().ToString(), e.Message);
                     throw;
+                }
             }
             finally
             {
@@ -747,7 +751,10 @@ namespace ChordingCoding.UI
             catch (Exception e)
             {
                 if (!(e is DllNotFoundException || e is EntryPointNotFoundException))
+                {
+                    Logger.AppendContextLog(Logger.ContextLogType.Warning, e.GetType().ToString(), e.Message);
                     throw;
+                }
             }
             finally
             {

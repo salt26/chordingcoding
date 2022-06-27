@@ -37,22 +37,22 @@
             this.versionLabel.AutoSize = true;
             this.versionLabel.BackColor = System.Drawing.Color.Transparent;
             this.versionLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 25.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.versionLabel.Location = new System.Drawing.Point(823, 171);
+            this.versionLabel.Location = new System.Drawing.Point(720, 137);
             this.versionLabel.Name = "versionLabel";
-            this.versionLabel.Size = new System.Drawing.Size(148, 58);
+            this.versionLabel.Size = new System.Drawing.Size(118, 47);
             this.versionLabel.TabIndex = 0;
-            this.versionLabel.Text = "v.1.8.1";
+            this.versionLabel.Text = "v.1.8.2";
             this.versionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.versionLabel.UseCompatibleTextRendering = true;
             // 
             // SplashScreen
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 15F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.White;
             this.BackgroundImage = global::ChordingCoding.Properties.Resources.logo00;
             this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-            this.ClientSize = new System.Drawing.Size(1024, 256);
+            this.ClientSize = new System.Drawing.Size(896, 205);
             this.ControlBox = false;
             this.Controls.Add(this.versionLabel);
             this.DoubleBuffered = true;

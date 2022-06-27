@@ -80,7 +80,7 @@ namespace ChordingCoding.SFX
             if (VERBOSE)
                 Console.WriteLine(root.ToString() + type.ToString());
 
-            Logger.AppendContextLog(Logger.LogType.Music, "Chord", root.ToString() + type.ToString());
+            Logger.AppendContextLog(Logger.ContextLogType.Music, "Chord", root.ToString() + type.ToString());
 
             rand = r.Next(16);
             octave = (minOctave + maxOctave) / 2;
@@ -389,7 +389,7 @@ namespace ChordingCoding.SFX
             if (VERBOSE)
                 Console.WriteLine(root.ToString() + type.ToString());
 
-            Logger.AppendContextLog(Logger.LogType.Music, "Chord", root.ToString() + type.ToString());
+            Logger.AppendContextLog(Logger.ContextLogType.Music, "Chord", root.ToString() + type.ToString());
 
             rand = r.Next(16);
             octave = c.octave;

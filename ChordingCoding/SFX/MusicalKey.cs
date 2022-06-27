@@ -84,7 +84,7 @@ namespace ChordingCoding.SFX
             if (VERBOSE)
                 Console.WriteLine("Key: " + tonic.ToString() + " " + mode.ToString());
 
-            Logger.AppendContextLog(Logger.LogType.Music, "MusicalKey", tonic.ToString() + " " + mode.ToString());
+            Logger.AppendContextLog(Logger.ContextLogType.Music, "MusicalKey", tonic.ToString() + " " + mode.ToString());
         }
 
         public MusicalKey(Mode mode, Tonic tonic, ModePolicy policy = ModePolicy.Auto)
@@ -142,7 +142,7 @@ namespace ChordingCoding.SFX
                 Console.WriteLine("Key: " + tonic.ToString() + " " + mode.ToString());
             }
 
-            Logger.AppendContextLog(Logger.LogType.Music, "MusicalKey", tonic.ToString() + " " + mode.ToString());
+            Logger.AppendContextLog(Logger.ContextLogType.Music, "MusicalKey", tonic.ToString() + " " + mode.ToString());
         }
 
         public static ModePolicy IntToModePolicy(int policy)

@@ -29,24 +29,21 @@ namespace ChordingCoding.UI.Logging
 {
     public class Logger
     {
-        public enum LogType { Process = 0, Key = 1, Mouse = 2, UI = 3, Music = 4, IME = 5 }
-
-        private const string contextSavePath = "WorkingContext.csv";
-        private static long prevTicks = DateTime.Now.Ticks;
-
-        private const string sentimentSavePath = "SentimentLog.csv";
-        private static long prevTicks2 = DateTime.Now.Ticks;
-
-        private const string sentimentSavePath2 = "SentimentWordLog.csv";
+        public enum ContextLogType { Process = 0, Key = 1, Mouse = 2, UI = 3, Music = 4, IME = 5 }
 
         private static string IMECache = "";
 
-        public static void AppendContextLog(LogType type, params object[] messages)
+        public static void AppendContextLog(ContextLogType type, params object[] messages)
         {
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
             if (!MainForm.ENABLE_CONTEXT_LOGGING) return;
 
-            if (type == LogType.IME && messages.Length > 0)
+            if (!Directory.Exists("Logs"))
+            {
+                Directory.CreateDirectory("Logs");
+            }
+
+            if (type == ContextLogType.IME && messages.Length > 0)
             {
                 if (messages[0].ToString().Equals(IMECache))
                     return;
@@ -54,12 +51,9 @@ namespace ChordingCoding.UI.Logging
                     IMECache = messages[0].ToString();
             }
 
-            long deltaTicks = DateTime.Now.Ticks - prevTicks;
-            prevTicks = DateTime.Now.Ticks;
-
-            string s = type.ToString() + "," + DateTime.Now.Year + "," + DateTime.Now.Month +
+            string s = "," + type.ToString() + "," + DateTime.Now.Year + "," + DateTime.Now.Month +
                 "," + DateTime.Now.Day + "," + DateTime.Now.Hour + "," + DateTime.Now.Minute +
-                "," + DateTime.Now.Second + "," + DateTime.Now.Millisecond + "," + (deltaTicks / 10000000f);
+                "," + DateTime.Now.Second + "," + DateTime.Now.Millisecond;
             foreach (object message in messages)
             {
                 if (message is null)
@@ -71,17 +65,18 @@ namespace ChordingCoding.UI.Logging
                     s += "," + message.ToString();
                 }
             }
+            string contextSavePath = @"Logs\ChordingCoding_context_log_" + DateTime.Now.ToString("yyMMdd") + ".csv";
             try
             {
                 if (!File.Exists(contextSavePath))
                 {
-                    File.AppendAllText(contextSavePath, "id,year,month,day,hour,minute,second,ms,delta,e,w1,w2,w3\n", Encoding.UTF8);
+                    File.AppendAllText(contextSavePath, "dummy,id,year,month,day,hour,minute,second,ms,e,w1,w2,w3\n", Encoding.UTF8);
                 }
                 File.AppendAllText(contextSavePath, s + "\n", Encoding.UTF8);
             }
             catch (Exception e)
             {
-                if (!(e is IOException))
+                if (!(e is IOException || e is UnauthorizedAccessException))
                     throw;
             }
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
@@ -92,12 +87,14 @@ namespace ChordingCoding.UI.Logging
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
             if (!MainForm.ENABLE_CONTEXT_LOGGING) return;
 
-            long deltaTicks = DateTime.Now.Ticks - prevTicks2;
-            prevTicks2 = DateTime.Now.Ticks;
+            if (!Directory.Exists("Logs"))
+            {
+                Directory.CreateDirectory("Logs");
+            }
 
-            string s = DateTime.Now.Year + "," + DateTime.Now.Month +
+            string s = "," + DateTime.Now.Year + "," + DateTime.Now.Month +
                 "," + DateTime.Now.Day + "," + DateTime.Now.Hour + "," + DateTime.Now.Minute +
-                "," + DateTime.Now.Second + "," + DateTime.Now.Millisecond + "," + (deltaTicks / 10000000f);
+                "," + DateTime.Now.Second + "," + DateTime.Now.Millisecond;
             foreach (object message in messages)
             {
                 if (message is null)
@@ -109,17 +106,18 @@ namespace ChordingCoding.UI.Logging
                     s += "," + message.ToString();
                 }
             }
+            string sentimentSavePath = @"Logs\ChordingCoding_sentiment_log_" + DateTime.Now.ToString("yyMMdd") + ".csv";
             try
             {
                 if (!File.Exists(sentimentSavePath))
                 {
-                    File.AppendAllText(sentimentSavePath, "year,month,day,hour,minute,second,ms,delta,word,valence,arousal,shortValence,shortArousal,longValence,longArousal,prevValence,prevArousal\n", Encoding.UTF8);
+                    File.AppendAllText(sentimentSavePath, "dummy,year,month,day,hour,minute,second,ms,word,valence,arousal,shortValence,shortArousal,longValence,longArousal,prevValence,prevArousal\n", Encoding.UTF8);
                 }
                 File.AppendAllText(sentimentSavePath, s + "\n", Encoding.UTF8);
             }
             catch (Exception e)
             {
-                if (!(e is IOException))
+                if (!(e is IOException || e is UnauthorizedAccessException))
                     throw;
             }
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
@@ -130,7 +128,12 @@ namespace ChordingCoding.UI.Logging
 #pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
             if (!MainForm.ENABLE_CONTEXT_LOGGING) return;
 
-            string s = " ";
+            if (!Directory.Exists("Logs"))
+            {
+                Directory.CreateDirectory("Logs");
+            }
+
+            string s = "";
             foreach (object message in messages)
             {
                 if (message is null)
@@ -142,6 +145,7 @@ namespace ChordingCoding.UI.Logging
                     s += "," + message.ToString();
                 }
             }
+            string sentimentSavePath2 = @"Logs\ChordingCoding_sentiment_word_log_" + DateTime.Now.ToString("yyMMdd") + ".csv";
             try
             {
                 if (!File.Exists(sentimentSavePath2))
@@ -152,7 +156,7 @@ namespace ChordingCoding.UI.Logging
             }
             catch (Exception e)
             {
-                if (!(e is IOException))
+                if (!(e is IOException || e is UnauthorizedAccessException))
                     throw;
             }
 #pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.

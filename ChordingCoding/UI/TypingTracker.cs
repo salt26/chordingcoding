@@ -189,16 +189,16 @@ namespace ChordingCoding.UI
                 else if (vkCode >= 21 && vkCode <= 25)
                 {
                     // IME Mode Change (Hangul/Kana mode, Junja mode, Final mode, Hanja/Kanji mode)
-                    Logger.AppendContextLog(Logger.LogType.Key, "IMEChange");
+                    Logger.AppendContextLog(Logger.ContextLogType.Key, "IMEChange");
 
                     // The mode is about to change...
                     if (IsIMESetToEnglish())
                     {
-                        Logger.AppendContextLog(Logger.LogType.IME, "Korean");
+                        Logger.AppendContextLog(Logger.ContextLogType.IME, "Korean");
                     }
                     else
                     {
-                        Logger.AppendContextLog(Logger.LogType.IME, "English");
+                        Logger.AppendContextLog(Logger.ContextLogType.IME, "English");
                     }
 
                     Util.TaskQueue.Add("wordState", ResetWord);
@@ -235,7 +235,7 @@ namespace ChordingCoding.UI
                     Music.PlayNoteInChord();
                     // 음표 재생 후에 Music.OnPlayNotes()가 호출되면서 시각 효과 발생
 
-                    Logger.AppendContextLog(Logger.LogType.Key, "Alphabet");
+                    Logger.AppendContextLog(Logger.ContextLogType.Key, "Alphabet");
                 }
                 else if (vkCode == 109 || 
                     ((vkCode == 189 || vkCode == 222) &&
@@ -248,7 +248,7 @@ namespace ChordingCoding.UI
                     Music.PlayNoteInChord();
                     // 음표 재생 후에 Music.OnPlayNotes()가 호출되면서 시각 효과 발생
 
-                    Logger.AppendContextLog(Logger.LogType.Key, "SymbolInWord");
+                    Logger.AppendContextLog(Logger.ContextLogType.Key, "SymbolInWord");
                 }
                 else if ((vkCode >= 48 && vkCode <= 57) ||
                     (vkCode >= 96 && vkCode <= 111) ||
@@ -266,11 +266,11 @@ namespace ChordingCoding.UI
                     if (((vkCode >= 48 && vkCode <= 57) || (vkCode >= 96 && vkCode <= 105)) &&
                         (Control.ModifierKeys & Keys.Shift) != Keys.Shift)
                     {
-                        Logger.AppendContextLog(Logger.LogType.Key, "Number");
+                        Logger.AppendContextLog(Logger.ContextLogType.Key, "Number");
                     }
                     else
                     {
-                        Logger.AppendContextLog(Logger.LogType.Key, "Symbol");
+                        Logger.AppendContextLog(Logger.ContextLogType.Key, "Symbol");
                     }
                 }
                 else if (vkCode == 8)
@@ -278,7 +278,7 @@ namespace ChordingCoding.UI
                     // Backspace
                     Util.TaskQueue.Add("wordState", BackspaceWord);
 
-                    Logger.AppendContextLog(Logger.LogType.Key, (Keys)vkCode); // "Back"
+                    Logger.AppendContextLog(Logger.ContextLogType.Key, (Keys)vkCode); // "Back"
                 }
                 else if ((vkCode == 32) || (vkCode == 9) || (vkCode == 13))
                 {
@@ -289,7 +289,7 @@ namespace ChordingCoding.UI
                     Music.PlayChordTransitionSync();
                     // 화음 전이 후에 Music.OnChordTransition()이 호출되면서 시각 효과 발생
 
-                    Logger.AppendContextLog(Logger.LogType.Key, (Keys)vkCode);
+                    Logger.AppendContextLog(Logger.ContextLogType.Key, (Keys)vkCode);
                 }
                 else if ((vkCode >= 33 && vkCode <= 40) || (vkCode == 27) ||
                     (vkCode >= 91 && vkCode <= 95))
@@ -298,7 +298,7 @@ namespace ChordingCoding.UI
                     Util.TaskQueue.Add("wordState", ResetWord);
                     Util.TaskQueue.Add("wordState", BackspaceStateToNull);
 
-                    Logger.AppendContextLog(Logger.LogType.Key, (Keys)vkCode);
+                    Logger.AppendContextLog(Logger.ContextLogType.Key, (Keys)vkCode);
                 }
                 else if (vkCode == 18 || vkCode == 164 || vkCode == 165)
                 {
@@ -306,7 +306,7 @@ namespace ChordingCoding.UI
                     // This key input may not be detected...
                     Util.TaskQueue.Add("wordState", BackspaceStateToNull);
 
-                    Logger.AppendContextLog(Logger.LogType.Key, (Keys)vkCode);
+                    Logger.AppendContextLog(Logger.ContextLogType.Key, (Keys)vkCode);
                 }
                 else if (vkCode == 45 || vkCode == 46 ||
                     vkCode == 20 || vkCode == 144 || vkCode == 145)
@@ -314,7 +314,7 @@ namespace ChordingCoding.UI
                     // Insert, Delete, Caps Lock, Num Lock, Scroll Lock
                     Util.TaskQueue.Add("wordState", BackspaceStateToNull);
 
-                    Logger.AppendContextLog(Logger.LogType.Key, (Keys)vkCode);
+                    Logger.AppendContextLog(Logger.ContextLogType.Key, (Keys)vkCode);
                 }
                 else if (vkCode == 123)
                 {
@@ -322,11 +322,11 @@ namespace ChordingCoding.UI
                     // Save MIDI recording file
                     Util.TaskQueue.Add("MidiTrack", Music.SaveTrack);
 
-                    Logger.AppendContextLog(Logger.LogType.Key, (Keys)vkCode, "SaveTrack");
+                    Logger.AppendContextLog(Logger.ContextLogType.Key, (Keys)vkCode, "SaveTrack");
                 }
                 else
                 {
-                    Logger.AppendContextLog(Logger.LogType.Key, (Keys)vkCode);
+                    Logger.AppendContextLog(Logger.ContextLogType.Key, (Keys)vkCode);
                 }
             }
             return CallNextHookEx(_keyboardHookID, nCode, wParam, lParam);
@@ -452,13 +452,13 @@ namespace ChordingCoding.UI
                 switch ((MouseMessages)wParam)
                 {
                     case MouseMessages.WM_LBUTTONDOWN:
-                        Logger.AppendContextLog(Logger.LogType.Mouse, "MouseLeftDown");
+                        Logger.AppendContextLog(Logger.ContextLogType.Mouse, "MouseLeftDown");
                         break;
                     case MouseMessages.WM_RBUTTONDOWN:
-                        Logger.AppendContextLog(Logger.LogType.Mouse, "MouseRightDown");
+                        Logger.AppendContextLog(Logger.ContextLogType.Mouse, "MouseRightDown");
                         break;
                     case MouseMessages.WM_MBUTTONDOWN:
-                        Logger.AppendContextLog(Logger.LogType.Mouse, "MouseMiddleDown");
+                        Logger.AppendContextLog(Logger.ContextLogType.Mouse, "MouseMiddleDown");
                         break;
                     case MouseMessages.WM_MOUSEWHEEL:
                         //Logger.AppendContextLog(Logger.LogType.Mouse, "MouseWheel");
@@ -631,14 +631,14 @@ namespace ChordingCoding.UI
         /// <param name="dwmsEventTime"></param>
         public static void WinEventProc(IntPtr hWinEventHook, uint eventType, IntPtr hwnd, int idObject, int idChild, uint dwEventThread, uint dwmsEventTime)
         {
-            Logger.AppendContextLog(Logger.LogType.Process, GetForegroundProcessName(), GetActiveWindowTitle());
+            Logger.AppendContextLog(Logger.ContextLogType.Process, GetForegroundProcessName(), GetActiveWindowTitle());
             if (IsIMESetToEnglish())
             {
-                Logger.AppendContextLog(Logger.LogType.IME, "English");
+                Logger.AppendContextLog(Logger.ContextLogType.IME, "English");
             }
             else
             {
-                Logger.AppendContextLog(Logger.LogType.IME, "Korean");
+                Logger.AppendContextLog(Logger.ContextLogType.IME, "Korean");
             }
         }
 

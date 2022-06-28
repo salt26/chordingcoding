@@ -1127,5 +1127,56 @@ namespace ChordingCoding.UI
 
             Close();
         }
+
+        private void resetToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            Logger.AppendContextLog(Logger.ContextLogType.UI, "Reset");
+
+            foreach (Theme theme in Theme.AvailableThemes)
+            {
+                _opacity[theme.Name] = 80;
+                Properties.Settings.Default["Opacity" + theme.Name] = _opacity[theme.Name];
+
+                theme.SFX.Volume = 80;
+                Properties.Settings.Default["Volume" + theme.Name] = theme.SFX.Volume;
+
+                theme.SFX.HasAccompanied = false;
+                Properties.Settings.Default["Accompaniment" + theme.Name] = theme.SFX.HasAccompanied;
+
+                theme.SFX.UseReverb = true;
+                Properties.Settings.Default["Reverb" + theme.Name] = theme.SFX.UseReverb;
+            }
+
+#pragma warning disable CS0162 // 접근할 수 없는 코드가 있습니다.
+            if (ENABLE_VFX)
+            {
+                Opacity = opacity / 100D;
+                opacityToolStripMenuItem.Text = "불투명도 (" + opacity + "%)";
+            }
+            volumeToolStripMenuItem.Text = "음량 (" + SFXTheme.CurrentSFXTheme.Volume + "%)";
+            autoAccompanimentToolStripMenuItem.CheckState = CheckState.Unchecked;
+            useReverbToolStripMenuItem.CheckState = CheckState.Checked;
+
+            SetTheme(Theme.AvailableThemes[0]);
+            Properties.Settings.Default["Theme"] = Theme.CurrentTheme.Name;
+
+            SetNoteResolution(4);
+            Properties.Settings.Default["NoteResolution"] = Music.NoteResolution;
+
+            if (ENABLE_SENTIMENT_ANALYZER)
+            {
+                SetSentimentAwareness(95);
+                Properties.Settings.Default["SentimentAwareness"] = Music.SentimentAwareness;
+            }
+            else
+            {
+                SetSentimentAwareness(0);
+                Properties.Settings.Default["SentimentAwareness"] = Music.SentimentAwareness;
+            }
+#pragma warning restore CS0162 // 접근할 수 없는 코드가 있습니다.
+
+            SetMusicalModePolicy(MusicalKey.ModePolicy.Auto);
+            Properties.Settings.Default["ModePolicy"] = (int)Music.Key.Policy;
+        }
     }
 }

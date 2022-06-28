@@ -67,17 +67,18 @@ namespace ChordingCoding.UI
             this.majorModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.minorModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sentimentAwarenessToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.trackBarMenuItem2 = new ChordingCoding.UI.TrackBarMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
             this.opacityToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.trackBarMenuItem1 = new ChordingCoding.UI.TrackBarMenuItem();
             this.volumeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.trackBarMenuItem3 = new ChordingCoding.UI.TrackBarMenuItem();
             this.autoAccompanimentToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.useReverbToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.recordToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.trackBarMenuItem2 = new ChordingCoding.UI.TrackBarMenuItem();
+            this.trackBarMenuItem1 = new ChordingCoding.UI.TrackBarMenuItem();
+            this.trackBarMenuItem3 = new ChordingCoding.UI.TrackBarMenuItem();
+            this.resetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -107,10 +108,11 @@ namespace ChordingCoding.UI
             this.useReverbToolStripMenuItem,
             this.toolStripSeparator1,
             this.recordToolStripMenuItem,
+            this.resetToolStripMenuItem,
             this.quitToolStripMenuItem});
             this.contextMenuStrip1.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.Table;
             this.contextMenuStrip1.Name = "contextMenuStrip1";
-            this.contextMenuStrip1.Size = new System.Drawing.Size(191, 258);
+            this.contextMenuStrip1.Size = new System.Drawing.Size(191, 280);
             // 
             // themeToolStripMenuItem
             // 
@@ -133,35 +135,35 @@ namespace ChordingCoding.UI
             // fourthNoteToolStripMenuItem
             // 
             this.fourthNoteToolStripMenuItem.Name = "fourthNoteToolStripMenuItem";
-            this.fourthNoteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.fourthNoteToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
             this.fourthNoteToolStripMenuItem.Text = "4분음표";
             this.fourthNoteToolStripMenuItem.Click += new System.EventHandler(this.fourthNoteToolStripMenuItem_Click);
             // 
             // eighthNoteToolStripMenuItem
             // 
             this.eighthNoteToolStripMenuItem.Name = "eighthNoteToolStripMenuItem";
-            this.eighthNoteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.eighthNoteToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
             this.eighthNoteToolStripMenuItem.Text = "8분음표";
             this.eighthNoteToolStripMenuItem.Click += new System.EventHandler(this.eighthNoteToolStripMenuItem_Click);
             // 
             // sixteenthNoteToolStripMenuItem
             // 
             this.sixteenthNoteToolStripMenuItem.Name = "sixteenthNoteToolStripMenuItem";
-            this.sixteenthNoteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.sixteenthNoteToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
             this.sixteenthNoteToolStripMenuItem.Text = "16분음표";
             this.sixteenthNoteToolStripMenuItem.Click += new System.EventHandler(this.sixteenthNoteToolStripMenuItem_Click);
             // 
             // thirtysecondNoteToolStripMenuItem
             // 
             this.thirtysecondNoteToolStripMenuItem.Name = "thirtysecondNoteToolStripMenuItem";
-            this.thirtysecondNoteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.thirtysecondNoteToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
             this.thirtysecondNoteToolStripMenuItem.Text = "32분음표";
             this.thirtysecondNoteToolStripMenuItem.Click += new System.EventHandler(this.thirtysecondNotetoolStripMenuItem_Click);
             // 
             // immediateNoteToolStripMenuItem
             // 
             this.immediateNoteToolStripMenuItem.Name = "immediateNoteToolStripMenuItem";
-            this.immediateNoteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.immediateNoteToolStripMenuItem.Size = new System.Drawing.Size(162, 22);
             this.immediateNoteToolStripMenuItem.Text = "없음 (즉시 반응)";
             this.immediateNoteToolStripMenuItem.Click += new System.EventHandler(this.immediateNoteToolStripMenuItem_Click);
             // 
@@ -205,15 +207,6 @@ namespace ChordingCoding.UI
             this.sentimentAwarenessToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
             this.sentimentAwarenessToolStripMenuItem.Text = "감성 인식 수준";
             // 
-            // trackBarMenuItem2
-            // 
-            this.trackBarMenuItem2.BackColor = System.Drawing.Color.White;
-            this.trackBarMenuItem2.Name = "trackBarMenuItem2";
-            this.trackBarMenuItem2.Size = new System.Drawing.Size(104, 24);
-            this.trackBarMenuItem2.Text = "trackBarMenuItem2";
-            this.trackBarMenuItem2.Value = 6;
-            this.trackBarMenuItem2.ValueChanged += new System.EventHandler(this.trackBarMenuItem2_ValueChanged);
-            // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
@@ -228,15 +221,6 @@ namespace ChordingCoding.UI
             this.opacityToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
             this.opacityToolStripMenuItem.Text = "불투명도";
             // 
-            // trackBarMenuItem1
-            // 
-            this.trackBarMenuItem1.BackColor = System.Drawing.Color.White;
-            this.trackBarMenuItem1.Name = "trackBarMenuItem1";
-            this.trackBarMenuItem1.Size = new System.Drawing.Size(104, 24);
-            this.trackBarMenuItem1.Text = "trackBarMenuItem1";
-            this.trackBarMenuItem1.Value = 0;
-            this.trackBarMenuItem1.ValueChanged += new System.EventHandler(this.trackBarMenuItem1_ValueChanged);
-            // 
             // volumeToolStripMenuItem
             // 
             this.volumeToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
@@ -245,15 +229,6 @@ namespace ChordingCoding.UI
             this.volumeToolStripMenuItem.Name = "volumeToolStripMenuItem";
             this.volumeToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
             this.volumeToolStripMenuItem.Text = "음량";
-            // 
-            // trackBarMenuItem3
-            // 
-            this.trackBarMenuItem3.BackColor = System.Drawing.Color.White;
-            this.trackBarMenuItem3.Name = "trackBarMenuItem3";
-            this.trackBarMenuItem3.Size = new System.Drawing.Size(104, 24);
-            this.trackBarMenuItem3.Text = "trackBarMenuItem3";
-            this.trackBarMenuItem3.Value = 10;
-            this.trackBarMenuItem3.ValueChanged += new System.EventHandler(this.trackBarMenuItem3_ValueChanged);
             // 
             // autoAccompanimentToolStripMenuItem
             // 
@@ -289,6 +264,41 @@ namespace ChordingCoding.UI
             this.quitToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
             this.quitToolStripMenuItem.Text = "종료                       ";
             this.quitToolStripMenuItem.Click += new System.EventHandler(this.quitToolStripMenuItem_Click);
+            // 
+            // trackBarMenuItem2
+            // 
+            this.trackBarMenuItem2.BackColor = System.Drawing.Color.White;
+            this.trackBarMenuItem2.Name = "trackBarMenuItem2";
+            this.trackBarMenuItem2.Size = new System.Drawing.Size(104, 24);
+            this.trackBarMenuItem2.Text = "trackBarMenuItem2";
+            this.trackBarMenuItem2.Value = 6;
+            this.trackBarMenuItem2.ValueChanged += new System.EventHandler(this.trackBarMenuItem2_ValueChanged);
+            // 
+            // trackBarMenuItem1
+            // 
+            this.trackBarMenuItem1.BackColor = System.Drawing.Color.White;
+            this.trackBarMenuItem1.Name = "trackBarMenuItem1";
+            this.trackBarMenuItem1.Size = new System.Drawing.Size(104, 24);
+            this.trackBarMenuItem1.Text = "trackBarMenuItem1";
+            this.trackBarMenuItem1.Value = 0;
+            this.trackBarMenuItem1.ValueChanged += new System.EventHandler(this.trackBarMenuItem1_ValueChanged);
+            // 
+            // trackBarMenuItem3
+            // 
+            this.trackBarMenuItem3.BackColor = System.Drawing.Color.White;
+            this.trackBarMenuItem3.Name = "trackBarMenuItem3";
+            this.trackBarMenuItem3.Size = new System.Drawing.Size(104, 24);
+            this.trackBarMenuItem3.Text = "trackBarMenuItem3";
+            this.trackBarMenuItem3.Value = 10;
+            this.trackBarMenuItem3.ValueChanged += new System.EventHandler(this.trackBarMenuItem3_ValueChanged);
+            // 
+            // resetToolStripMenuItem
+            // 
+            this.resetToolStripMenuItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
+            this.resetToolStripMenuItem.Name = "resetToolStripMenuItem";
+            this.resetToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.resetToolStripMenuItem.Text = "모든 설정 초기화";
+            this.resetToolStripMenuItem.Click += new System.EventHandler(this.resetToolStripMenuItem_Click);
             // 
             // MainForm
             // 
@@ -349,6 +359,7 @@ namespace ChordingCoding.UI
         private System.Windows.Forms.ToolStripMenuItem autoModeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem majorModeToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem minorModeToolStripMenuItem;
+        private System.Windows.Forms.ToolStripMenuItem resetToolStripMenuItem;
     }
 }
 

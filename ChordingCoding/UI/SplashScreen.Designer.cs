@@ -41,7 +41,7 @@
             this.versionLabel.Name = "versionLabel";
             this.versionLabel.Size = new System.Drawing.Size(118, 47);
             this.versionLabel.TabIndex = 0;
-            this.versionLabel.Text = "v.1.8.2";
+            this.versionLabel.Text = "v.1.8.3";
             this.versionLabel.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
             this.versionLabel.UseCompatibleTextRendering = true;
             // 

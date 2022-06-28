@@ -16,6 +16,7 @@ Windows Forms로 개발된 응용 프로그램으로, 64-bit Windows에서 사�
 
 ## The Latest Version
 * [v.1.8.3](https://github.com/salt26/chordingcoding/tree/v.1.8.3)
+  * [Click here to download!](https://github.com/salt26/chordingcoding/releases/tag/v.1.8.3)
 
 ## How To Use
 1. [여기](https://github.com/salt26/chordingcoding/releases/tag/v.1.8.3)를 클릭하여 파일 `ChordingCoding.v.1.8.3.zip`을 다운로드 받으세요.

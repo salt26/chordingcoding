@@ -15,7 +15,7 @@ ChordingCoding은 코딩과 문서 작업에 지친 사람들의 감성을 채�
 Windows Forms로 개발된 응용 프로그램으로, 64-bit Windows에서 사용 가능합니다.
 
 ## How To Use
-1. [여기](https://github.com/salt26/chordingcoding/releases/tag/v.1.8.2)를 클릭하여 파일 `ChordingCoding.v.1.8.2.zip`을 다운로드 받으세요.
+1. [여기](https://github.com/salt26/chordingcoding/releases/tag/v.1.8.3)를 클릭하여 파일 `ChordingCoding.v.1.8.3.zip`을 다운로드 받으세요.
  
 2. 압축을 풀고 `ChordingCoding.exe`를 실행합니다.
    * `ChordingCoding.exe`의 바로 가기(.lnk)를 만들면 실행하기 편리합니다.
@@ -31,6 +31,7 @@ Windows Forms로 개발된 응용 프로그램으로, 64-bit Windows에서 사�
      * 집중할 때는 자동 반주를 끄셔도 좋습니다.
    * **반향**을 켜면 울림이 더해져 소리가 더 자연스럽게 들립니다.
      * 성능 문제가 생긴다면 반향을 끄셔도 좋습니다.
+   * 언제든지 모든 설정을 ChordingCoding 설치 직후의 상태로 초기화할 수 있습니다.
 
 6. 설정이 완료되면 소리를 켜고 키보드로 타이핑을 하면 됩니다.
    * 스페이스 등의 공백 문자를 입력할 때마다 화음이 달라집니다.
@@ -40,7 +41,7 @@ Windows Forms로 개발된 응용 프로그램으로, 64-bit Windows에서 사�
    * 최근에 생성된 음악을 즉시 파일로 저장할 수 있습니다.
    * 1분 이상 사용하지 않아 침묵이 유지되면 그 이전의 음악은 저장되지 않으니 주의 바랍니다.
 
-8. ChordingCoding을 사용하는 동안 사용자의 작업 맥락을 추적하여 기록합니다.
+8.  ChordingCoding을 사용하는 동안 사용자의 작업 맥락을 추적하여 기록합니다.
    * 사용했던 프로그램 이름, 키보드 입력, 마우스 클릭, ChordingCoding 설정 상태, 생성된 음악 등이 기록됩니다.
      * 키보드 입력 중 글자는 "Alphabet"으로, 숫자는 "Number"로, 특수문자는 "Symbol" 또는 "SymbolInWord"로 비식별화되어 기록됩니다. **즉, 비밀번호 유출은 걱정하지 않아도 됩니다.**
    * 종료 후 `ChordingCoding.exe`가 있는 폴더 안에 `Logs` 폴더가 생기고, 그 안에 `ChordingCoding_context_log_yyMMdd.csv` 파일들이 생성됩니다. (`yyMMdd`는 오늘 날짜입니다.)
@@ -48,6 +49,19 @@ Windows Forms로 개발된 응용 프로그램으로, 64-bit Windows에서 사�
    * **기록한 데이터는 사용자의 컴퓨터에만 남으며, 외부로는 전송되지 않습니다.**
 
 ## Update Log
+### [v.1.8.3](https://github.com/salt26/chordingcoding/tree/v.1.8.3) - 22/06/28
+* 모든 테마 이름을 사용되는 악기 종류와 일치하도록 직관적으로 변경
+  * 골동품 -> 현악 3중주
+  * 구름 너머 -> 하프
+  * 별 헤는 밤 -> 마림바
+  * 피아노포르테 -> 피아노
+  * 가을 산책 -> 어쿠스틱 기타
+  * 바람의 속삭임 -> 관악 2중주
+  * 중세 유적지 -> 합창
+  * 파티 타임 -> 전자음
+* 선법 선택 기능에서 표시되는 이름 변경
+* 모든 설정 초기화 기능 추가
+
 ### [v.1.8.2](https://github.com/salt26/chordingcoding/tree/v.1.8.2) - 22/06/27
 * 사용 도중 음악이 재생되지 않는 버그 수정
 * 오래 사용 시 키 입력과 음 생성 사이에 지연이 발생하는 버그 수정

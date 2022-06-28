@@ -150,7 +150,7 @@ namespace ChordingCoding.UI
             _availableThemes = new List<Theme>();
 
             _availableThemes.Add(new Theme(
-                "Antique", "골동품",
+                "Antique", /*"골동품"*/"현악 3중주",
                 new ParticleSystem(/*cNum*/ 1, /*cRange*/ 0,
                                    ParticleSystem.CreateFunction.Random,
                                    Particle.Type.star, () => Color.Black,
@@ -166,7 +166,7 @@ namespace ChordingCoding.UI
                 "Antique"));
 
             _availableThemes.Add(new Theme(
-                "Sky", "구름 너머",
+                "Sky", /*"구름 너머"*/"하프",
                 new ParticleSystem(/*cNum*/ 1, /*cRange*/ 0,
                                    ParticleSystem.CreateFunction.Random,
                                    Particle.Type.star, () => Color.Black,
@@ -182,7 +182,7 @@ namespace ChordingCoding.UI
                 "Sky"));
 
             _availableThemes.Add(new Theme(
-                "Star", "별 헤는 밤",
+                "Star", /*"별 헤는 밤"*/"마림바",
                 new ParticleSystem(/*cNum*/ 1, /*cRange*/ 0,
                                    ParticleSystem.CreateFunction.Random,
                                    Particle.Type.star, () => Color.Black,
@@ -198,7 +198,7 @@ namespace ChordingCoding.UI
                 "Star"));
 
             _availableThemes.Add(new Theme(
-                "Pianoforte", "피아노포르테",
+                "Pianoforte", /*"피아노포르테"*/"피아노",
                 new ParticleSystem(/*cNum*/ 4, /*cRange*/ 0,
                                    ParticleSystem.CreateFunction.TopRandom,
                                    Particle.Type.leaf, () => Color.White,
@@ -214,7 +214,7 @@ namespace ChordingCoding.UI
                 "Pianoforte"));
 
             _availableThemes.Add(new Theme(
-                "Autumn", "가을 산책",
+                "Autumn", /*"가을 산책"*/"어쿠스틱 기타",
                 new ParticleSystem(/*cNum*/ 1, /*cRange*/ 0,
                                    ParticleSystem.CreateFunction.TopRandom,
                                    Particle.Type.leaf, () => Color.White,
@@ -276,7 +276,7 @@ namespace ChordingCoding.UI
             */
 
             _availableThemes.Add(new Theme(
-                "Breeze", "바람의 속삭임",
+                "Breeze", /*"바람의 속삭임"*/"관악 2중주",
                 new ParticleSystem(/*cNum*/ 1, /*cRange*/ 0,
                                    ParticleSystem.CreateFunction.TopRandom,
                                    Particle.Type.leaf, () => Color.White,
@@ -285,7 +285,7 @@ namespace ChordingCoding.UI
                 "Breeze"));
 
             _availableThemes.Add(new Theme(
-                "Medieval_ruins", "중세 유적지",
+                "Medieval_ruins", /*"중세 유적지"*/"합창",
                 new ParticleSystem(1, 0,
                                    ParticleSystem.CreateFunction.TopRandom,
                                    Particle.Type.rain, () => Color.White,
@@ -301,7 +301,7 @@ namespace ChordingCoding.UI
                 "Medieval_ruins"));
 
             _availableThemes.Add(new Theme(
-                "Party", "파티 타임",
+                "Party", /*"파티 타임"*/"전자음",
                 new ParticleSystem(/*cNum*/ 1, /*cRange*/ 0,
                                    ParticleSystem.CreateFunction.TopRandom,
                                    Particle.Type.note, () => Color.White,

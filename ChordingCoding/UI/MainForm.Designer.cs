@@ -62,6 +62,10 @@ namespace ChordingCoding.UI
             this.sixteenthNoteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.thirtysecondNoteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.immediateNoteToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.musicalModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.autoModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.majorModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.minorModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.sentimentAwarenessToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.trackBarMenuItem2 = new ChordingCoding.UI.TrackBarMenuItem();
             this.toolStripSeparator2 = new System.Windows.Forms.ToolStripSeparator();
@@ -74,10 +78,6 @@ namespace ChordingCoding.UI
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.recordToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.quitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.musicalModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.autoModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.majorModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.minorModeToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.contextMenuStrip1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -164,6 +164,37 @@ namespace ChordingCoding.UI
             this.immediateNoteToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.immediateNoteToolStripMenuItem.Text = "없음 (즉시 반응)";
             this.immediateNoteToolStripMenuItem.Click += new System.EventHandler(this.immediateNoteToolStripMenuItem_Click);
+            // 
+            // musicalModeToolStripMenuItem
+            // 
+            this.musicalModeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.autoModeToolStripMenuItem,
+            this.majorModeToolStripMenuItem,
+            this.minorModeToolStripMenuItem});
+            this.musicalModeToolStripMenuItem.Name = "musicalModeToolStripMenuItem";
+            this.musicalModeToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
+            this.musicalModeToolStripMenuItem.Text = "선법";
+            // 
+            // autoModeToolStripMenuItem
+            // 
+            this.autoModeToolStripMenuItem.Name = "autoModeToolStripMenuItem";
+            this.autoModeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.autoModeToolStripMenuItem.Text = "자동";
+            this.autoModeToolStripMenuItem.Click += new System.EventHandler(this.autoModeToolStripMenuItem_Click);
+            // 
+            // majorModeToolStripMenuItem
+            // 
+            this.majorModeToolStripMenuItem.Name = "majorModeToolStripMenuItem";
+            this.majorModeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.majorModeToolStripMenuItem.Text = "밝은 음악 선호";
+            this.majorModeToolStripMenuItem.Click += new System.EventHandler(this.majorModeToolStripMenuItem_Click);
+            // 
+            // minorModeToolStripMenuItem
+            // 
+            this.minorModeToolStripMenuItem.Name = "minorModeToolStripMenuItem";
+            this.minorModeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.minorModeToolStripMenuItem.Text = "어두운 음악 선호";
+            this.minorModeToolStripMenuItem.Click += new System.EventHandler(this.minorModeToolStripMenuItem_Click);
             // 
             // sentimentAwarenessToolStripMenuItem
             // 
@@ -258,37 +289,6 @@ namespace ChordingCoding.UI
             this.quitToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
             this.quitToolStripMenuItem.Text = "종료                       ";
             this.quitToolStripMenuItem.Click += new System.EventHandler(this.quitToolStripMenuItem_Click);
-            // 
-            // musicalModeToolStripMenuItem
-            // 
-            this.musicalModeToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.autoModeToolStripMenuItem,
-            this.majorModeToolStripMenuItem,
-            this.minorModeToolStripMenuItem});
-            this.musicalModeToolStripMenuItem.Name = "musicalModeToolStripMenuItem";
-            this.musicalModeToolStripMenuItem.Size = new System.Drawing.Size(190, 22);
-            this.musicalModeToolStripMenuItem.Text = "선법";
-            // 
-            // autoModeToolStripMenuItem
-            // 
-            this.autoModeToolStripMenuItem.Name = "autoModeToolStripMenuItem";
-            this.autoModeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.autoModeToolStripMenuItem.Text = "자동";
-            this.autoModeToolStripMenuItem.Click += new System.EventHandler(this.autoModeToolStripMenuItem_Click);
-            // 
-            // majorModeToolStripMenuItem
-            // 
-            this.majorModeToolStripMenuItem.Name = "majorModeToolStripMenuItem";
-            this.majorModeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.majorModeToolStripMenuItem.Text = "장조 선호";
-            this.majorModeToolStripMenuItem.Click += new System.EventHandler(this.majorModeToolStripMenuItem_Click);
-            // 
-            // minorModeToolStripMenuItem
-            // 
-            this.minorModeToolStripMenuItem.Name = "minorModeToolStripMenuItem";
-            this.minorModeToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
-            this.minorModeToolStripMenuItem.Text = "단조 선호";
-            this.minorModeToolStripMenuItem.Click += new System.EventHandler(this.minorModeToolStripMenuItem_Click);
             // 
             // MainForm
             // 

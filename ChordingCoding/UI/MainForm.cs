@@ -962,12 +962,12 @@ namespace ChordingCoding.UI
                     break;
                 case MusicalKey.ModePolicy.FavorMajor:
                     majorModeToolStripMenuItem.CheckState = CheckState.Checked;
-                    musicalModeToolStripMenuItem.Text = "선법 (밝은 음악)";
+                    musicalModeToolStripMenuItem.Text = "선법 (장조 선호)";
                     Logger.AppendContextLog(Logger.ContextLogType.UI, "ModePolicy", "Major");
                     break;
                 case MusicalKey.ModePolicy.FavorMinor:
                     minorModeToolStripMenuItem.CheckState = CheckState.Checked;
-                    musicalModeToolStripMenuItem.Text = "선법 (어두운 음악)";
+                    musicalModeToolStripMenuItem.Text = "선법 (단조 선호)";
                     Logger.AppendContextLog(Logger.ContextLogType.UI, "ModePolicy", "Minor");
                     break;
             }
